@@ -29,10 +29,10 @@ In particular, the following modifications have been made to the `py_trees` sour
   'Sequence*').
 
 ## Content
-* `behavior_tree.py` is a class for handling string representations of behavior trees.
+* `behavior_tree.py` is a class for handling string representations of behavior trees (STB).
 * `behaviors.py` contains the implementation of all behaviors used in the simulations.
 * `cost_function.py` is used to compute the cost function, the costs are defined here.
-* `environment.py` handles the scenarios configurations and executes the BT, returning the fitness score.
+* `environment.py` handles the scenarios configurations and executes the SBT, returning the fitness score.
 * `genetic_programming.py` implements the GP algorithm, with many possible settings.
 * `gp_bt_interface.py` provides an interface between a GP algorithm and behavior tree functions.
 * `hash_table.py` and `logplot.py` are utilities for data storage and visualization.
