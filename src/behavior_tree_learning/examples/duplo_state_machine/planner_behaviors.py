@@ -27,11 +27,12 @@ def get_node_from_string(string, world_interface, condition_parameters):
         node = PutOn(string, world_interface, re.findall(r'\d+', string), condition_parameters)
     elif 'apply force' in string:
         node = ApplyForce(string, world_interface, re.findall(r'\d+', string), condition_parameters)
-examples
+    elif 'picked ' in string:
+        node = Picked(string, world_interface, re.findall(r'\d+', string), condition_parameters)
+    elif 'hand empty' in string:
+        node = HandEmpty(string, world_interface, condition_parameters)
+    elif 'at pos ' in string:
         node = AtPos(string, world_interface, re.findall(r'-?\d+\.\d+|-?\d+', string), condition_parameters)
-    elif ' on ' in string:
-        node = On(string, world_interface, re.findall(r'\d+', string), condition_parameters)
-
     elif string == 'f(':
         node = pt.composites.Selector('Fallback')
         has_children = True
