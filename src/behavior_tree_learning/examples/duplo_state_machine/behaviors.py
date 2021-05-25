@@ -9,6 +9,7 @@ import py_trees as pt
 from behavior_tree_learning.core.str_bt.behaviors import RSequence
 import behavior_tree_learning.examples.duplo_state_machine.state_machine as sm
 
+
 def get_node_from_string(string, world_interface, verbose=False):
     # pylint: disable=too-many-branches
     """
@@ -56,6 +57,7 @@ def get_node_from_string(string, world_interface, verbose=False):
         raise Exception("Unexpected character", string)
     return node, has_children
 
+
 class HandEmpty(pt.behaviour.Behaviour):
     """
     Check if hand is empty
@@ -68,6 +70,7 @@ class HandEmpty(pt.behaviour.Behaviour):
         if self.world_interface.hand_empty():
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class Picked(pt.behaviour.Behaviour):
     """
@@ -82,6 +85,7 @@ class Picked(pt.behaviour.Behaviour):
         if self.world_interface.get_picked() == self.brick:
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class AtPos(pt.behaviour.Behaviour):
     """
@@ -103,6 +107,7 @@ class AtPos(pt.behaviour.Behaviour):
             print(self.name, ": FAILURE")
         return pt.common.Status.FAILURE
 
+
 class On(pt.behaviour.Behaviour):
     """
     Check if one brick is on other brick
@@ -123,6 +128,7 @@ class On(pt.behaviour.Behaviour):
         if self.verbose:
             print(self.name, ": FAILURE")
         return pt.common.Status.FAILURE
+
 
 class SmBehavior(pt.behaviour.Behaviour):
     """
@@ -149,6 +155,7 @@ class SmBehavior(pt.behaviour.Behaviour):
         self.state = pt.common.Status.FAILURE
         if self.verbose:
             print(self.name, ": FAILURE")
+
 
 class Pick(SmBehavior):
     """
@@ -177,6 +184,7 @@ class Pick(SmBehavior):
                 self.failure()
             self.world_interface.random_event()
         return self.state
+
 
 class Place(SmBehavior):
     """
@@ -214,6 +222,7 @@ class Place(SmBehavior):
                 self.failure()
             self.world_interface.random_event()
         return self.state
+
 
 class Put(SmBehavior):
     """
@@ -262,6 +271,7 @@ class Put(SmBehavior):
                 self.failure()
             self.world_interface.random_event()
         return self.state
+
 
 class ApplyForce(SmBehavior):
     """

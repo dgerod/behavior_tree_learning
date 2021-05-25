@@ -6,14 +6,16 @@ import re
 import py_trees as pt
 
 from behavior_tree_learning.core.str_bt.behaviors import RSequence
-import behavior_tree_learning.examples.duplo_state_machine.behaviors as behaviors
-import behavior_tree_learning.examples.duplo_state_machine.state_machine as sm
+from behavior_tree_learning.examples.duplo_state_machine import behaviors
+from behavior_tree_learning.examples.duplo_state_machine import state_machine as sm
+
 
 def get_node_from_string(string, world_interface, condition_parameters):
     # pylint: disable=too-many-branches
     """
     Returns a py trees behavior or composite given the string
     """
+
     has_children = False
     if 'pick ' in string:
         node = Pick(string, world_interface, re.findall(r'\d+', string), condition_parameters)
@@ -46,7 +48,9 @@ def get_node_from_string(string, world_interface, condition_parameters):
         has_children = True
     else:
         raise Exception("Unexpected character", string)
+
     return node, has_children
+
 
 def get_condition_parameters(condition):
     """
@@ -61,9 +65,11 @@ def get_condition_parameters(condition):
 
     return []
 
+
 def get_position_string(position):
     """ Returns a string of the position for creating behavior names """
     return '(' + str(position[0]) + ', ' + str(position[1]) + ', ' + str(position[2]) + ')'
+
 
 class PlannedBehavior():
     """
@@ -81,6 +87,7 @@ class PlannedBehavior():
         """ Returns list of postconditions """
         return self.postconditions
 
+
 class HandEmpty(behaviors.HandEmpty, PlannedBehavior):
     """
     Check if hand is empty
@@ -88,6 +95,7 @@ class HandEmpty(behaviors.HandEmpty, PlannedBehavior):
     def __init__(self, name, world_interface, _condition_parameters):
         behaviors.HandEmpty.__init__(self, name, world_interface)
         PlannedBehavior.__init__(self, [], [])
+
 
 class Picked(behaviors.Picked, PlannedBehavior):
     """
@@ -106,6 +114,7 @@ class AtPos(behaviors.AtPos, PlannedBehavior):
         behaviors.AtPos.__init__(self, name, world_interface, brick_and_pos)
         PlannedBehavior.__init__(self, [], [])
 
+
 class On(behaviors.On, PlannedBehavior):
     """
     Check if brick is at goal
@@ -113,6 +122,7 @@ class On(behaviors.On, PlannedBehavior):
     def __init__(self, name, world_interface, bricks, _condition_parameters):
         behaviors.On.__init__(self, name, world_interface, bricks)
         PlannedBehavior.__init__(self, [], [])
+
 
 class Pick(behaviors.Pick, PlannedBehavior):
     """
@@ -122,6 +132,7 @@ class Pick(behaviors.Pick, PlannedBehavior):
         behaviors.Pick.__init__(self, name, world_interface, brick)
         PlannedBehavior.__init__(self, [], ['picked ' + str(brick[0]) + '?'])
 
+
 class PlaceAt(behaviors.Place, PlannedBehavior):
     """
     Place given brick at given position
@@ -130,6 +141,7 @@ class PlaceAt(behaviors.Place, PlannedBehavior):
         behaviors.Place.__init__(self, name, world_interface, position=position)
         PlannedBehavior.__init__(self, ['picked ' + str(condition_parameters[0]) +  '?'], \
             ['hand empty?', str(condition_parameters[0]) + ' at pos ' + get_position_string(position) + '?'])
+
 
 class PlaceOn(behaviors.Place, PlannedBehavior):
     """
@@ -148,6 +160,7 @@ class PlaceOn(behaviors.Place, PlannedBehavior):
         brickpos = [str(self.condition_parameters[0]) + ' on ' + str(self.brick) + '?']
         return self.postconditions + brickpos
 
+
 class PutAt(behaviors.Put, PlannedBehavior):
     """
     Picks brick and places it at position
@@ -157,6 +170,7 @@ class PutAt(behaviors.Put, PlannedBehavior):
         PlannedBehavior.__init__(self, [], \
                                  [str(brick_and_pos[0]) + ' at pos ' + get_position_string(brick_and_pos[1:]) + '?'])
 
+
 class PutOn(behaviors.Put, PlannedBehavior):
     """
     Picks brick and places it on other brick
@@ -165,6 +179,7 @@ class PutOn(behaviors.Put, PlannedBehavior):
         behaviors.Put.__init__(self, name, world_interface, brick_and_pos)
         PlannedBehavior.__init__(self, [], [str(self.brick) + ' on ' + str(self.lower) + '?'])
         self.condition_parameters = condition_parameters
+
 
 class ApplyForce(behaviors.ApplyForce, PlannedBehavior):
     """

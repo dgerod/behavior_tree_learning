@@ -7,6 +7,7 @@ from enum import IntEnum
 from dataclasses import dataclass
 from copy import copy
 
+
 @dataclass
 class Pos:
     """
@@ -21,6 +22,7 @@ class Pos:
     def __str__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
 
+
 @dataclass
 class State():
     """
@@ -28,6 +30,7 @@ class State():
     """
     bricks = None
     picked = None
+
 
 @dataclass
 class SMParameters:
@@ -40,12 +43,14 @@ class SMParameters:
     random_events: bool = False         #Random events
     verbose: bool = False               #Extra prints
 
+
 class SMMode(IntEnum):
     """Special state machine modes for testing different situations """
     DEFAULT = 0
     CROISSANT = 1
     BALANCE = 2
     BLOCKING = 3
+
 
 class StateMachine:
     """
@@ -175,6 +180,7 @@ class StateMachine:
             0 < upper_brick.z - lower_brick.z <= self.sm_par.brick_height + self.sm_par.ontop_margin:
             return True
         return False
+
 
 def move_brick_to(brick, position):
     """ Move brick to given position """
