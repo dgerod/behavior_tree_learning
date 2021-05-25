@@ -4,6 +4,7 @@ Behaviors for creating figures
 import py_trees as pt
 from behavior_tree_learning.core.str_bt.behaviors import RSequence
 
+
 def get_node_from_string(string, _world_interface, _verbose=False):
     """
     Returns a py trees behavior or composite given the string
@@ -19,12 +20,13 @@ def get_node_from_string(string, _world_interface, _verbose=False):
     elif string == 'p(':
         node = pt.composites.Parallel(
             name="Parallel",
-            policy=pt.common.ParallelPolicy.SuccessOnAll(synchronise=False))
+            policy= pt.common.ParallelPolicy.SuccessOnAll(synchronise=False))
         has_children = True
     else:
         node = Leaf(string)
 
     return node, has_children
+
 
 class Leaf(pt.behaviour.Behaviour):
     """

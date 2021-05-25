@@ -71,8 +71,10 @@ global ALL_NODES
 All list of all the nodes
 """
 
+
 def load_settings_from_file(file):
     # pylint: disable=too-many-statements
+
     """
     Sets the lists of allowed nodes module wide.
     """
@@ -155,12 +157,14 @@ def load_settings_from_file(file):
     ALL_NODES += UP_NODE
     LEAF_NODES += BEHAVIOR_NODES
 
+
 def get_action_list():
     """
     Returns list of actions
     """
     global ACTION_NODES
     return ACTION_NODES
+
 
 class StringBehaviorTree:
     """
