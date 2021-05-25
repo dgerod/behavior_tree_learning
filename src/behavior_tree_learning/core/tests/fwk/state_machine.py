@@ -14,10 +14,12 @@ class State(IntEnum):
     Boolstate3 = 2
     Boolstate4 = 3
 
+
 @dataclass
 class SMParameters:
     """Data class for parameters for the state machine simulator """
     verbose: bool = False                                  #Extra prints
+
 
 class StateMachine:
     """

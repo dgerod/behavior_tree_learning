@@ -20,8 +20,11 @@ class TestGpOperations(unittest.TestCase):
         
         genome = ['s(', 'a0', ')']
 
-        self.assertRaises(Exception, gp.mutate_gene(genome, p_add=-1, p_delete=1))
-        self.assertRaises(Exception, gp.mutate_gene(genome, p_add=1, p_delete=1))
+        with self.assertRaises(Exception):
+            gp.mutate_gene(genome, p_add=-1, p_delete=1)
+        
+        with self.assertRaises(Exception):
+            gp.mutate_gene(genome, p_add=1, p_delete=1)
 
         for _ in range(10):
             #Loop many times to catch random errors

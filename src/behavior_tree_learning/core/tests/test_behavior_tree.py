@@ -346,18 +346,15 @@ class TestBehaviorTree(unittest.TestCase):
         assert bt.find_up_node(2) == 7
 
         bt.set(['s(', 'a0', 'f(', 'a0', ')', 'a0', ')'])
-        
-
-        bt.set(['s(', 'a0', 'f(', 'a0', ')', 'a0', ')'])
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             _ = bt.find_up_node(1)
 
         bt.set(['s(', 'a0', 'f(', 'a0', ')', 'a0'])
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             _ = bt.find_up_node(0)
 
         bt.set(['s(', 's(', 'a0', 'f(', 'a0', ')', 'a0'])
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             _ = bt.find_up_node(1)
 
     def test_get_subtree(self):

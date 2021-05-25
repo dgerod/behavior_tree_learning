@@ -33,12 +33,16 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
 
         bt = ['f(', 'f(', 'a', 'a', ')', 's(', 'a', 'a', ')', ')']
         py_tree = StringBehaviorTreeForPyTree(bt, behaviors=behaviors)
-        assert bt == 
+        assert bt == []
+        assert len(py_tree.root.children) == 2
+        print_ascii_tree(py_tree)
 
-if __name__ == '__main__':
-    unittest.main()
-ree(py_tree)
-
+        bt = ['f(', 'f(', 'a', 'a', ')', 'f(', 's(', 'a', ')', ')', ')']
+        py_tree = StringBehaviorTreeForPyTree(bt, behaviors=behaviors)
+        assert bt == []
+        assert len(py_tree.root.children) == 2
+        print_ascii_tree(py_tree)
+        
         bt = ['f(', 'f(', 'a', 'a', ')']
         py_tree = StringBehaviorTreeForPyTree(bt, behaviors=behaviors)
         assert bt == []
@@ -50,10 +54,12 @@ ree(py_tree)
         assert bt != []
         print_ascii_tree(py_tree)
        
-        self.assertRaises(Exception, StringBehaviorTreeForPyTree(['nonbehavior'], behaviors=behaviors))
-        self.assertRaises(Exception, StringBehaviorTreeForPyTree(['f(', 'nonpytreesbehavior', ')'], behaviors=behaviors))
+        with self.assertRaises(Exception):
+            StringBehaviorTreeForPyTree(['nonbehavior'], behaviors=behaviors)
         
-
+        with self.assertRaises(Exception):
+            StringBehaviorTreeForPyTree(['f(', 'nonpytreesbehavior', ')'], behaviors=behaviors)
+        
     def test_get_bt_from_root(self):
         """ Specific test for get_string_from_root function """
 
