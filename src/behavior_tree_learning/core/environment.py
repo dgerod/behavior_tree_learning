@@ -1,14 +1,16 @@
+from interface import Interface
 
-class Environment():
+
+class Environment(Interface):
     
     def set_random_events(self, random_events):
-        return NotImplementedError
+        pass
 
     def get_fitness(self, individual):
-        return NotImplementedError
+        pass
 
     def plot_individual(self, path, plot_name, individual):
-        return NotImplementedError
+        pass
 
     def add_to_static_tree(self, individual):
-        return NotImplementedError
+        pass
