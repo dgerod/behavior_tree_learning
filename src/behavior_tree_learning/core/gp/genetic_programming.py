@@ -13,7 +13,20 @@ from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 
 #Below are imports that can be changed to run against different environments etc.
 from behavior_tree_learning.core.environment import Environment
-from behavior_tree_learning.core.str_bt import gp_operations as gp_operations
+from behavior_tree_learning.core.str_bt import gp_operators
+
+
+_operators = {'random_genome' : gp_operators.random_genome,
+              'crossover_genome' : gp_operators.crossover_genome,
+              'mutate_gene' : gp_operators.mutate_gene }
+
+
+def set_operators(random_genome, crossover_genome, mutate_gene):
+    
+    global _operators
+    _operators['random_genome'] = random_genome
+    _operators['crossover_genome'] = crossover_genome
+    _operators['mutate_gene'] = mutate_gene
 
 
 def set_seeds(seed):
@@ -36,7 +49,8 @@ def create_population(population_size, genome_length):
         attempts = 0
 
         while attempts < max_attempts:
-            individual = gp_operations.random_genome(genome_length)
+
+            individual = _operators['random_genome'](genome_length)
             if individual != [] and individual not in new_population:
                 new_population.append(individual)
                 break
@@ -54,12 +68,14 @@ def mutation(population, parents, gp_par):
 
     for parent in parents:
         for _ in range(gp_par.n_offspring_mutation):
+
             mutated_individual = []
             attempts = 0
+
             while attempts < max_attempts:
-                mutated_individual = gp_operations.mutate_gene(population[parent], \
-                                                              gp_par.mutation_p_add, \
-                                                              gp_par.mutation_p_delete)
+
+                mutated_individual = \
+                    _operators['mutate_gene'](population[parent], gp_par.mutation_p_add, gp_par.mutation_p_delete)
                 if len(mutated_individual) >= gp_par.min_length and \
                     (gp_par.allow_identical or (mutated_individual not in population + mutated_population)):
                     mutated_population.append(mutated_individual)
@@ -85,13 +101,13 @@ def crossover(population, parents, gp_par):
         attempts = 0
 
         while len(unused_parents) >= 2 and attempts < max_attempts:
-            crossover_parents = random.sample(range(len(unused_parents)), 2)
-            parent1 = unused_parents[int(crossover_parents[0])]
-            parent2 = unused_parents[int(crossover_parents[1])]
-            offspring1, offspring2 = gp_operations.crossover_genome(population[parent1], \
-                                                                   population[parent2], \
-                                                                   gp_par.replace_crossover)
 
+            crossover_parents = random.sample(range(len(unused_parents)), 2)
+            parent1 = unused_parents[int(crossover_parents[0])] 
+            parent2 = unused_parents[int(crossover_parents[1])]
+
+            offspring1, offspring2 = \
+                _operators['crossover_genome'](population[parent1], population[parent2], gp_par.replace_crossover)
             if len(offspring1) >= gp_par.min_length and len(offspring2) >= gp_par.min_length and \
                 (gp_par.allow_identical or \
                  (offspring1 not in population + crossover_offspring and \
