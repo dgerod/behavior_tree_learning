@@ -74,12 +74,12 @@ class Environment():
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
         if self.static_tree is not None:
-            pytree = StringBehaviorTreeForPyTree(self.add_to_static_tree(individual), behaviors=behaviors)
+            pytree = StringBehaviorTreeForPyTree(self._add_to_static_tree(individual), behaviors=behaviors)
         else:
             pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors)
         pytree.save_fig(path, name=plot_name)
 
-    def add_to_static_tree(self, individual):
+    def _add_to_static_tree(self, individual):
         """ Add invididual to the static part of the tree in the front """
         new_individual = self.static_tree[:]
         new_individual[-2:-2] = individual
@@ -92,7 +92,7 @@ class Environment1(Environment):
         self.targets = [self.targets[0]] #Only first target
 
     def get_fitness(self, individual, save_video=False):
-        return super().get_fitness(self.add_to_static_tree(individual), save_video)
+        return super().get_fitness(self._add_to_static_tree(individual), save_video)
 
 class Environment12(Environment):
     """ Test class for only running first two targets in list  """
@@ -101,7 +101,7 @@ class Environment12(Environment):
         self.targets = self.targets[:2] #Only first two targets
 
     def get_fitness(self, individual, save_video=False):
-        return super().get_fitness(self.add_to_static_tree(individual), save_video)
+        return super().get_fitness(self._add_to_static_tree(individual), save_video)
 
 class Environment123(Environment):
     """ Test class for only running first three targets in list  """
@@ -110,4 +110,4 @@ class Environment123(Environment):
         self.targets = self.targets[:3] #Only first three targets
 
     def get_fitness(self, individual, save_video=False):
-        return super().get_fitness(self.add_to_static_tree(individual), save_video)
+        return super().get_fitness(self._add_to_static_tree(individual), save_video)
