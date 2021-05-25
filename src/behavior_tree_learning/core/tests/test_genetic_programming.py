@@ -6,6 +6,9 @@ import os
 import random
 from behavior_tree_learning.core.str_bt import behavior_tree
 from behavior_tree_learning.core.gp import genetic_programming as gp
+from behavior_tree_learning.core.gp.parameters import GeneticParameters
+from behavior_tree_learning.core.gp import selection as gps
+
 from behavior_tree_learning.core.hash_table import HashTable
 from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
 from behavior_tree_learning.core.tests.fwk import environment_strings as environment
@@ -31,7 +34,7 @@ class TestGpAlgorithm(unittest.TestCase):
     def test_mutation(self):
         """ Tests mutation function """
 
-        gp_par = gp.GpParameters()
+        gp_par = GeneticParameters()
         gp_par.n_population = 5
         gp_par.n_offspring_mutation = 1
         gp_par.mutation_p_add = 0.3
@@ -77,7 +80,7 @@ class TestGpAlgorithm(unittest.TestCase):
         """ Tests crossover function """
 
         pop_size = 10
-        gp_par = gp.GpParameters()
+        gp_par = GeneticParameters()
         gp_par.n_population = pop_size
         gp_par.n_offspring_crossover = 1
         gp_par.allow_identical = False
@@ -134,10 +137,10 @@ class TestGpAlgorithm(unittest.TestCase):
     def test_crossover_parent_selection(self):
         """ Tests crossover_parent_selection function """
 
-        gp_par = gp.GpParameters()
+        gp_par = GeneticParameters()
         gp_par.n_population = 10
         gp_par.f_crossover = 0.4
-        gp_par.parent_selection = gp.SelectionMethods.ELITISM
+        gp_par.parent_selection = gps.SelectionMethods.ELITISM
         population = gp.create_population(gp_par.n_population, 5)
         fitness = [0, 1, 2, 1, 2, 1, 1, 2, 2, 0]
         parents = gp.crossover_parent_selection(population, fitness, gp_par)
@@ -152,7 +155,7 @@ class TestGpAlgorithm(unittest.TestCase):
     def test_mutation_parent_selection(self):
         """ Tests mutation_parent_selection function """
         
-        gp_par = gp.GpParameters()
+        gp_par = GeneticParameters()
         gp_par.n_population = 8
         gp_par.f_mutation = 0.5
         gp_par.parent_selection = gp.SelectionMethods.ELITISM
@@ -179,7 +182,7 @@ class TestGpAlgorithm(unittest.TestCase):
     def test_survivor_selection(self):
         """ Tests survivor_selection function """
 
-        gp_par = gp.GpParameters()
+        gp_par = GeneticParameters()
         gp_par.f_parents = 1/3
         gp_par.f_elites = 0
         gp_par.n_population = 6
@@ -217,24 +220,24 @@ class TestGpAlgorithm(unittest.TestCase):
         population = list(range(6))
         fitness = [0, 1, 2, 1, 3, 1]
 
-        selected = gp.selection(population, fitness, 2, gp.SelectionMethods.ELITISM)
+        selected = gps.selection(gps.SelectionMethods.ELITISM, population, fitness, 2)
         assert selected == [4, 2]
 
-        selected = gp.selection(population, fitness, 3, gp.SelectionMethods.TOURNAMENT)
+        selected = gps.selection(gp.SelectionMethods.TOURNAMENT, population, fitness, 3)
         assert 4 in selected
         assert 0 not in selected
 
         selected = []
         for _ in range(10):
-            selected += gp.selection(population, fitness, 2, gp.SelectionMethods.RANK)
+            selected += gps.selection(gps.SelectionMethods.RANK, population, fitness, 2)
         assert 4 in selected
 
         random.seed(0)
-        selected1 = gp.selection(population, fitness, 3, gp.SelectionMethods.RANDOM)
-        selected2 = gp.selection(population, fitness, 3, gp.SelectionMethods.RANDOM)
+        selected1 = gps.selection(gps.SelectionMethods.RANDOM, population, fitness, 3)
+        selected2 = gps.selection(gps.SelectionMethods.RANDOM, population, fitness, 3)
         assert selected1 != selected2
 
-        selected = gp.selection(population, fitness, 2, gp.SelectionMethods.ALL)
+        selected = gps.selection(gps.SelectionMethods.ALL, population, fitness, 2)
         assert selected == population
 
     def test_elite_selection(self):
@@ -243,7 +246,7 @@ class TestGpAlgorithm(unittest.TestCase):
         population = list(range(8))
         fitness = [0, 6, 2, 8, 3, 2, 1, 1]
 
-        selected = gp.elite_selection(population, fitness, 2)
+        selected = gps.selection(gps.SelectionMethods.ELITISM, population, fitness, 2)
         assert selected == [3, 1]
 
     def test_tournament_selection(self):
@@ -252,15 +255,15 @@ class TestGpAlgorithm(unittest.TestCase):
         population = list(range(10))
         fitness = [2, 1, 2, 1, 3, 1, 4, 5, 3, 0]
 
-        selected = gp.tournament_selection(population, fitness, 5)
+        selected = gps.selection(gps.SelectionMethods.TOURNAMENT, population, fitness, 5)
         assert 7 in selected
         assert 9 not in selected
 
-        selected = gp.tournament_selection(population, fitness, 4)
+        selected = gps.selection(gps.SelectionMethods.TOURNAMENT, population, fitness, 4)
         assert 7 in selected
         assert 9 not in selected
 
-        selected = gp.tournament_selection(population, fitness, 3)
+        selected = gps.selection(gps.SelectionMethods.TOURNAMENT, population, fitness, 3)
         assert 9 not in selected
 
     def test_rank_selection(self):
@@ -273,7 +276,7 @@ class TestGpAlgorithm(unittest.TestCase):
         n_runs = 100
         for seed in range(0, n_runs):
             gp.set_seeds(seed)
-            selected = gp.rank_selection(population, fitness, 2)
+            selected = gps.selection(gps.SelectionMethods.RANK, population, fitness, 2)
             if 0 in selected:
                 n_times_selected += 1
 
@@ -295,7 +298,7 @@ class TestGpAlgorithm(unittest.TestCase):
     def test_run(self):
         """ Tests run function """
 
-        gp_par = gp.GpParameters()
+        gp_par = GeneticParameters()
         gp_par.ind_start_length = 3
         gp_par.n_population = 20
         gp_par.f_crossover = 0.5
@@ -317,8 +320,8 @@ class TestGpAlgorithm(unittest.TestCase):
         assert population == population2
         assert fitness == fitness2
 
-        gp_par.parent_selection = gp.SelectionMethods.RANK
-        gp_par.survivor_selection = gp.SelectionMethods.RANK
+        gp_par.parent_selection = gps.SelectionMethods.RANK
+        gp_par.survivor_selection = gps.SelectionMethods.RANK
         gp.set_seeds(1337)
         population, fitness, _, _ = gp.run(environment, gp_par)
         assert(max(fitness)) == 3.4
@@ -331,7 +334,7 @@ class TestGpAlgorithm(unittest.TestCase):
     def test_hotstart(self):
         """ Test with hotstart """
 
-        gp_par = gp.GpParameters()
+        gp_par = GeneticParameters()
         gp_par.ind_start_length = 3
         gp_par.n_population = 8
         gp_par.f_crossover = 0.5

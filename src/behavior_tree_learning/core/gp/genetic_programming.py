@@ -3,56 +3,18 @@
 A genetic programming algorithm with many possible settings
 """
 import random
-from enum import Enum, auto
 from dataclasses import dataclass
 from statistics import mean
 import numpy as np
 
 from behavior_tree_learning.core.hash_table import HashTable
-import behavior_tree_learning.core.logger.logplot as logplot
+from behavior_tree_learning.core.logger import logplot
+from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 
 #Below are imports that can be changed to run against different environments etc.
-import behavior_tree_learning.core.gp_operations.operations as gp_interface
+from behavior_tree_learning.core.environment import Environment
+from behavior_tree_learning.core.str_bt import gp_operations as gp_operations
 
-class SelectionMethods(Enum):
-    """ Enum class for selection methods """
-    ELITISM = auto()
-    TOURNAMENT = auto()
-    RANK = auto()
-    RANDOM = auto()
-    ALL = auto()
-
-@dataclass
-class GpParameters:
-    """ Data class for parameters for the GP algorithm """
-    ind_start_length: int = 5                              #Start length of initial genomes
-    min_length: int = 2                                    #Minimum length of individual
-    n_population: int = 8                                  #Number of individuals in population
-    f_crossover: float = 0.5                               #Fraction of parent pool selected for crossover
-    n_offspring_crossover: int = 1                         #Number of offspring from crossover per parent
-    replace_crossover: bool = False                        #Crossover replaces subtree at receiving genome or inserts
-    f_mutation: float = 0.5                                #Fraction of parent pool selected for mutation
-    n_offspring_mutation: int = 1                          #Number of offspring from mutation per parent
-    parent_selection: int = SelectionMethods.TOURNAMENT    #Selection method for parents
-    survivor_selection: int = SelectionMethods.TOURNAMENT  #Selection method for survival
-    f_elites: float = 0.1                                  #Fraction of population that survive as elites
-    f_parents: float = 1                                   #Fraction of parents that may survive to next generation
-    mutate_co_offspring: bool = False                      #Offspring from crossover may also be mutated
-    mutate_co_parents: bool = False                        #Parents for crossover may also be mutated
-    mutation_p_add: float = 0.4                            #Probability of mutation adding a gene
-    mutation_p_delete: float = 0.3                         #Probability of mutation deleting a gene
-    allow_identical: bool = False                          #Offspring may be identical to any parent in prev generation
-    keep_baseline: bool = True                             #Baseline, if any, is always kept in population for breeding
-    boost_baseline: bool = False                           #Baseline is boosted to have higher probability of breeding
-    boost_baseline_only_co: bool = True                    #Baseline is boosted for crossover selection, not mutation
-    plot: bool = True                                      #Plot fitness
-    n_generations: int = 100                               #Number of generations
-    hash_table_size: int = 100000                          #Size of hash table
-    rerun_fitness: int = 0                                 #0-run only once, 1-according to prob, 2-always
-    verbose: bool = False                                  #Extra prints
-    log_name: str = '1'                                    #Name of log for folder and file handling
-    fig_best: bool = True                                  #Save final best individual as figure
-    fig_last_gen: bool = False                             #Save figures of entire last generation
 
 def set_seeds(seed):
     """
@@ -60,6 +22,7 @@ def set_seeds(seed):
     """
     random.seed(seed)
     np.random.seed(seed)
+
 
 def create_population(population_size, genome_length):
     """
@@ -73,13 +36,14 @@ def create_population(population_size, genome_length):
         attempts = 0
 
         while attempts < max_attempts:
-            individual = gp_interface.random_genome(genome_length)
+            individual = gp_operations.random_genome(genome_length)
             if individual != [] and individual not in new_population:
                 new_population.append(individual)
                 break
             attempts += 1
 
     return new_population
+
 
 def mutation(population, parents, gp_par):
     """
@@ -93,7 +57,7 @@ def mutation(population, parents, gp_par):
             mutated_individual = []
             attempts = 0
             while attempts < max_attempts:
-                mutated_individual = gp_interface.mutate_gene(population[parent], \
+                mutated_individual = gp_operations.mutate_gene(population[parent], \
                                                               gp_par.mutation_p_add, \
                                                               gp_par.mutation_p_delete)
                 if len(mutated_individual) >= gp_par.min_length and \
@@ -103,6 +67,7 @@ def mutation(population, parents, gp_par):
                 attempts += 1
 
     return mutated_population
+
 
 def crossover(population, parents, gp_par):
     """
@@ -123,7 +88,7 @@ def crossover(population, parents, gp_par):
             crossover_parents = random.sample(range(len(unused_parents)), 2)
             parent1 = unused_parents[int(crossover_parents[0])]
             parent2 = unused_parents[int(crossover_parents[1])]
-            offspring1, offspring2 = gp_interface.crossover_genome(population[parent1], \
+            offspring1, offspring2 = gp_operations.crossover_genome(population[parent1], \
                                                                    population[parent2], \
                                                                    gp_par.replace_crossover)
 
@@ -148,6 +113,7 @@ def crossover(population, parents, gp_par):
 
     return crossover_offspring
 
+
 def rerun_probability(n_runs):
     """
     Calculates a probability for running another episode with the same
@@ -156,6 +122,7 @@ def rerun_probability(n_runs):
     if n_runs <= 0:
         return 1
     return 1 / n_runs**2
+
 
 def get_fitness(individual, hash_table, environment, rerun=0):
     """
@@ -175,6 +142,7 @@ def get_fitness(individual, hash_table, environment, rerun=0):
 
     return mean(values)
 
+
 def crossover_parent_selection(population, fitness, gp_par):
     """
     Select parents for crossover. Returns indices of parents.
@@ -182,7 +150,8 @@ def crossover_parent_selection(population, fitness, gp_par):
     n_parents_crossover = int(round(gp_par.f_crossover * gp_par.n_population))
     if n_parents_crossover <= 0:
         return []
-    return selection(range(len(population)), fitness, n_parents_crossover, gp_par.parent_selection)
+    return selection(gp_par.parent_selection,range(len(population)), fitness, n_parents_crossover)
+
 
 def mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, gp_par):
     """
@@ -207,7 +176,8 @@ def mutation_parent_selection(population, fitness, crossover_parents, crossover_
     n_parents_mutation = int(round(gp_par.f_mutation * gp_par.n_population))
     if n_parents_mutation <= 0:
         return []
-    return selection(range(len(mutable_population)), fitness, n_parents_mutation, gp_par.parent_selection)
+    return selection(gp_par.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation)
+
 
 def survivor_selection(population, fitness, crossover_offspring, mutated_offspring, gp_par):
     """
@@ -221,7 +191,7 @@ def survivor_selection(population, fitness, crossover_offspring, mutated_offspri
     #Pick out selectable parents using elitism.
     n_parents = int(round(gp_par.f_parents * gp_par.n_population))
     if n_parents > 0:
-        parents = elite_selection(range(len(population)), fitness[:len(population)], n_parents)
+        parents = selection(SelectionMethods.ELITISM, range(len(population)), fitness[:len(population)], n_parents)
         for i in parents:
             selectable.append(population[i])
             selectable_fitness.append(fitness[i])
@@ -233,7 +203,7 @@ def survivor_selection(population, fitness, crossover_offspring, mutated_offspri
     #Pick out elites
     n_elites = int(round(gp_par.f_elites * gp_par.n_population))
     if n_elites > 0:
-        elites = elite_selection(range(len(selectable)), selectable_fitness, n_elites)
+        elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, n_elites)
         elites.sort(reverse=True)
         for i in elites:
             survivors.append(selectable[i])
@@ -242,7 +212,7 @@ def survivor_selection(population, fitness, crossover_offspring, mutated_offspri
             selectable_fitness.pop(i)
 
     n_to_select = gp_par.n_population - len(survivors)
-    selected = selection(range(len(selectable)), selectable_fitness, n_to_select, gp_par.survivor_selection)
+    selected = selection(gp_par.survivor_selection, range(len(selectable)), selectable_fitness, n_to_select)
 
     for i in selected:
         survivors.append(selectable[i])
@@ -250,73 +220,6 @@ def survivor_selection(population, fitness, crossover_offspring, mutated_offspri
 
     return survivors, survivor_fitness
 
-def selection(population, fitness, n_selected, selection_method):
-    """
-    Select individuals from population
-    """
-    if selection_method == SelectionMethods.ELITISM:
-        selected = elite_selection(population, fitness, n_selected)
-    elif selection_method == SelectionMethods.TOURNAMENT:
-        selected = tournament_selection(population, fitness, n_selected)
-    elif selection_method == SelectionMethods.RANK:
-        selected = rank_selection(population, fitness, n_selected)
-    elif selection_method == SelectionMethods.RANDOM:
-        selected = random.sample(population, n_selected)
-    elif selection_method == SelectionMethods.ALL:
-        selected = population
-    else:
-        raise Exception('Invalid selection method')
-
-    return selected
-
-def elite_selection(population, fitness, n_elites):
-    """
-    Elite selection from population
-    """
-    sorted_population = sorted(zip(fitness, population), reverse=True)
-
-    return [x for _, x in sorted_population[:n_elites]]
-
-def tournament_selection(population, fitness, n_winners):
-    """
-    Tournament selection.
-    """
-    tournament_size = n_winners
-    while tournament_size < len(population):
-        tournament_size *= 2
-
-    tournament_population = list(zip(fitness, population))
-    random.shuffle(tournament_population)
-
-    for i in range(tournament_size - len(population)):
-        #Add dummies to make sure we have a full tournament
-        tournament_population.insert(i * 2, (-float("inf"), []))
-
-    winner_fitness, winners = [list(x) for x in zip(*tournament_population)]
-    while len(winners) > n_winners:
-        for i in range(0, int(len(winners) / 2)):
-            if winner_fitness[i] < winner_fitness[i+1]:
-                winner_fitness.pop(i)
-                winners.pop(i)
-            else:
-                winner_fitness.pop(i + 1)
-                winners.pop(i + 1)
-
-    return winners
-
-def rank_selection(population, fitness, n_selected):
-    """
-    Rank proportional selection
-    Probabilities for each individual are scaled linearly according to rank
-    such that the highest ranked individual get n_ranks as weight
-    and the lowest ranked individual gets 1. The weights are then scaled so
-    that they sum to 1.
-    """
-    sorted_population = sorted(zip(fitness, population), reverse=True)
-    _, sorted_indices = [list(x) for x in zip(*sorted_population)]
-    n_ranks = len(sorted_indices)
-    p = np.linspace(2 / (n_ranks + 1), 2 / (n_ranks * (n_ranks + 1)), n_ranks)
-    return list(np.random.choice(sorted_indices, size=n_selected, replace=False, p=p))
 
 def print_population(population, fitness, generation):
     """
@@ -330,7 +233,8 @@ def print_population(population, fitness, generation):
     print("Best individual: ", best)
     print(population[best])
 
-def run(environment, gp_par, hotstart=False, baseline=None):
+
+def run(environment: Environment, gp_par, hotstart=False, baseline=None):
     # pylint: disable=too-many-statements, too-many-locals, too-many-branches
     """
     Runs the genetic programming algorithm
@@ -414,7 +318,7 @@ def run(environment, gp_par, hotstart=False, baseline=None):
     print("\nFINAL POPULATION: ")
     print_population(population, fitness, generation)
 
-    best_individual = selection(population, fitness, 1, SelectionMethods.ELITISM)[0]
+    best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1)[0]
 
     save_state(gp_par, population, best_individual, best_fitness, n_episodes, baseline, generation, hash_table)
 
@@ -428,6 +332,7 @@ def run(environment, gp_par, hotstart=False, baseline=None):
 
     return population, fitness, best_fitness, best_individual
 
+
 def save_state(gp_par, population, best_individual, best_fitness, n_episodes, baseline, generation, hash_table):
     # pylint: disable=too-many-arguments
     """ Saves state for later hotstart """
@@ -439,6 +344,7 @@ def save_state(gp_par, population, best_individual, best_fitness, n_episodes, ba
     logplot.log_settings(gp_par.log_name, gp_par, baseline)
     logplot.log_state(gp_par.log_name, random.getstate(), np.random.get_state(), generation)
     hash_table.write_table()
+
 
 def load_state(log_name, hash_table):
     """ Loads state for hotstart """
