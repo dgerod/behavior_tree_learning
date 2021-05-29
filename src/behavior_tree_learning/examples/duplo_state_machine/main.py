@@ -1,18 +1,22 @@
-import sys
-import time
+#!/usr/bin/env python3
+
+import os
 
 import behavior_tree_learning.core.str_bt.behavior_tree as behavior_tree
-import behavior_tree_learning.core.gp.genetic_programming as gp
-import behavior_tree_learning.core.logger.logplot as logplot
+from behavior_tree_learning.core.gp import algorithm as gp
+from behavior_tree_learning.core.gp.parameters import GeneticParameters
 
-import behavior_tree_learning.examples.duplo_state_machine.environment as Environment
+from behavior_tree_learning.examples.duplo_state_machine.paths import EXAMPLE_DIRECTORY
+from behavior_tree_learning.examples.duplo_state_machine.environment import Environment
+from behavior_tree_learning.examples.duplo_state_machine import state_machine as sm
 
 
 def run():
 
-    behavior_tree.load_settings_from_file('BT_SETTINGS_TOWER.yaml')
+    settings_file = os.path.join(EXAMPLE_DIRECTORY, 'BT_SETTINGS_TOWER.yaml')
+    behavior_tree.load_settings_from_file(settings_file)
 
-    gp_parameters = gp.GpParameters()
+    gp_parameters = GeneticParameters()
     gp_parameters.ind_start_length = 8
     gp_parameters.n_population = 16
     gp_parameters.f_crossover = 0.5
@@ -33,15 +37,15 @@ def run():
     gp_parameters.n_generations = 200
     gp_parameters.verbose = False
     gp_parameters.fig_last_gen = False
-    
-    targets = []
-    targets.append(agx_interface.Pos(0.0, 0.05, 0))
-    targets.append(agx_interface.Pos(0.0, 0.05, 0.0192))
-    targets.append(agx_interface.Pos(0.0, 0.05, 2*0.0192))
 
-    rosid = "1"
-    world_interface = agx_interface.AgxInterface(rosid)
-    environment = Environment(world_interface, targets, verbose=False)
+    start_position = [sm.Pos(0.0, 0.05, 0),
+                      sm.Pos(0.0, 0.05, 0.0192),
+                      sm.Pos(0.0, 0.05, 2*0.0192)]
+
+    target_position = start_position
+
+    world = sm.StateMachine(start_position)
+    environment = Environment(world, target_position, verbose=False)
     
     n_logs = 10
     for i in range(1, n_logs + 1):
@@ -95,3 +99,7 @@ def run():
         gp_parameters.log_name = 'tower_planner_baseline_' + str(i)
         gp.set_seeds(i)
         gp.run(environment, gp_parameters, baseline=planner_baseline)
+
+
+if __name__ == "__main__":
+    run()

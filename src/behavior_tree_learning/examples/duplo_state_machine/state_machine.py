@@ -27,7 +27,7 @@ class Pos:
 
 
 @dataclass
-class State():
+class State:
     """
     Definition of substates
     """

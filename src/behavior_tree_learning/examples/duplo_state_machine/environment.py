@@ -4,22 +4,23 @@ All environments must contain a get_fitness(individual) function
 that returns a fitness value and a plot_individual() function that
 returns nothing but saves a graphical representation of the individual
 """
-
+from interface import implements
 from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
-import behavior_tree_learning.examples.duplo_state_machine.behaviors as behaviors
-import behavior_tree_learning.examples.duplo_state_machine.state_machine as sm
-import behavior_tree_learning.examples.duplo_simulation.fitness_function as fitness_function
+from behavior_tree_learning.core.environment import Environment as GpEnvironment
+from behavior_tree_learning.core.world import World
+from behavior_tree_learning.examples.duplo_state_machine import behaviors
+from behavior_tree_learning.examples.duplo_state_machine import state_machine as sm
+from behavior_tree_learning.examples.duplo_simulation import fitness_function
 
 
-class Environment():
+class Environment(implements(GpEnvironment)):
     """ Class defining the environment in which the individual operates """
 
-    def __init__(self, start_positions, targets, static_tree=None, \
+    def __init__(self, world: World, target_positions, static_tree=None,
                  verbose=False, sm_pars=None, mode=0, fitness_coeff=None):
 
-        # pylint: disable=too-many-arguments
-        self.start_positions = start_positions
-        self.targets = targets
+        self.world = world
+        self.targets = target_positions
         self.static_tree = static_tree
         self.verbose = verbose
         self.sm_pars = sm_pars
@@ -35,12 +36,9 @@ class Environment():
     def run_and_compute(self, individual):
         """ Run the simulation and return the fitness """
 
-        state_machine = sm.StateMachine(self.start_positions, self.random_events, self.sm_pars, self.mode)
-        behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world=state_machine, verbose=self.verbose)
-
+        behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world=self.world, verbose=self.verbose)
         ticks, _ = behavior_tree.run_bt()
-
-        return fitness_function.compute_fitness(state_machine, behavior_tree, ticks, self.targets, self.fitness_coeff)
+        return fitness_function.compute_fitness(self.world, behavior_tree, ticks, self.targets, self.fitness_coeff)
 
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
