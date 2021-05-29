@@ -6,7 +6,6 @@ from behavior_tree_learning.core.str_bt.behavior_tree import StringBehaviorTree
 class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
 
     def __init__(self, string, behaviors, world_interface=None, root=None, verbose=False):        
-        # pylint: disable=too-many-arguments
 
         if root is not None:
             self.root = root
@@ -22,7 +21,7 @@ class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
         self.timeout = False
 
         if root is None:
-            self.root, has_children = behaviors.get_node_from_string(string[0], world_interface, self.verbose)
+            sdoneelf.root, has_children = behaviors.get_node_from_string(string[0], world_interface, self.verbose)
             string.pop(0)
         else:
             has_children = False

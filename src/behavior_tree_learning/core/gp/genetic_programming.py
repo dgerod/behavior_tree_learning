@@ -3,41 +3,138 @@
 A genetic programming algorithm with many possible settings
 """
 import random
-from dataclasses import dataclass
 from statistics import mean
 import numpy as np
+
+from behavior_tree_learning.core.environment import Environment
+from behavior_tree_learning.core.str_bt import gp_operators
 
 from behavior_tree_learning.core.hash_table import HashTable
 from behavior_tree_learning.core.logger import logplot
 from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 
-#Below are imports that can be changed to run against different environments etc.
-from behavior_tree_learning.core.environment import Environment
-from behavior_tree_learning.core.str_bt import gp_operators
-
-
-_operators = {'random_genome' : gp_operators.random_genome,
-              'crossover_genome' : gp_operators.crossover_genome,
-              'mutate_gene' : gp_operators.mutate_gene }
-
-
-def set_operators(random_genome, crossover_genome, mutate_gene):
-    
-    global _operators
-    _operators['random_genome'] = random_genome
-    _operators['crossover_genome'] = crossover_genome
-    _operators['mutate_gene'] = mutate_gene
+_operators = {'random_genome': gp_operators.random_genome,
+              'crossover_genome': gp_operators.crossover_genome,
+              'mutate_gene': gp_operators.mutate_gene }
 
 
 def set_seeds(seed):
     """
     Sets random seeds for random number generators
     """
+
     random.seed(seed)
     np.random.seed(seed)
 
 
-def create_population(population_size, genome_length):
+def set_operators(random_genome, crossover_genome, mutate_gene):
+
+    global _operators
+    _operators['random_genome'] = random_genome
+    _operators['crossover_genome'] = crossover_genome
+    _operators['mutate_gene'] = mutate_gene
+
+
+def run(environment: Environment, gp_par, hotstart=False, baseline=None):
+    """
+    Runs the genetic programming algorithm
+    """
+
+    hash_table = HashTable(gp_par.hash_table_size, gp_par.log_name)
+
+    if hotstart:
+        best_fitness, n_episodes, last_generation, population = _load_state(gp_par.log_name, hash_table)
+    else:
+        population = _create_population(gp_par.n_population, gp_par.ind_start_length)
+        logplot.clear_logs(gp_par.log_name)
+        best_fitness = []
+        n_episodes = []
+        n_episodes.append(hash_table.n_values)
+        last_generation = 0
+
+        if baseline is not None:
+            population[0] = baseline
+            baseline_index = 0
+
+    fitness = []
+    for individual in population:
+        fitness.append(_calculate_fitness(individual, hash_table, environment, rerun=0))
+
+    if not hotstart:
+        best_fitness.append(max(fitness))
+
+        if gp_par.verbose:
+            _print_population(population, fitness, last_generation)
+            print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
+
+        logplot.log_fitness(gp_par.log_name, fitness)
+        logplot.log_population(gp_par.log_name, population)
+
+    generation = gp_par.n_generations - 1 #In case loop is skipped due to hotstart
+    for generation in range(last_generation + 1, gp_par.n_generations):
+        if gp_par.keep_baseline:
+            if baseline is not None and not baseline in population:
+                population.append(baseline) #Make sure we are always able to source from baseline
+
+        if generation > 1:
+            fitness = []
+            for index, individual in enumerate(population):
+                fitness.append(_calculate_fitness(individual, hash_table, environment, gp_par.rerun_fitness))
+                if baseline is not None and individual == baseline:
+                    baseline_index = index
+        if gp_par.keep_baseline and gp_par.boost_baseline and baseline is not None:
+            baseline_fitness = fitness[baseline_index]
+            fitness[baseline_index] = max(fitness)
+
+        co_parents = _crossover_parent_selection(population, fitness, gp_par)
+        co_offspring = _crossover(population, co_parents, gp_par)
+        for offspring in co_offspring:
+            fitness.append(_calculate_fitness(offspring, hash_table, environment, gp_par.rerun_fitness))
+
+        if gp_par.boost_baseline and gp_par.boost_baseline_only_co and baseline is not None:
+            fitness[baseline_index] = baseline_fitness #Restore original fitness for survivor selection
+
+        mutation_parents = _mutation_parent_selection(population, fitness, co_parents, co_offspring, gp_par)
+        mutated_offspring = _mutation(population + co_offspring, mutation_parents, gp_par)
+        for offspring in mutated_offspring:
+            fitness.append(_calculate_fitness(offspring, hash_table, environment, gp_par.rerun_fitness))
+
+        if gp_par.boost_baseline and baseline is not None:
+            fitness[baseline_index] = baseline_fitness #Restore original fitness for survivor selection
+
+        population, fitness = _survivor_selection(population, fitness, co_offspring, mutated_offspring, gp_par)
+
+        best_fitness.append(max(fitness))
+        n_episodes.append(hash_table.n_values)
+
+        logplot.log_fitness(gp_par.log_name, fitness)
+        logplot.log_population(gp_par.log_name, population)
+
+        if gp_par.verbose:
+            print("Generation: ", generation, "Fitness: ", fitness, "Best fitness: ", best_fitness[generation])
+
+        if (generation + 1) % 25 == 0 and generation < gp_par.n_generations - 1: #Last generation will be saved later
+            _save_state(gp_par, population, None, best_fitness, n_episodes, baseline, generation, hash_table)
+
+    print("\nFINAL POPULATION: ")
+    _print_population(population, fitness, generation)
+
+    best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1)[0]
+
+    _save_state(gp_par, population, best_individual, best_fitness, n_episodes, baseline, generation, hash_table)
+
+    if gp_par.plot:
+        logplot.plot_fitness(gp_par.log_name, best_fitness, n_episodes)
+    if gp_par.fig_best:
+        environment.plot_individual(logplot.get_log_folder(gp_par.log_name), 'best individual', best_individual)
+    if gp_par.fig_last_gen:
+        for i in range(gp_par.n_population):
+            environment.plot_individual(logplot.get_log_folder(gp_par.log_name), 'individual_' + str(i), population[i])
+
+    return population, fitness, best_fitness, best_individual
+
+
+def _create_population(population_size, genome_length):
     """
     Creates an initial random population
     """
@@ -59,7 +156,7 @@ def create_population(population_size, genome_length):
     return new_population
 
 
-def mutation(population, parents, gp_par):
+def _mutation(population, parents, gp_par):
     """
     Generate offspring by mutating a gene
     """
@@ -85,7 +182,7 @@ def mutation(population, parents, gp_par):
     return mutated_population
 
 
-def crossover(population, parents, gp_par):
+def _crossover(population, parents, gp_par):
     """
     Generates offspring by crossovers
     """
@@ -109,8 +206,8 @@ def crossover(population, parents, gp_par):
             offspring1, offspring2 = \
                 _operators['crossover_genome'](population[parent1], population[parent2], gp_par.replace_crossover)
             if len(offspring1) >= gp_par.min_length and len(offspring2) >= gp_par.min_length and \
-                (gp_par.allow_identical or \
-                 (offspring1 not in population + crossover_offspring and \
+                (gp_par.allow_identical or
+                 (offspring1 not in population + crossover_offspring and
                   offspring2 not in population + crossover_offspring)):
                 crossover_offspring.append(offspring1)
                 crossover_offspring.append(offspring2)
@@ -125,12 +222,12 @@ def crossover(population, parents, gp_par):
         if attempts == max_attempts and len(unused_parents) > 0 and \
             gp_par.n_offspring_mutation <= 1 and gp_par.n_offspring_crossover <= 1:
             #Fill up with mutation in case we can't find enough good crossovers
-            crossover_offspring += mutation(population + crossover_offspring, unused_parents, gp_par)
+            crossover_offspring += _mutation(population + crossover_offspring, unused_parents, gp_par)
 
     return crossover_offspring
 
 
-def rerun_probability(n_runs):
+def _rerun_probability(n_runs):
     """
     Calculates a probability for running another episode with the same
     genome.
@@ -140,7 +237,7 @@ def rerun_probability(n_runs):
     return 1 / n_runs**2
 
 
-def get_fitness(individual, hash_table, environment, rerun=0):
+def _calculate_fitness(individual, hash_table, environment: Environment, rerun=0):
     """
     Gets fitness from hash table if possible, otherwise gets it from simulation
     rerun = 0 means never rerun
@@ -149,17 +246,19 @@ def get_fitness(individual, hash_table, environment, rerun=0):
     """
     values = hash_table.find(individual)
 
-    if values is None or rerun == 2 or (rerun == 1 and random.random() < rerun_probability(len(values))):
-        fitness = environment.get_fitness(individual)
+    if values is None or rerun == 2 or (rerun == 1 and random.random() < _rerun_probability(len(values))):
+        fitness = environment.run_and_compute(individual)
         hash_table.insert(individual, fitness)
 
         if values is None:
             values = [fitness]
 
+    print(values)
+    #new_values = list(map(int, values))
     return mean(values)
 
 
-def crossover_parent_selection(population, fitness, gp_par):
+def _crossover_parent_selection(population, fitness, gp_par):
     """
     Select parents for crossover. Returns indices of parents.
     """
@@ -169,7 +268,7 @@ def crossover_parent_selection(population, fitness, gp_par):
     return selection(gp_par.parent_selection,range(len(population)), fitness, n_parents_crossover)
 
 
-def mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, gp_par):
+def _mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, gp_par):
     """
     Select parents for crossover
     Input fitness contains fitness for crossover offspring after fitness for the rest of the population
@@ -195,7 +294,7 @@ def mutation_parent_selection(population, fitness, crossover_parents, crossover_
     return selection(gp_par.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation)
 
 
-def survivor_selection(population, fitness, crossover_offspring, mutated_offspring, gp_par):
+def _survivor_selection(population, fitness, crossover_offspring, mutated_offspring, gp_par):
     """
     Select survivors for next generation
     """
@@ -237,7 +336,7 @@ def survivor_selection(population, fitness, crossover_offspring, mutated_offspri
     return survivors, survivor_fitness
 
 
-def print_population(population, fitness, generation):
+def _print_population(population, fitness, generation):
     """
     Prints information about a population
     """
@@ -250,106 +349,7 @@ def print_population(population, fitness, generation):
     print(population[best])
 
 
-def run(environment: Environment, gp_par, hotstart=False, baseline=None):
-    # pylint: disable=too-many-statements, too-many-locals, too-many-branches
-    """
-    Runs the genetic programming algorithm
-    """
-    hash_table = HashTable(gp_par.hash_table_size, gp_par.log_name)
-
-    if hotstart:
-        best_fitness, n_episodes, last_generation, population = load_state(gp_par.log_name, hash_table)
-    else:
-        population = create_population(gp_par.n_population, gp_par.ind_start_length)
-        logplot.clear_logs(gp_par.log_name)
-        best_fitness = []
-        n_episodes = []
-        n_episodes.append(hash_table.n_values)
-        last_generation = 0
-
-        if baseline is not None:
-            population[0] = baseline
-            baseline_index = 0
-
-    fitness = []
-    for individual in population:
-        fitness.append(get_fitness(individual, hash_table, environment, rerun=0))
-
-    if not hotstart:
-        best_fitness.append(max(fitness))
-
-        if gp_par.verbose:
-            print_population(population, fitness, last_generation)
-            print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
-
-        logplot.log_fitness(gp_par.log_name, fitness)
-        logplot.log_population(gp_par.log_name, population)
-
-    generation = gp_par.n_generations - 1 #In case loop is skipped due to hotstart
-    for generation in range(last_generation + 1, gp_par.n_generations):
-        if gp_par.keep_baseline:
-            if baseline is not None and not baseline in population:
-                population.append(baseline) #Make sure we are always able to source from baseline
-
-        if generation > 1:
-            fitness = []
-            for index, individual in enumerate(population):
-                fitness.append(get_fitness(individual, hash_table, environment, gp_par.rerun_fitness))
-                if baseline is not None and individual == baseline:
-                    baseline_index = index
-        if gp_par.keep_baseline and gp_par.boost_baseline and baseline is not None:
-            baseline_fitness = fitness[baseline_index]
-            fitness[baseline_index] = max(fitness)
-
-        co_parents = crossover_parent_selection(population, fitness, gp_par)
-        co_offspring = crossover(population, co_parents, gp_par)
-        for offspring in co_offspring:
-            fitness.append(get_fitness(offspring, hash_table, environment, gp_par.rerun_fitness))
-
-        if gp_par.boost_baseline and gp_par.boost_baseline_only_co and baseline is not None:
-            fitness[baseline_index] = baseline_fitness #Restore original fitness for survivor selection
-
-        mutation_parents = mutation_parent_selection(population, fitness, co_parents, co_offspring, gp_par)
-        mutated_offspring = mutation(population + co_offspring, mutation_parents, gp_par)
-        for offspring in mutated_offspring:
-            fitness.append(get_fitness(offspring, hash_table, environment, gp_par.rerun_fitness))
-
-        if gp_par.boost_baseline and baseline is not None:
-            fitness[baseline_index] = baseline_fitness #Restore original fitness for survivor selection
-
-        population, fitness = survivor_selection(population, fitness, co_offspring, mutated_offspring, gp_par)
-
-        best_fitness.append(max(fitness))
-        n_episodes.append(hash_table.n_values)
-
-        logplot.log_fitness(gp_par.log_name, fitness)
-        logplot.log_population(gp_par.log_name, population)
-
-        if gp_par.verbose:
-            print("Generation: ", generation, "Fitness: ", fitness, "Best fitness: ", best_fitness[generation])
-
-        if (generation + 1) % 25 == 0 and generation < gp_par.n_generations - 1: #Last generation will be saved later
-            save_state(gp_par, population, None, best_fitness, n_episodes, baseline, generation, hash_table)
-
-    print("\nFINAL POPULATION: ")
-    print_population(population, fitness, generation)
-
-    best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1)[0]
-
-    save_state(gp_par, population, best_individual, best_fitness, n_episodes, baseline, generation, hash_table)
-
-    if gp_par.plot:
-        logplot.plot_fitness(gp_par.log_name, best_fitness, n_episodes)
-    if gp_par.fig_best:
-        environment.plot_individual(logplot.get_log_folder(gp_par.log_name), 'best individual', best_individual)
-    if gp_par.fig_last_gen:
-        for i in range(gp_par.n_population):
-            environment.plot_individual(logplot.get_log_folder(gp_par.log_name), 'individual_' + str(i), population[i])
-
-    return population, fitness, best_fitness, best_individual
-
-
-def save_state(gp_par, population, best_individual, best_fitness, n_episodes, baseline, generation, hash_table):
+def _save_state(gp_par, population, best_individual, best_fitness, n_episodes, baseline, generation, hash_table):
     # pylint: disable=too-many-arguments
     """ Saves state for later hotstart """
     logplot.log_last_population(gp_par.log_name, population)
@@ -362,7 +362,7 @@ def save_state(gp_par, population, best_individual, best_fitness, n_episodes, ba
     hash_table.write_table()
 
 
-def load_state(log_name, hash_table):
+def _load_state(log_name, hash_table):
     """ Loads state for hotstart """
     population = logplot.get_last_population(log_name)
     best_fitness = logplot.get_best_fitness(log_name)
