@@ -1,11 +1,13 @@
 import time
 import py_trees as pt
+
+from behavior_tree_learning.core.world.world import World
 from behavior_tree_learning.core.str_bt.behavior_tree import StringBehaviorTree
 
 
 class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
 
-    def __init__(self, string, behaviors, world_interface=None, root=None, verbose=False):        
+    def __init__(self, string, behaviors, world: World = None, root=None, verbose=False):
 
         if root is not None:
             self.root = root
@@ -14,14 +16,14 @@ class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
         self.bt = StringBehaviorTree(string)
         self.depth = self.bt.depth()
         self.length = self.bt.length()
-        self.world_interface = world_interface
+        self.world = world
         self.verbose = verbose
         self.behaviors = behaviors
         self.failed = False
         self.timeout = False
 
         if root is None:
-            sdoneelf.root, has_children = behaviors.get_node_from_string(string[0], world_interface, self.verbose)
+            self.root, has_children = behaviors.get_node_from_string(string[0], world, self.verbose)
             string.pop(0)
         else:
             has_children = False
@@ -69,7 +71,7 @@ class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
                 string.pop(0)
                 return node
 
-            newnode, has_children = self.behaviors.get_node_from_string(string[0], self.world_interface, self.verbose)
+            newnode, has_children = self.behaviors.get_node_from_string(string[0], self.world, self.verbose)
             string.pop(0)
             if has_children:
                 #Node is a control node or decorator with children - add subtree via string and then add to parent
@@ -98,11 +100,11 @@ class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
               (self.root.status is not pt.common.Status.SUCCESS or successes < successes_required) and \
               ticks < max_ticks and status_ok:
 
-            status_ok = self.world_interface.get_feedback() #Wait for connection
+            status_ok = self.world.get_feedback() #Wait for connection
 
             if status_ok:
                 self.root.tick_once()
-                self.world_interface.send_references()
+                self.world.send_references()
 
                 ticks += 1
                 if self.root.status is pt.common.Status.SUCCESS:
