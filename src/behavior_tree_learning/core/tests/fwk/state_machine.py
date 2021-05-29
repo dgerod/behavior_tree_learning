@@ -3,7 +3,8 @@ State Machine Simulator
 """
 from enum import IntEnum
 from dataclasses import dataclass
-
+from interface import implements
+from behavior_tree_learning.core.world import World
 
 class State(IntEnum):
     """
@@ -21,7 +22,7 @@ class SMParameters:
     verbose: bool = False                                  #Extra prints
 
 
-class StateMachine:
+class StateMachine(implements(World)):
     """
     Class for handling the State Machine Simulator
     """
