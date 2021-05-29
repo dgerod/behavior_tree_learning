@@ -36,7 +36,7 @@ class Environment():
         """ Run the simulation and return the fitness """
 
         state_machine = sm.StateMachine(self.start_positions, self.random_events, self.sm_pars, self.mode)
-        behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world_interface=state_machine, verbose=self.verbose)
+        behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world=state_machine, verbose=self.verbose)
 
         ticks, _ = behavior_tree.run_bt()
 

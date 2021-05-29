@@ -14,7 +14,7 @@ from behavior_tree_learning.core.tests.fwk import state_machine as sm
 def get_fitness(string):
     """ Run the simulation and return the fitness """
     state_machine = sm.StateMachine()
-    behavior_tree = StringBehaviorTreeForPyTree(string[:], behaviors=behaviors, world_interface=state_machine)
+    behavior_tree = StringBehaviorTreeForPyTree(string[:], behaviors=behaviors, world=state_machine)
 
     # run the Behavior Tree
     behavior_tree.run_bt()

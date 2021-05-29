@@ -31,7 +31,8 @@ class Environment(implements(World)):
         Run the simulation and return the fitness
         In case of error, restarts world_interface and tries again.
         """
-        pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world_interface=self.world_interface, verbose=self.verbose)
+        pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world=self.world_interface,
+                                             verbose=self.verbose)
 
         status_ok = True
         fitness = None
