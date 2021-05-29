@@ -18,7 +18,7 @@ class Coefficients:
     timeout: float = 10.0
     hand_not_empty: float = 0.0
 
-def compute_fitness(world_interface, behavior_tree, ticks, targets, coeff=None, verbose=False):
+def compute_fitness(world, behavior_tree, ticks, targets, coeff=None, verbose=False):
     # pylint: disable=too-many-arguments
     """ Retrieve values and compute cost """
 
@@ -34,10 +34,10 @@ def compute_fitness(world_interface, behavior_tree, ticks, targets, coeff=None, 
     if verbose:
         print("Cost from length:", cost)
     for i in range(len(targets)):
-        cost += coeff.task_completion * max(0, world_interface.distance(i, targets[i]) - coeff.pos_acc)
+        cost += coeff.task_completion * max(0, world.distance(i, targets[i]) - coeff.pos_acc)
         if verbose:
             print("Cost:", cost)
-            print(i, ": ", world_interface.get_brick_position(i))
+            print(i, ": ", world.get_brick_position(i))
 
     if behavior_tree.failed:
         cost += coeff.failed
@@ -47,7 +47,7 @@ def compute_fitness(world_interface, behavior_tree, ticks, targets, coeff=None, 
         cost += coeff.timeout
         if verbose:
             print("Timed out: ", cost)
-    if world_interface.get_picked() is not None:
+    if world.get_picked() is not None:
         cost += coeff.hand_not_empty
         if verbose:
             print("Hand not empty: ", cost)

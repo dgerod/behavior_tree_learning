@@ -6,19 +6,18 @@ returns nothing but saves a graphical representation of the individual
 """
 import time
 from interface import implements
-from behavior_tree_learning.core.world import World
-
+from behavior_tree_learning.core.environment import Environment as GpEnvironment
 from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
 import behavior_tree_learning.examples.duplo_simulation.behaviors as behaviors
 import behavior_tree_learning.examples.duplo_simulation.fitness_function as fitness_function
 
 
-class Environment(implements(World)):
+class Environment(implements(GpEnvironment)):
     """ General class template defining the environment in which the individual operates """
-    def __init__(self, world_interface, targets, static_tree=None, \
+    def __init__(self, world, targets, static_tree=None, \
                  verbose=False, maximum_runs_per_session=100, fitness_coeff=None):
         # pylint: disable=too-many-arguments
-        self.world_interface = world_interface
+        self.world = world
         self.targets = targets
         self.verbose = verbose
         self.static_tree = static_tree
@@ -51,20 +50,20 @@ class Environment(implements(World)):
             ticks, status_ok = pytree.run_bt(max_ticks=200)
             count = 0
             while count < 50 and status_ok: #Wait up to five seconds for everything to come to a resting state
-                old_sensor_data = self.world_interface.get_sensor_data()
-                status_ok = self.world_interface.get_feedback()
+                old_sensor_data = self.world.get_sensor_data()
+                status_ok = self.world.get_feedback()
                 if status_ok:
-                    if self.world_interface.at_standstill(old_sensor_data):
+                    if self.world.at_standstill(old_sensor_data):
                         break
-                    self.world_interface.send_references()
+                    self.world.send_references()
                     count += 1
 
             if save_video:
                 time.sleep(1) #Needed for ros synch
-                self.world_interface.stop_video()
+                self.world.stop_video()
 
             if status_ok:
-                fitness = fitness_function.compute_fitness(self.world_interface, pytree, ticks, \
+                fitness = fitness_function.compute_fitness(self.world, pytree, ticks,
                                                            self.targets, self.fitness_coeff, self.verbose)
             else:
                 self.world_interface.restart()
@@ -77,10 +76,10 @@ class Environment(implements(World)):
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
         if self.static_tree is not None:
-            pytree = StringBehaviorTreeForPyTree(self._add_to_static_tree(individual), behaviors=behaviors)
+            bt = StringBehaviorTreeForPyTree(self._add_to_static_tree(individual), behaviors=behaviors)
         else:
-            pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors)
-        pytree.save_fig(path, name=plot_name)
+            bt = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors)
+        bt.save_fig(path, name=plot_name)
 
     def _add_to_static_tree(self, individual):
         """ Add invididual to the static part of the tree in the front """
@@ -88,28 +87,34 @@ class Environment(implements(World)):
         new_individual[-2:-2] = individual
         return new_individual
 
+
 class Environment1(Environment):
     """ Test class for only running first target in list  """
-    def __init__(self, world_interface, targets, static_tree, verbose=False):
-        super().__init__(world_interface, targets, static_tree, verbose)
+
+    def __init__(self, world, targets, static_tree, verbose=False):
+        super().__init__(world, targets, static_tree, verbose)
         self.targets = [self.targets[0]] #Only first target
 
     def get_fitness(self, individual, save_video=False):
         return super().get_fitness(self._add_to_static_tree(individual), save_video)
 
+
 class Environment12(Environment):
     """ Test class for only running first two targets in list  """
-    def __init__(self, world_interface, targets, static_tree, verbose=False):
-        super().__init__(world_interface, targets, static_tree, verbose)
+
+    def __init__(self, world, targets, static_tree, verbose=False):
+        super().__init__(world, targets, static_tree, verbose)
         self.targets = self.targets[:2] #Only first two targets
 
     def get_fitness(self, individual, save_video=False):
         return super().get_fitness(self._add_to_static_tree(individual), save_video)
 
+
 class Environment123(Environment):
     """ Test class for only running first three targets in list  """
-    def __init__(self, world_interface, targets, static_tree, verbose=False):
-        super().__init__(world_interface, targets, static_tree, verbose)
+
+    def __init__(self, world, targets, static_tree, verbose=False):
+        super().__init__(world, targets, static_tree, verbose)
         self.targets = self.targets[:3] #Only first three targets
 
     def get_fitness(self, individual, save_video=False):
