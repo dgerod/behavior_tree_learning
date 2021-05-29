@@ -6,7 +6,7 @@ import sys
 import time
 
 import behavior_tree_learning.core.str_bt.behavior_tree as behavior_tree
-import behavior_tree_learning.core.gp.genetic_programming as gp
+from behavior_tree_learning.core.gp import algorithm as gp
 import behavior_tree_learning.core.logger.logplot as logplot
 
 import behavior_tree_learning.examples.duplo_simulation.agx_interface as agx_interface

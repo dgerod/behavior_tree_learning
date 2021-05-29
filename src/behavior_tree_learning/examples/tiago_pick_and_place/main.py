@@ -3,7 +3,7 @@
 import os
 
 from behavior_tree_learning.core.logger import logplot
-from behavior_tree_learning.core.gp import genetic_programming as gp
+from behavior_tree_learning.core.gp import algorithm as gp
 from behavior_tree_learning.core.gp.parameters import GeneticParameters
 from behavior_tree_learning.examples.tiago_pick_and_place.environment import Environment
 
