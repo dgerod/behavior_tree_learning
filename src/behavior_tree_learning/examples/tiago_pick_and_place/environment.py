@@ -39,7 +39,7 @@ class Environment(implements(GpEnvironment)):
             completed = False
             for i in range(3):
                 state_machine = sm.StateMachine(self.scenario, self.deterministic, self.verbose, pose_id=i)
-                behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors, world_interface=state_machine)
+                behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors, world=state_machine)
 
                 ticks, _ = behavior_tree.run_bt()
 
@@ -53,7 +53,7 @@ class Environment(implements(GpEnvironment)):
 
         else:
             state_machine = sm.StateMachine(self.scenario, self.deterministic, self.verbose)
-            behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors, world_interface=state_machine)
+            behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors, world=state_machine)
 
             ticks, _ = behavior_tree.run_bt()
 
