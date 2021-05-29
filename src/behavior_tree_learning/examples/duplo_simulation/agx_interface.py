@@ -95,7 +95,7 @@ class LauncherFeedback(IntEnum):
     ACK = 0
     ERROR = 1
 
-class AgxInterface:
+class AgxInterface(implements(World)):
     """
     Class for handling the interface to the agx simulation from the behavior tree side
     """

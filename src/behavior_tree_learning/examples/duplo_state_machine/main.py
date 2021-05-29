@@ -7,6 +7,7 @@ import behavior_tree_learning.core.logger.logplot as logplot
 
 import behavior_tree_learning.examples.duplo_state_machine.environment as Environment
 
+
 def run():
 
     behavior_tree.load_settings_from_file('BT_SETTINGS_TOWER.yaml')

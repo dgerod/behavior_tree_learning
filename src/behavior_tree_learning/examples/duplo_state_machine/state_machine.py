@@ -7,6 +7,9 @@ from enum import IntEnum
 from dataclasses import dataclass
 from copy import copy
 
+from interface import implements
+from behavior_tree_learning.core.world import World
+
 
 @dataclass
 class Pos:
@@ -52,7 +55,7 @@ class SMMode(IntEnum):
     BLOCKING = 3
 
 
-class StateMachine:
+class StateMachine(implements(World)):
     """
     Class for handling the State Machine Simulator
     """

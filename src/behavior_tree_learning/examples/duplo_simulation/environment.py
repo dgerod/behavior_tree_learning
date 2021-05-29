@@ -5,13 +5,15 @@ that returns a fitness value and a plot_individual() function that
 returns nothing but saves a graphical representation of the individual
 """
 import time
+from interface import implements
+from behavior_tree_learning.core.world import World
 
-#Imports that define the environment
 from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
 import behavior_tree_learning.examples.duplo_simulation.behaviors as behaviors
 import behavior_tree_learning.examples.duplo_simulation.fitness_function as fitness_function
 
-class Environment():
+
+class Environment(implements(World)):
     """ General class template defining the environment in which the individual operates """
     def __init__(self, world_interface, targets, static_tree=None, \
                  verbose=False, maximum_runs_per_session=100, fitness_coeff=None):
@@ -24,7 +26,7 @@ class Environment():
         self.fitness_coeff = fitness_coeff
         self.counter = 0
 
-    def get_fitness(self, individual, save_video=False):
+    def run_and_compute(self, individual, save_video=False):
         """
         Run the simulation and return the fitness
         In case of error, restarts world_interface and tries again.

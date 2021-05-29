@@ -32,16 +32,15 @@ class Environment():
 
         self.random_events = random_events
 
-    def get_fitness(self, individual):
+    def run_and_compute(self, individual):
         """ Run the simulation and return the fitness """
 
         state_machine = sm.StateMachine(self.start_positions, self.random_events, self.sm_pars, self.mode)
-        pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world_interface=state_machine, verbose=self.verbose)
+        behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world_interface=state_machine, verbose=self.verbose)
 
-        # run the Behavior Tree
-        ticks, _ = pytree.run_bt()
+        ticks, _ = behavior_tree.run_bt()
 
-        return fitness_function.compute_fitness(state_machine, pytree, ticks, self.targets, self.fitness_coeff)
+        return fitness_function.compute_fitness(state_machine, behavior_tree, ticks, self.targets, self.fitness_coeff)
 
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
