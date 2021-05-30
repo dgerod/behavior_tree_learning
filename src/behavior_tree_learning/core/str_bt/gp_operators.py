@@ -2,15 +2,17 @@
 Provides an interface between a GP algorithm and behavior tree functions
 """
 import random
-import behavior_tree_learning.core.str_bt.behavior_tree as behavior_tree
+from behavior_tree_learning.core.str_bt import StringBehaviorTree
 
 
 def random_genome(length):
     """
     Returns a random genome
     """
-    bt = behavior_tree.StringBehaviorTree([])
+
+    bt = StringBehaviorTree([])
     return bt.random(length)
+
 
 def mutate_gene(genome, p_add, p_delete):
     """
@@ -23,7 +25,7 @@ def mutate_gene(genome, p_add, p_delete):
     if p_add + p_delete > 1:
         raise Exception("Sum of the mutation probabilities must be less than 1.")
 
-    mutated_individual = behavior_tree.StringBehaviorTree([])
+    mutated_individual = StringBehaviorTree([])
     max_attempts = 100
     attempts = 0
     while (not mutated_individual.is_valid() or mutated_individual.bt == genome) and attempts < max_attempts:
@@ -38,25 +40,26 @@ def mutate_gene(genome, p_add, p_delete):
         else:
             mutated_individual.change_node(index)
 
-        #Close and trim bt accordingly to the change
         mutated_individual.close()
         mutated_individual.trim()
         attempts += 1
 
     if attempts >= max_attempts and (not mutated_individual.is_valid() or mutated_individual.bt == genome):
-        mutated_individual = behavior_tree.StringBehaviorTree([])
+        mutated_individual = StringBehaviorTree([])
 
     return mutated_individual.bt
+
 
 def crossover_genome(genome1, genome2, replace=True):
     # pylint: disable=too-many-branches
     """
     Do crossover between genomes at random points
     """
-    bt1 = behavior_tree.StringBehaviorTree(genome1)
-    bt2 = behavior_tree.StringBehaviorTree(genome2)
-    offspring1 = behavior_tree.StringBehaviorTree([])
-    offspring2 = behavior_tree.StringBehaviorTree([])
+
+    bt1 = StringBehaviorTree(genome1)
+    bt2 = StringBehaviorTree(genome2)
+    offspring1 = StringBehaviorTree([])
+    offspring2 = StringBehaviorTree([])
 
     if bt1.is_valid() and bt2.is_valid():
         max_attempts = 100
