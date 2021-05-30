@@ -6,12 +6,12 @@ import random
 from statistics import mean
 import numpy as np
 
-from behavior_tree_learning.core.environment import GeneticEnvironment
-from behavior_tree_learning.core.gp_sbt import gp_operators
-
 from behavior_tree_learning.core.hash_table import HashTable
 from behavior_tree_learning.core.logger import logplot
+from behavior_tree_learning.core.gp_sbt import gp_operators
+from behavior_tree_learning.core.gp.environment import GeneticEnvironment
 from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
+
 
 _operators = {'random_genome': gp_operators.random_genome,
               'crossover_genome': gp_operators.crossover_genome,
