@@ -1,9 +1,7 @@
 # Learning Behavior Trees with Genetic Programming
 
 This repository contains an implementation of a Genetic Programming (GP) algorithm 
-that evolves Behavior Trees (BTs) to solve different mobile manipulation tasks. The 
-BTs are executed in a high level state machine to make the problem computationally 
-tractable, but they can be exported and run in a physical simulator.
+that evolves Behavior Trees (BTs) to solve different mobile manipulation tasks.
 
 This repository is based on:
 * https://github.com/jstyrud/planning-and-learning
