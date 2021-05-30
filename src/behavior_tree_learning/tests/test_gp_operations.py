@@ -35,7 +35,7 @@ class TestGpOperations(unittest.TestCase):
             assert len(mutated_genome) <= len(genome)
 
             mutated_genome = gp.mutate_gene(genome, p_add=0, p_delete=0)
-            bt = behavior_tree.StringBehaviorTree(mutated_genome)
+            bt = behavior_tree.BehaviorTreeStringRepresentation(mutated_genome)
             assert mutated_genome != genome
             assert bt.is_valid()
 
@@ -61,7 +61,7 @@ class TestGpOperations(unittest.TestCase):
         assert offspring2 != genome1
         assert offspring2 != genome2
 
-        bt1 = behavior_tree.StringBehaviorTree(offspring1)
+        bt1 = behavior_tree.BehaviorTreeStringRepresentation(offspring1)
         assert bt1.is_valid()
         bt1 = bt1.set(offspring2)
         assert bt1.is_valid()

@@ -5,7 +5,7 @@ import unittest
 import os
 import random
 from behavior_tree_learning.core.str_bt import behavior_tree
-from behavior_tree_learning.core.str_bt import StringBehaviorTree, StringBehaviorTreeForPyTree
+from behavior_tree_learning.core.str_bt import BehaviorTreeStringRepresentation, StringBehaviorTreeForPyTree
 from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
 
 import behavior_tree_learning.examples.duplo_state_machine.behaviors as behaviors
@@ -19,12 +19,12 @@ class TestBehaviorTree(unittest.TestCase):
     def test_init(self):
         """ Tests init function """
 
-        _ = StringBehaviorTree([])
+        _ = BehaviorTreeStringRepresentation([])
 
     def test_random(self):
         """ Tests random function """
     
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         random.seed(1337)
 
@@ -36,7 +36,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_is_valid(self):
         """ Tests is_valid function """
     
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
         assert not bt.is_valid()
 
         #Valid tree
@@ -90,7 +90,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_subtree_is_valid(self):
         """ Tests subtree_is_valid function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         assert bt.is_subtree_valid(['s(', 'f(', 'a0', ')', ')', ')'], True, True)
 
@@ -109,7 +109,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_close(self):
         """ Tests close function """
 
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         bt.close()
         assert bt.bt == []
@@ -137,7 +137,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_trim(self):
         """ Tests trim function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         bt.set(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', 's(', 'a0', ')', ')'])
         bt.trim()
@@ -162,7 +162,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_depth(self):
         """ Tests bt_depth function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         #Normal correct tree
         bt.set(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
@@ -187,7 +187,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_length(self):
         """ Tests bt_length function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         bt.set(['s(', 'a0', 'a1', ')'])
         assert bt.length() == 3
@@ -204,7 +204,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_change_node(self):
         """ Tests change_node function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         random.seed(1337)
 
@@ -242,7 +242,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_add_node(self):
         """ Tests add_node function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         random.seed(1337)
 
@@ -282,7 +282,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_delete_node(self):
         """ Tests delete_node function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         bt.set(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')']).delete_node(0)
         assert bt.bt == []
@@ -308,7 +308,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_find_parent(self):
         """ Tests find_parent function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         bt.set(['s(', 'a0', 'f(', 'a0', ')', 'a0', ')'])
         assert bt.find_parent(0) is None
@@ -321,7 +321,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_find_children(self):
         """ Tests find_children function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         bt.set(['s(', 'a0', 'f(', 'a0', ')', 'a0', ')'])
         assert bt.find_children(0) == [1, 2, 5]
@@ -334,7 +334,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_find_up_node(self):
         """ Tests find_up_node function """
         
-        bt = StringBehaviorTree([])
+        bt = BehaviorTreeStringRepresentation([])
 
         bt.set(['s(', 'a0', 'f(', 'a0', ')', 'a0', ')'])
         assert bt.find_up_node(0) == 6
@@ -360,7 +360,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_get_subtree(self):
         """ Tests get_subtree function """
 
-        bt = StringBehaviorTree(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
+        bt = BehaviorTreeStringRepresentation(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
         subtree = bt.get_subtree(1)
         assert subtree == ['a0']
 
@@ -378,7 +378,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_insert_subtree(self):
         """ Tests insert_subtree function """
         
-        bt1 = StringBehaviorTree(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
+        bt1 = BehaviorTreeStringRepresentation(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
         
         bt1.insert_subtree(['f(', 'a1', ')'], 1)
         assert bt1.bt == ['s(', 'f(', 'a1', ')', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')']
@@ -389,8 +389,8 @@ class TestBehaviorTree(unittest.TestCase):
     def test_swap_subtrees(self):
         """ Tests swap_subtrees function """
 
-        bt1 = StringBehaviorTree(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
-        bt2 = StringBehaviorTree(['s(', 'a0', 'f(', 'a0', 'a0', ')', 's(', 'a0', 'a0', ')', ')'])    
+        bt1 = BehaviorTreeStringRepresentation(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
+        bt2 = BehaviorTreeStringRepresentation(['s(', 'a0', 'f(', 'a0', 'a0', ')', 's(', 'a0', 'a0', ')', ')'])
         bt1.swap_subtrees(bt2, 6, 6)
 
         assert bt1.bt == ['s(', 'a0', 'f(', 'a0', 'a0', ')', 's(', 'a0', 'a0', ')', ')']
@@ -407,7 +407,7 @@ class TestBehaviorTree(unittest.TestCase):
     def test_is_subtree(self):
         """ Tests is_subtree function """
 
-        bt = StringBehaviorTree(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
+        bt = BehaviorTreeStringRepresentation(['s(', 'a0', 'f(', 'a0', 'a0', ')', 'a0', ')'])
 
         assert bt.is_subtree(0)
         assert bt.is_subtree(1)

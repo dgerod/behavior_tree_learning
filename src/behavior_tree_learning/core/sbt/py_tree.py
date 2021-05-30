@@ -2,7 +2,7 @@ import time
 import py_trees as pt
 
 from behavior_tree_learning.core.world.world import World
-from behavior_tree_learning.core.sbt.behavior_tree import StringBehaviorTree
+from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
 
 
 class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
@@ -13,7 +13,7 @@ class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
             self.root = root
             string = self.get_bt_from_root()
 
-        self.bt = StringBehaviorTree(string)
+        self.bt = BehaviorTreeStringRepresentation(string)
         self.depth = self.bt.depth()
         self.length = self.bt.length()
         self.world = world
@@ -57,7 +57,7 @@ class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
                     bt.insert(i + 1, ')')
             prev_leading_spaces = leading_spaces
 
-        bt_obj = StringBehaviorTree(bt)
+        bt_obj = BehaviorTreeStringRepresentation(bt)
         bt_obj.close()
         
         return bt_obj.bt

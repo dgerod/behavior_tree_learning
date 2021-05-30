@@ -166,7 +166,7 @@ def get_action_list():
     return ACTION_NODES
 
 
-class StringBehaviorTree:
+class BehaviorTreeStringRepresentation:
     """
     Class for handling string representations of behavior trees
     """
@@ -197,12 +197,12 @@ class StringBehaviorTree:
                 self.bt = [random.choice(CONTROL_NODES)]
                 for _ in range(length - 1):
                     if self.bt[-1] in CONTROL_NODES:
-                        child = [StringBehaviorTree.random_node()]
+                        child = [BehaviorTreeStringRepresentation.random_node()]
                         while child in UP_NODE:
-                            child = [StringBehaviorTree.random_node()]
+                            child = [BehaviorTreeStringRepresentation.random_node()]
                         self.bt += child
                     else:
-                        self.bt += [StringBehaviorTree.random_node()]
+                        self.bt += [BehaviorTreeStringRepresentation.random_node()]
 
                     if self.bt[-1] in ACTION_NODES:
                         self.bt += [UP_NODE[0]]
@@ -398,7 +398,7 @@ class StringBehaviorTree:
             return
 
         if new_node is None:
-            new_node = StringBehaviorTree.random_node()
+            new_node = BehaviorTreeStringRepresentation.random_node()
 
         # Change control node to leaf node, remove whole subtree
         if new_node in LEAF_NODES and self.bt[index] in CONTROL_NODES:
@@ -424,7 +424,7 @@ class StringBehaviorTree:
         Adds new node at index
         """
         if new_node is None:
-            new_node = StringBehaviorTree.random_node()
+            new_node = BehaviorTreeStringRepresentation.random_node()
         if new_node in CONTROL_NODES:
             if index == 0:
                 #Adding new control node to encapsulate entire tree
