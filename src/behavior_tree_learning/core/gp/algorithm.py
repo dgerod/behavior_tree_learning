@@ -6,7 +6,7 @@ import random
 from statistics import mean
 import numpy as np
 
-from behavior_tree_learning.core.environment import Environment
+from behavior_tree_learning.core.environment import GeneticEnvironment
 from behavior_tree_learning.core.gp_sbt import gp_operators
 
 from behavior_tree_learning.core.hash_table import HashTable
@@ -35,7 +35,7 @@ def set_operators(random_genome, crossover_genome, mutate_gene):
     _operators['mutate_gene'] = mutate_gene
 
 
-def run(environment: Environment, gp_par, hotstart=False, baseline=None):
+def run(environment: GeneticEnvironment, gp_par, hotstart=False, baseline=None):
     """
     Runs the genetic programming algorithm
     """
@@ -237,7 +237,7 @@ def _rerun_probability(n_runs):
     return 1 / n_runs**2
 
 
-def _calculate_fitness(individual, hash_table, environment: Environment, rerun=0):
+def _calculate_fitness(individual, hash_table, environment: GeneticEnvironment, rerun=0):
     """
     Gets fitness from hash table if possible, otherwise gets it from simulation
     rerun = 0 means never rerun
