@@ -7,7 +7,7 @@ returns nothing but saves a graphical representation of the individual
 import time
 from interface import implements
 from behavior_tree_learning.core.environment import Environment as GpEnvironment
-from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
+from behavior_tree_learning.core.sbt import StringBehaviorTreeForPyTree
 import duplo_simulation.behaviors as behaviors
 import duplo_simulation.fitness_function as fitness_function
 

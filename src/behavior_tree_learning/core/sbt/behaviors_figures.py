@@ -2,7 +2,7 @@
 Behaviors for creating figures
 """
 import py_trees as pt
-from behavior_tree_learning.core.str_bt.behaviors import RSequence
+from behavior_tree_learning.core.sbt.behaviors import RSequence
 
 
 def get_node_from_string(string, _world_interface, _verbose=False):

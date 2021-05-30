@@ -2,7 +2,7 @@ import time
 import py_trees as pt
 
 from behavior_tree_learning.core.world.world import World
-from behavior_tree_learning.core.str_bt.behavior_tree import StringBehaviorTree
+from behavior_tree_learning.core.sbt.behavior_tree import StringBehaviorTree
 
 
 class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):

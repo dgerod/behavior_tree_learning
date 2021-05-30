@@ -5,7 +5,7 @@ For duplo brick handling in a state machine env
 """
 import re
 import py_trees as pt
-from behavior_tree_learning.core.str_bt.behaviors import RSequence
+from behavior_tree_learning.core.sbt.behaviors import RSequence
 import duplo_state_machine.state_machine as sm
 
 

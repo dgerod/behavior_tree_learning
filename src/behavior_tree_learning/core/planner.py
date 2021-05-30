@@ -8,8 +8,8 @@ the conditions.
 import py_trees as pt
 
 from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
-from behavior_tree_learning.core.str_bt.behaviors import RSequence
-from behavior_tree_learning.core.str_bt.behavior_tree import get_action_list
+from behavior_tree_learning.core.sbt.behaviors import RSequence
+from behavior_tree_learning.core.sbt.behavior_tree import get_action_list
 
 
 def _handle_precondition(precondition, behaviors, world_interface):

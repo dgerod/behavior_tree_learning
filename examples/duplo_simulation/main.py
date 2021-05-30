@@ -9,7 +9,7 @@ import time
 PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
-import behavior_tree_learning.core.str_bt.behavior_tree as behavior_tree
+import behavior_tree_learning.core.sbt.behavior_tree as behavior_tree
 from behavior_tree_learning.core.gp import algorithm as gp
 import behavior_tree_learning.core.logger.logplot as logplot
 import duplo_simulation.agx_interface as agx_interface
@@ -537,7 +537,7 @@ def paper_plots():
 def paper_figures():
     # pylint: disable=import-outside-toplevel
     """ Creates the bt figures used in the paper """
-    from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
+    from behavior_tree_learning.core.sbt import StringBehaviorTreeForPyTree
     import behavior_tree_learning.behaviors_figures as behaviors
 
     behavior_tree.load_settings_from_file('BT_SETTINGS_TOWER.yaml')

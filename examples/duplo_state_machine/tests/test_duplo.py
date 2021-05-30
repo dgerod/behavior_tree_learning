@@ -6,7 +6,7 @@ import os
 import random
 from behavior_tree_learning.core.gp import genetic_programming as gp
 from behavior_tree_learning.core.gp.parameters import GeneticParameters
-import behavior_tree_learning.core.str_bt.behavior_tree as bt
+import behavior_tree_learning.core.sbt.behavior_tree as bt
 
 from behavior_tree_learning.examples.duplo_state_machine.paths import EXAMPLE_DIRECTORY
 from behavior_tree_learning.examples.duplo_state_machine.environment import Environment
