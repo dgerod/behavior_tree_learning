@@ -7,7 +7,7 @@ from statistics import mean
 import numpy as np
 
 from behavior_tree_learning.core.environment import Environment
-from behavior_tree_learning.core.str_bt import gp_operators
+from behavior_tree_learning.core.gp_sbt import gp_operators
 
 from behavior_tree_learning.core.hash_table import HashTable
 from behavior_tree_learning.core.logger import logplot
