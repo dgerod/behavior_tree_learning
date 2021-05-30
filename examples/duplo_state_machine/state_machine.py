@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from copy import copy
 
 from interface import implements
-from behavior_tree_learning.core.world import World
+from behavior_tree_learning.learning import World
 
 
 @dataclass

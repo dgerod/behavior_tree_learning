@@ -1,13 +1,13 @@
 from interface import implements
-from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
-from behavior_tree_learning.core.environment import Environment as GpEnvironment
-from behavior_tree_learning.core.world import World
+from behavior_tree_learning.learning import GeneticEnvironment
+from behavior_tree_learning.learning import World
+from behavior_tree_learning.learning import StringBehaviorTreeForPyTree
+
 from duplo_state_machine import behaviors
-from duplo_state_machine import state_machine as sm
 from duplo_state_machine import fitness_function
 
 
-class Environment(implements(GpEnvironment)):
+class Environment(implements(GeneticEnvironment)):
     """ Class defining the environment in which the individual operates """
 
     def __init__(self, world: World, target_positions, static_tree=None,
