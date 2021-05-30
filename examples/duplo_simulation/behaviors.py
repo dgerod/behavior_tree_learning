@@ -8,7 +8,7 @@ import re
 import py_trees as pt
 
 from behavior_tree_learning.behaviors import RSequence
-from behavior_tree_learning.examples.duplo_simulation.agx_interface import Pos
+from duplo_simulation.agx_interface import Pos
 
 def get_node_from_string(string, world_interface, verbose=False):
     """

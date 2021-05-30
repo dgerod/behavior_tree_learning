@@ -6,7 +6,8 @@ import os
 import sys
 
 import py_trees as pt
-import state_machine as sm
+from tiago_pick_and_place import state_machine as sm
+
 
 def get_node_from_string(string, state_machine_, verbose=False):
     """

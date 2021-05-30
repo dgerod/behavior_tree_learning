@@ -3,15 +3,18 @@
 Main script for running duplo simulations
 """
 import sys
+import os
 import time
+
+PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
 import behavior_tree_learning.core.str_bt.behavior_tree as behavior_tree
 from behavior_tree_learning.core.gp import algorithm as gp
 import behavior_tree_learning.core.logger.logplot as logplot
-
-import behavior_tree_learning.examples.duplo_simulation.agx_interface as agx_interface
-from behavior_tree_learning.examples.duplo_simulation.environment import Environment
-from behavior_tree_learning.examples.duplo_simulation.fitness_function import Coefficients
+import duplo_simulation.agx_interface as agx_interface
+from duplo_simulation.environment import Environment
+from duplo_simulation.fitness_function import Coefficients
 
 
 def run_individual():

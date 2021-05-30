@@ -1,16 +1,10 @@
-"""
-A simple simulation environment for testing duplo handling.
-All environments must contain a get_fitness(individual) function
-that returns a fitness value and a plot_individual() function that
-returns nothing but saves a graphical representation of the individual
-"""
 from interface import implements
 from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
 from behavior_tree_learning.core.environment import Environment as GpEnvironment
 from behavior_tree_learning.core.world import World
-from behavior_tree_learning.examples.duplo_state_machine import behaviors
-from behavior_tree_learning.examples.duplo_state_machine import state_machine as sm
-from behavior_tree_learning.examples.duplo_simulation import fitness_function
+from duplo_state_machine import behaviors
+from duplo_state_machine import state_machine as sm
+from duplo_state_machine import fitness_function
 
 
 class Environment(implements(GpEnvironment)):

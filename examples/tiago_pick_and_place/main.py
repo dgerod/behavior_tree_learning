@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
+import sys
 import os
+
+PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
 from behavior_tree_learning.core.logger import logplot
 from behavior_tree_learning.core.gp import algorithm as gp
 from behavior_tree_learning.core.gp.parameters import GeneticParameters
-from behavior_tree_learning.examples.tiago_pick_and_place.environment import Environment
+from tiago_pick_and_place.environment import Environment
 
 
 def _run_simulation():

@@ -8,8 +8,8 @@ import time
 from interface import implements
 from behavior_tree_learning.core.environment import Environment as GpEnvironment
 from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
-import behavior_tree_learning.examples.duplo_simulation.behaviors as behaviors
-import behavior_tree_learning.examples.duplo_simulation.fitness_function as fitness_function
+import duplo_simulation.behaviors as behaviors
+import duplo_simulation.fitness_function as fitness_function
 
 
 class Environment(implements(GpEnvironment)):

@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 
+import sys
 import os
+
+PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
 import behavior_tree_learning.core.str_bt.behavior_tree as behavior_tree
 from behavior_tree_learning.core.gp import algorithm as gp
 from behavior_tree_learning.core.gp.parameters import GeneticParameters
-
-from behavior_tree_learning.examples.duplo_state_machine.paths import EXAMPLE_DIRECTORY
-from behavior_tree_learning.examples.duplo_state_machine.environment import Environment
-from behavior_tree_learning.examples.duplo_state_machine import state_machine as sm
+from duplo_state_machine.paths import EXAMPLE_DIRECTORY
+from duplo_state_machine.environment import Environment
+from duplo_state_machine import state_machine as sm
 
 
 def run():
@@ -41,10 +44,9 @@ def run():
     start_position = [sm.Pos(0.0, 0.05, 0),
                       sm.Pos(0.0, 0.05, 0.0192),
                       sm.Pos(0.0, 0.05, 2*0.0192)]
-
-    target_position = start_position
-
     world = sm.StateMachine(start_position)
+
+    target_position = start_position    
     environment = Environment(world, target_position, verbose=False)
     
     n_logs = 10

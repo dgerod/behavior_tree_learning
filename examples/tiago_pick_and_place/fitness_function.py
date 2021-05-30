@@ -5,7 +5,7 @@ Task dependent cost function
 """
 
 from dataclasses import dataclass
-import state_machine as sm
+from tiago_pick_and_place import state_machine as sm
 
 @dataclass
 class Coefficients:

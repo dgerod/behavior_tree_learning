@@ -9,11 +9,10 @@ from interface import implements
 from behavior_tree_learning.core.str_bt import behavior_tree as bt
 from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
 from behavior_tree_learning.core.environment import Environment as GpEnvironment
-
-from behavior_tree_learning.examples.tiago_pick_and_place.paths import EXAMPLE_DIRECTORY
-from behavior_tree_learning.examples.tiago_pick_and_place import behaviors
-from behavior_tree_learning.examples.tiago_pick_and_place import fitness_function
-from behavior_tree_learning.examples.tiago_pick_and_place import state_machine as sm
+from tiago_pick_and_place.paths import EXAMPLE_DIRECTORY
+from tiago_pick_and_place import behaviors
+from tiago_pick_and_place import fitness_function
+from tiago_pick_and_place import state_machine as sm
 
 
 class Environment(implements(GpEnvironment)):

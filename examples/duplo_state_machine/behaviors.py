@@ -5,9 +5,8 @@ For duplo brick handling in a state machine env
 """
 import re
 import py_trees as pt
-
 from behavior_tree_learning.core.str_bt.behaviors import RSequence
-import behavior_tree_learning.examples.duplo_state_machine.state_machine as sm
+import duplo_state_machine.state_machine as sm
 
 
 def get_node_from_string(string, world_interface, verbose=False):

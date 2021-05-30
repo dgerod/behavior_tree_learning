@@ -4,6 +4,7 @@ Task dependent cost function
 
 from dataclasses import dataclass
 
+
 @dataclass
 class Coefficients:
     """
@@ -17,6 +18,7 @@ class Coefficients:
     failed: float = 50.0
     timeout: float = 10.0
     hand_not_empty: float = 0.0
+
 
 def compute_fitness(world, behavior_tree, ticks, targets, coeff=None, verbose=False):
     # pylint: disable=too-many-arguments

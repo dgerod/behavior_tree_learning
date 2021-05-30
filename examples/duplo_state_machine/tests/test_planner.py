@@ -1,10 +1,11 @@
 """
 Test for planner
 """
-import behavior_tree_learning.duplo_state_machine.planner_behaviors as behaviors
-import behavior_tree_learning.duplo_state_machine.state_machine as sm
+
 import behavior_tree_learning.planner as planner
 import behavior_tree_learning.behavior_tree as behavior_tree
+import duplo_state_machine.planner_behaviors as behaviors
+import duplo_state_machine.state_machine as sm
 
 def test_tower():
     """ Test run of stacking three bricks in a tower """
