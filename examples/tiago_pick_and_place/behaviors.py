@@ -6,6 +6,7 @@ import os
 import sys
 
 import py_trees as pt
+from behavior_tree_learning.learning import RSequence
 from tiago_pick_and_place import state_machine as sm
 
 
@@ -141,6 +142,7 @@ def get_node_from_string(string, state_machine_, verbose=False):
         raise Exception("Unexpected character", string)
     return node, has_children
 
+
 class BlockOnTable(pt.behaviour.Behaviour):
     """
     Condition checking if the cube is on table
@@ -153,6 +155,7 @@ class BlockOnTable(pt.behaviour.Behaviour):
         if self.state_machine.feedback[sm.Feedback.CUBE] == self.state_machine.poses.cube_goal_pose:
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class IsLocalised(pt.behaviour.Behaviour):
     """
@@ -167,6 +170,7 @@ class IsLocalised(pt.behaviour.Behaviour):
         if self.state_machine.current[sm.State.LOCALISED]:
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class Localise(pt.behaviour.Behaviour):
     """
@@ -191,6 +195,7 @@ class Localise(pt.behaviour.Behaviour):
             else:
                 self.state = pt.common.Status.FAILURE
         return self.state
+
 
 class MoveArm(pt.behaviour.Behaviour):
     """
@@ -218,6 +223,7 @@ class MoveArm(pt.behaviour.Behaviour):
             self.state_machine.manipulating = False
         return self.state
 
+
 class IsTucked(pt.behaviour.Behaviour):
     """
     Condition checking if the robot arm is tucked
@@ -232,6 +238,7 @@ class IsTucked(pt.behaviour.Behaviour):
         if self.state_machine.current[sm.State.ARM] == "Tucked":
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class NotHaveBlock(pt.behaviour.Behaviour):
     """
@@ -260,6 +267,7 @@ class HaveBlock(pt.behaviour.Behaviour):
         if self.state_machine.current[sm.State.HAS_CUBE]:
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class PickUp(pt.behaviour.Behaviour):
     """
@@ -295,6 +303,7 @@ class PickUp(pt.behaviour.Behaviour):
 
         return self.state
 
+
 class Placed(pt.behaviour.Behaviour):
     """
     Condition checking if the robot has placed the cube
@@ -309,6 +318,7 @@ class Placed(pt.behaviour.Behaviour):
         if self.state_machine.feedback[sm.Feedback.CUBE][self.cube_ID] == self.state_machine.poses.cube_goal_pose and not self.state_machine.current[sm.State.HAS_CUBE]:
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class Place(pt.behaviour.Behaviour):
     """
@@ -336,6 +346,7 @@ class Place(pt.behaviour.Behaviour):
             self.state_machine.manipulating = False
         return self.state
 
+
 class Visited(pt.behaviour.Behaviour):
     """
     Condition checking if robot has visited a pick table and attempted the picking
@@ -354,6 +365,7 @@ class Visited(pt.behaviour.Behaviour):
         if self.state_machine.current[sm.State.VISITED][self.pose_idx]:
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
+
 
 class MoveToPose(pt.behaviour.Behaviour):
     """
@@ -399,6 +411,7 @@ class MoveToPose(pt.behaviour.Behaviour):
             self.state_machine.moving = False
         return self.state
 
+
 class MoveToPose_safe(pt.behaviour.Behaviour):
     """
     Move to palce pose behavior taking a slower but safer path
@@ -429,6 +442,7 @@ class MoveToPose_safe(pt.behaviour.Behaviour):
             self.state_machine.moving = False
         return self.state
 
+
 class MoveHead_Up(pt.behaviour.Behaviour):
     """
     Move the head up behavior
@@ -452,6 +466,7 @@ class MoveHead_Up(pt.behaviour.Behaviour):
             else:
                 self.state = pt.common.Status.FAILURE
         return self.state
+
 
 class MoveHead_Down(pt.behaviour.Behaviour):
     """
@@ -477,6 +492,7 @@ class MoveHead_Down(pt.behaviour.Behaviour):
                 self.state = pt.common.Status.FAILURE
         return self.state
 
+
 class Finished(pt.behaviour.Behaviour):
     """
     Condition checking if the task is finished
@@ -493,59 +509,7 @@ class Finished(pt.behaviour.Behaviour):
         return pt.common.Status.FAILURE
 
 
-
-# Reactive sequence
-class RSequence(pt.composites.Selector):
-    """
-    Rsequence for py_trees
-    Reactive sequence overidding sequence with memory, py_trees' only available sequence.
-
-    Author: Chrisotpher Iliffe Sprague, sprague@kth.se
-    """
+class ReactiveSequence(RSequence):
 
     def __init__(self, name='Sequence', children=None):
         super(RSequence, self).__init__(name=name, children=children)
-
-    def tick(self):
-        """
-        Run the tick behaviour for this selector. Note that the status
-        of the tick is always determined by its children, not
-        by the user customised update function.
-        Yields:
-            :class:`~py_trees.behaviour.Behaviour`: a reference to itself or one of its children
-        """
-        self.logger.debug("%s.tick()" % self.__class__.__name__)
-        # Required behaviour for *all* behaviours and composites is
-        # for tick() to check if it isn't running and initialise
-        if self.status != pt.common.Status.RUNNING:
-            # selectors dont do anything specific on initialisation
-            #   - the current child is managed by the update, never needs to be 'initialised'
-            # run subclass (user) handles
-            self.initialise()
-        # run any work designated by a customised instance of this class
-        self.update()
-        previous = self.current_child
-        for child in self.children:
-            for node in child.tick():
-                yield node
-                if node is child and \
-                    (node.status == pt.common.Status.RUNNING or node.status == pt.common.Status.FAILURE):
-                    self.current_child = child
-                    self.status = node.status
-                    if previous is None or previous != self.current_child:
-                        # we interrupted, invalidate everything at a lower priority
-                        passed = False
-                        for sibling in self.children:
-                            if passed and sibling.status != pt.common.Status.INVALID:
-                                sibling.stop(pt.common.Status.INVALID)
-                            if sibling == self.current_child:
-                                passed = True
-                    yield self
-                    return
-        # all children succeded, set succed ourselves and current child to the last bugger who failed us
-        self.status = pt.common.Status.SUCCESS
-        try:
-            self.current_child = self.children[-1]
-        except IndexError:
-            self.current_child = None
-        yield self

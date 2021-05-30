@@ -2,6 +2,7 @@ from enum import Enum, auto
 import random
 import numpy as np
 
+
 class SelectionMethods(Enum):
     """ Enum class for selection methods """
 
