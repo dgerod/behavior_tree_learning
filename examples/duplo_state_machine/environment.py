@@ -1,7 +1,7 @@
 from interface import implements
 from behavior_tree_learning.learning import GeneticEnvironment
 from behavior_tree_learning.learning import World
-from behavior_tree_learning.learning import StringBehaviorTreeForPyTree
+from behavior_tree_learning.learning import StringBehaviorTree
 
 from duplo_state_machine import behaviors
 from duplo_state_machine import fitness_function
@@ -30,7 +30,7 @@ class Environment(implements(GeneticEnvironment)):
     def run_and_compute(self, individual):
         """ Run the simulation and return the fitness """
 
-        behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world=self.world, verbose=self.verbose)
+        behavior_tree = StringBehaviorTree(individual[:], behaviors=behaviors, world=self.world, verbose=self.verbose)
         ticks, _ = behavior_tree.run_bt()
         return fitness_function.compute_fitness(self.world, behavior_tree, ticks, self.targets, self.fitness_coeff)
 
@@ -38,9 +38,9 @@ class Environment(implements(GeneticEnvironment)):
         """ Saves a graphical representation of the individual """
 
         if self.static_tree is not None:
-            pytree = StringBehaviorTreeForPyTree(self._add_to_static_tree(individual), behaviors=behaviors)
+            pytree = StringBehaviorTree(self._add_to_static_tree(individual), behaviors=behaviors)
         else:
-            pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors)
+            pytree = StringBehaviorTree(individual[:], behaviors=behaviors)
         pytree.save_fig(path, name=plot_name)
 
     def _add_to_static_tree(self, individual):

@@ -7,7 +7,7 @@ returns nothing but saves a graphical representation of the individual
 import os
 from interface import implements
 from behavior_tree_learning.core.str_bt import behavior_tree as bt
-from behavior_tree_learning.core.str_bt import StringBehaviorTreeForPyTree
+from behavior_tree_learning.core.str_bt import StringBehaviorTree
 from behavior_tree_learning.core.environment import Environment as GpEnvironment
 from tiago_pick_and_place.paths import EXAMPLE_DIRECTORY
 from tiago_pick_and_place import behaviors
@@ -38,7 +38,7 @@ class Environment(implements(GpEnvironment)):
             completed = False
             for i in range(3):
                 state_machine = sm.StateMachine(self.scenario, self.deterministic, self.verbose, pose_id=i)
-                behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors, world=state_machine)
+                behavior_tree = StringBehaviorTree(individual[:], behaviors, world=state_machine)
 
                 ticks, _ = behavior_tree.run_bt()
 
@@ -52,7 +52,7 @@ class Environment(implements(GpEnvironment)):
 
         else:
             state_machine = sm.StateMachine(self.scenario, self.deterministic, self.verbose)
-            behavior_tree = StringBehaviorTreeForPyTree(individual[:], behaviors, world=state_machine)
+            behavior_tree = StringBehaviorTree(individual[:], behaviors, world=state_machine)
 
             ticks, _ = behavior_tree.run_bt()
 
@@ -64,6 +64,6 @@ class Environment(implements(GpEnvironment)):
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
 
-        pytree = StringBehaviorTreeForPyTree(individual[:], behaviors)
+        pytree = StringBehaviorTree(individual[:], behaviors)
         pytree.save_fig(path, name=plot_name)
 

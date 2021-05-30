@@ -7,7 +7,7 @@ returns nothing but saves a graphical representation of the individual
 import time
 from interface import implements
 from behavior_tree_learning.core.environment import Environment as GpEnvironment
-from behavior_tree_learning.core.sbt import StringBehaviorTreeForPyTree
+from behavior_tree_learning.core.sbt import StringBehaviorTree
 import duplo_simulation.behaviors as behaviors
 import duplo_simulation.fitness_function as fitness_function
 
@@ -30,7 +30,7 @@ class Environment(implements(GpEnvironment)):
         Run the simulation and return the fitness
         In case of error, restarts world_interface and tries again.
         """
-        pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors, world=self.world_interface,
+        pytree = StringBehaviorTree(individual[:], behaviors=behaviors, world=self.world_interface,
                                              verbose=self.verbose)
 
         status_ok = True
@@ -76,9 +76,9 @@ class Environment(implements(GpEnvironment)):
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
         if self.static_tree is not None:
-            bt = StringBehaviorTreeForPyTree(self._add_to_static_tree(individual), behaviors=behaviors)
+            bt = StringBehaviorTree(self._add_to_static_tree(individual), behaviors=behaviors)
         else:
-            bt = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors)
+            bt = StringBehaviorTree(individual[:], behaviors=behaviors)
         bt.save_fig(path, name=plot_name)
 
     def _add_to_static_tree(self, individual):

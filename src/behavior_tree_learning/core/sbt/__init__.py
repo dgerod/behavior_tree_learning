@@ -1,2 +1,2 @@
 from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
-from behavior_tree_learning.core.sbt.py_tree import StringBehaviorTreeForPyTree
+from behavior_tree_learning.core.sbt.py_tree import StringBehaviorTree

@@ -5,7 +5,7 @@ from behavior_tree_learning.core.world.world import World
 from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
 
 
-class StringBehaviorTreeForPyTree(pt.trees.BehaviourTree):
+class StringBehaviorTree(pt.trees.BehaviourTree):
 
     def __init__(self, string, behaviors, world: World = None, root=None, verbose=False):
 

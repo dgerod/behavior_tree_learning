@@ -537,7 +537,7 @@ def paper_plots():
 def paper_figures():
     # pylint: disable=import-outside-toplevel
     """ Creates the bt figures used in the paper """
-    from behavior_tree_learning.core.sbt import StringBehaviorTreeForPyTree
+    from behavior_tree_learning.core.sbt import StringBehaviorTree
     import behavior_tree_learning.behaviors_figures as behaviors
 
     behavior_tree.load_settings_from_file('BT_SETTINGS_TOWER.yaml')
@@ -545,14 +545,14 @@ def paper_figures():
     tree = ['s(', 'f(', 'Green at A?', 's(', 'f(', 'picked Green?', 'pick Green!', ')', 'place at A!', ')', ')', \
             'f(', 'Blue at pos B?', 's(', 'f(', 'Blue on Green?', 's(', 'f(', 'picked Blue?', 'pick Blue!', ')', 'place on Green!', ')', ')', 'apply force Blue!', ')', ')',  \
             'f(', 'Red at pos C?', 's(', 'f(', 'Red on Blue?', 's(', 'f(', 'picked Red?', 'pick Red!', ')', 'place on Blue!', ')', ')', 'apply force Red!', ')', ')', ')']
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='tower_planned', svg=True)
 
     # Tower solved
     tree = ['s(', 'f(', 'Green at pos A?', 's(', 'pick Green!', 'place at A!', ')', ')', \
             'f(', 'Blue at pos B?', 's(', 'f(', 'Blue on Green?', 's(', 'pick Blue!', 'place on Green!', ')', ')', 'apply force Blue!', ')', ')',  \
             'f(', 'Red at pos C?', 's(', 'f(', 'Red on Blue?', 's(', 'pick Red!', 'place on Blue!', ')', ')', 'apply force Red!', ')', ')', ')']
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='tower_solved', svg=True)
 
     behavior_tree.load_settings_from_file('BT_SETTINGS_CROISSANT.yaml')
@@ -561,7 +561,7 @@ def paper_figures():
             'f(', 'Blue at pos D?', 's(', 'f(', 'Blue on Green?', 's(', 'f(', 'picked Blue?', 'pick Blue!', ')', 'place on Green!', ')', ')', 'apply force Blue!', ')', ')', \
             'f(', 'Red at pos A?', 's(', 'f(', 'picked Red?', 'pick Red!', ')', 'place at A!', ')', ')', \
             'f(', 'Yellow at pos C?', 's(', 'f(', 'picked Yellow?', 'pick Yellow!', ')', 'place at C!', ')', ')', ')']
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='croissant_planned', svg=True)
 
     # Croissant solved
@@ -569,18 +569,18 @@ def paper_figures():
             'f(', 'Red at pos A?', 's(', 'pick Red!', 'place at A!', ')', ')', \
             'f(', 'Yellow at pos C?', 's(', 'pick Yellow!', 'place at C!', ')', ')', \
             'f(', 'Blue at pos D?', 's(', 'f(', 'Blue on Green?', 's(', 'pick Blue!', 'place on Green!', ')', ')', 'apply force Blue!', ')', ')', ')']
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='croissant_solved', svg=True)
 
     behavior_tree.load_settings_from_file('BT_SETTINGS_BALANCE.yaml')
     # Balance planned
     tree = ['s(', 'f(', 'Green at pos B?', 's(', 'f(', 'Blue at pos A?', 'put Blue at A!', ')', 'f(', 'Green on Blue?', 'put Green on Blue!', ')', 'apply force Green!', ')', ')', ')']
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='balance_planned', svg=True)
 
     # Balance solved
     tree = ['f(', 'Green at pos B?', 's(', 'put Red at A!', 'put Green on Red!', 'apply force Green!', ')', ')']
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='balance_solved', svg=True)
 
     behavior_tree.load_settings_from_file('BT_SETTINGS_BLOCKING.yaml')
@@ -589,7 +589,7 @@ def paper_figures():
             'f(', 'Blue at E?', 's(', 'f(', 'Blue on Green?', 'put Blue on Green!', ')', 'apply force Blue!', ')', ')', \
             'f(', 'Red at C?', 'put Red at C!', ')', ')']
 
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='blocking_planned', svg=True)
 
     # Blocking solved
@@ -597,5 +597,5 @@ def paper_figures():
             'put Green at A!', \
             'f(', 'Blue at E?', 'apply force Blue!', ')', \
             'put Red at C!', ')']
-    pytree = StringBehaviorTreeForPyTree(tree[:], behaviors=behaviors)
+    pytree = StringBehaviorTree(tree[:], behaviors=behaviors)
     pytree.save_fig('logs/paperfigures/', name='blocking_solved', svg=True)

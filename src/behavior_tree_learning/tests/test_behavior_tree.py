@@ -5,7 +5,7 @@ import unittest
 import os
 import random
 from behavior_tree_learning.core.str_bt import behavior_tree
-from behavior_tree_learning.core.str_bt import BehaviorTreeStringRepresentation, StringBehaviorTreeForPyTree
+from behavior_tree_learning.core.str_bt import BehaviorTreeStringRepresentation, StringBehaviorTree
 from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
 
 import behavior_tree_learning.examples.duplo_state_machine.behaviors as behaviors
@@ -276,7 +276,7 @@ class TestBehaviorTree(unittest.TestCase):
     def plot_individual(self, individual, plot_name):
         """ Saves a graphical representation of the individual """
         
-        pytree = StringBehaviorTreeForPyTree(individual[:], behaviors=behaviors)
+        pytree = StringBehaviorTree(individual[:], behaviors=behaviors)
         pytree.save_fig('logs/', name=plot_name)
 
     def test_delete_node(self):
