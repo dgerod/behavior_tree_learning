@@ -15,7 +15,7 @@ from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 
 _operators = {'random_genome': gp_operators.random_genome,
               'crossover_genome': gp_operators.crossover_genome,
-              'mutate_gene': gp_operators.mutate_gene }
+              'mutate_gene': gp_operators.mutate_gene}
 
 
 def set_seeds(seed):
