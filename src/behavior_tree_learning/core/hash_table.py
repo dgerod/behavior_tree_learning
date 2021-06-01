@@ -7,6 +7,7 @@ import ast
 
 import behavior_tree_learning.core.logger.logplot as logplot
 
+
 class Node:
     """
     Node data structure - essentially a LinkedList node

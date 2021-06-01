@@ -115,12 +115,12 @@ def log_last_population(log_name, population):
     with open_file(get_log_folder(log_name) + '/population.pickle', 'wb') as f:
         pickle.dump(population, f)
 
-def log_settings(log_name, settings, baseline):
+def log_settings(log_name, settings, base_line):
     """ Logs settings used for the run """
     with open_file(get_log_folder(log_name) + '/settings.txt', 'w') as f:
         for key, value in vars(settings).items():
             f.write(key + ' ' + str(value) + '\n')
-        f.write('Baseline: ' + str(baseline) + '\n')
+        f.write('Baseline: ' + str(base_line) + '\n')
 
 def log_state(log_name, randomstate, np_randomstate, generation):
     """ Logs the current random state and generation number """

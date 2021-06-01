@@ -38,15 +38,17 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         by cleaning the ascii tree from py trees
         Not complete or beautiful by any means but works for many trees
         """
+
         string = pt.display.ascii_tree(self.root)
         print(string)
+
         string = string.replace('[o] ', '')
         string = string.replace('\t', '')
         string = string.replace('-->', '')
         string = string.replace('Fallback', 'f(')
         string = string.replace('Sequence', 's(')
         bt = string.split('\n')
-        bt = bt[:-1] #Remove empty element because of final newline
+        bt = bt[:-1]
 
         prev_leading_spaces = 999999
         for i in range(len(bt) - 1, -1, -1):
@@ -71,15 +73,15 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
                 string.pop(0)
                 return node
 
-            newnode, has_children = self.behaviors.get_node_from_string(string[0], self.world, self.verbose)
+            new_node, has_children = self.behaviors.get_node_from_string(string[0], self.world, self.verbose)
             string.pop(0)
             if has_children:
                 #Node is a control node or decorator with children - add subtree via string and then add to parent
-                newnode = self.create_from_string(string, newnode)
-                node.add_child(newnode)
+                new_node = self.create_from_string(string, new_node)
+                node.add_child(new_node)
             else:
                 #Node is a leaf/action node - add to parent, then keep looking for siblings
-                node.add_child(newnode)
+                node.add_child(new_node)
 
         #This return is only reached if there are too few up nodes
         return node
@@ -100,7 +102,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
               (self.root.status is not pt.common.Status.SUCCESS or successes < successes_required) and \
               ticks < max_ticks and status_ok:
 
-            status_ok = self.world.get_feedback() #Wait for connection
+            status_ok = self.world.get_feedback()
 
             if status_ok:
                 self.root.tick_once()
