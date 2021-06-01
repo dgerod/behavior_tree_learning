@@ -52,33 +52,33 @@ class Environment(implements(GeneticEnvironment)):
 
 
 class Environment1(Environment):
-
     """ Test class for only running first target in list  """
+
     def __init__(self, targets, static_tree, verbose=False):
         super().__init__(targets, static_tree, verbose)
-        self.targets = [self.targets[0]] #Only first target
+        self.targets = [self.targets[0]]
 
     def get_fitness(self, individual):
         return super().get_fitness(self._add_to_static_tree(individual))
 
 
 class Environment12(Environment):
-
     """ Test class for only running first two targets in list  """
+
     def __init__(self, targets, static_tree, verbose=False):
         super().__init__(targets, static_tree, verbose)
-        self.targets = self.targets[:2] #Only first two targets
+        self.targets = self.targets[:2]
 
     def get_fitness(self, individual):
         return super().get_fitness(self._add_to_static_tree(individual))
 
 
 class Environment123(Environment):
-    
     """ Test class for only running first three targets in list  """
+
     def __init__(self, targets, static_tree, verbose=False):
         super().__init__(targets, static_tree, verbose)
-        self.targets = self.targets[:3] #Only first three targets
+        self.targets = self.targets[:3]
 
     def get_fitness(self, individual):
         return super().get_fitness(self._add_to_static_tree(individual))

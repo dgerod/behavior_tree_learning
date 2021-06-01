@@ -188,7 +188,7 @@ class TestDuploStateMachine(unittest.TestCase):
             for i in range(1, n_logs + 1):
                   gp_par.log_name = 'croissant_baseline_sm_' + str(i)
                   gp.set_seeds(i)
-                  gp.run(environment, gp_par, baseline=planned)
+                  gp.run(environment, gp_par, base_line=planned)
 
 
 #@pytest.mark.skip

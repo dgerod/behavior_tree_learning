@@ -77,7 +77,7 @@ class TestStateMachine(unittest.TestCase):
             assert fitness > -3
 
             gp_par.log_name = 'test_tower'
-            _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+            _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
             assert best_fitness[-1] > -3
 
             bt.load_settings_from_file(os.path.join(CORE_TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml'))
@@ -147,7 +147,7 @@ class TestStateMachine(unittest.TestCase):
             assert fitness > -3
 
             gp_par.log_name = 'test_croissant'
-            _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+            _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
             assert best_fitness[-1] > -4
 
             bt.load_settings_from_file(os.path.join(CORE_TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml'))
@@ -204,7 +204,7 @@ class TestStateMachine(unittest.TestCase):
             assert fitness > -1
 
             gp_par.log_name = 'test_balance'
-            _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+            _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
             assert best_fitness[-1] > -1
 
 
@@ -264,7 +264,7 @@ class TestStateMachine(unittest.TestCase):
             assert fitness > -2
 
             gp_par.log_name = 'test_blocking'
-            _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+            _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
             assert best_fitness[-1] > -2
 
             bt.load_settings_from_file(os.path.join(CORE_TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml'))
@@ -319,7 +319,7 @@ class TestStateMachine(unittest.TestCase):
             for i in range(1, n_logs + 1):
                   gp_par.log_name = 'test_baseline_no_keep' + str(i)
                   gp.set_seeds(i)
-                  _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+                  _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
                   best_list_baseline_no_keep.append(best_fitness[-1])
 
             gp_par.n_generations = 200
@@ -327,7 +327,7 @@ class TestStateMachine(unittest.TestCase):
             for i in range(1, n_logs + 1):
                   gp_par.log_name = 'test_baseline' + str(i)
                   gp.set_seeds(i)
-                  _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+                  _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
                   best_list_baseline.append(best_fitness[-1])
 
             best_list_baseline_boost = []
@@ -337,7 +337,7 @@ class TestStateMachine(unittest.TestCase):
             for i in range(1, n_logs + 1):
                   gp_par.log_name = 'test_baseline_boost' + str(i)
                   gp.set_seeds(i)
-                  _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+                  _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
                   best_list_baseline_boost.append(best_fitness[-1])
 
             best_list_baseline_boost_only_co = []
@@ -347,7 +347,7 @@ class TestStateMachine(unittest.TestCase):
             for i in range(1, n_logs + 1):
                   gp_par.log_name = 'test_baseline_boost_only_co' + str(i)
                   gp.set_seeds(i)
-                  _, _, best_fitness, _ = gp.run(environment, gp_par, baseline=planner_baseline)
+                  _, _, best_fitness, _ = gp.run(environment, gp_par, base_line=planner_baseline)
                   best_list_baseline_boost_only_co.append(best_fitness[-1])
 
             print(best_list_baseline_no_keep)

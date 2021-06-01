@@ -7,7 +7,8 @@ PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
 from behavior_tree_learning.sbt import bt as behavior_tree
-from behavior_tree_learning.gp import gp, GeneticParameters
+from behavior_tree_learning.gp import gp, GeneticParameters, GeneticSelectionMethods
+from behavior_tree_learning.core.gp_sbt import Operators as GeneticOperatorsForStringBehaviorTree
 from duplo_state_machine.paths import EXAMPLE_DIRECTORY
 from duplo_state_machine.environment import Environment
 from duplo_state_machine import state_machine as sm
@@ -26,8 +27,8 @@ def run():
     gp_parameters.replace_crossover = False
     gp_parameters.f_mutation = 0.5
     gp_parameters.n_offspring_mutation = 2
-    gp_parameters.parent_selection = gp.SelectionMethods.RANK
-    gp_parameters.survivor_selection = gp.SelectionMethods.RANK
+    gp_parameters.parent_selection = GeneticSelectionMethods.RANK
+    gp_parameters.survivor_selection = GeneticSelectionMethods.RANK
     gp_parameters.f_elites = 0.1
     gp_parameters.f_parents = gp_parameters.f_elites
     gp_parameters.mutate_co_offspring = False
@@ -52,6 +53,7 @@ def run():
     for i in range(1, n_logs + 1):
         gp_parameters.log_name = 'tower_no_baseline_' + str(i)
         gp.set_seeds(i)
+        gp.set_operators(GeneticOperatorsForStringBehaviorTree())
         gp.run(environment, gp_parameters)
 
     planner_baseline = ['s(', 
@@ -99,7 +101,8 @@ def run():
     for i in range(1, n_logs + 1):
         gp_parameters.log_name = 'tower_planner_baseline_' + str(i)
         gp.set_seeds(i)
-        gp.run(environment, gp_parameters, baseline=planner_baseline)
+        gp.set_operators(GeneticOperatorsForStringBehaviorTree())
+        gp.run(environment, gp_parameters, base_line=planner_baseline)
 
 
 if __name__ == "__main__":
