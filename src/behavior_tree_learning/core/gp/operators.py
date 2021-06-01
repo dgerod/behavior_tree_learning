@@ -1,5 +1,4 @@
 from interface import Interface
-from typing import Tuple
 
 
 class GeneticOperators(Interface):
