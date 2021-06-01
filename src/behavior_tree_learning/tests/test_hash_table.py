@@ -4,6 +4,7 @@ import unittest
 
 from behavior_tree_learning.core import hash_table
 
+
 class TestHastTable(unittest.TestCase):
   
     def test_hash_table_save_load(self):

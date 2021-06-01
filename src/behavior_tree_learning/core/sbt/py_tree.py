@@ -1,7 +1,7 @@
 import time
 import py_trees as pt
 
-from behavior_tree_learning.core.world.world import World
+from behavior_tree_learning.core.sbt.world import World
 from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
 
 
@@ -22,11 +22,11 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         self.failed = False
         self.timeout = False
 
-        if root is None:
-            self.root, has_children = behaviors.get_node_from_string(string[0], world, self.verbose)
-            string.pop(0)
-        else:
+        if root is not None:
             has_children = False
+        else:
+            self.root, has_children = behaviors.get_node_from_string(string[0], self.world, self.verbose)
+            string.pop(0)
 
         super().__init__(root=self.root)
         if has_children:

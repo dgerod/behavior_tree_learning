@@ -2,7 +2,6 @@ matplotlib
 py_trees
 numpy
 dataclasses
-pytest
 scipy
 PyYAML
 python-interface

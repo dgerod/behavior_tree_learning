@@ -1,7 +1,7 @@
 from interface import implements
-from behavior_tree_learning.learning import GeneticEnvironment
-from behavior_tree_learning.learning import World
-from behavior_tree_learning.learning import StringBehaviorTree
+from behavior_tree_learning.gp import GeneticEnvironment
+from behavior_tree_learning.sbt import World
+from behavior_tree_learning.sbt import StringBehaviorTree
 
 from duplo_state_machine import behaviors
 from duplo_state_machine import fitness_function

@@ -6,8 +6,8 @@ import os
 PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
-from behavior_tree_learning.learning import bt as behavior_tree
-from behavior_tree_learning.learning import gp, GeneticParameters
+from behavior_tree_learning.sbt import bt as behavior_tree
+from behavior_tree_learning.gp import gp, GeneticParameters
 from duplo_state_machine.paths import EXAMPLE_DIRECTORY
 from duplo_state_machine.environment import Environment
 from duplo_state_machine import state_machine as sm

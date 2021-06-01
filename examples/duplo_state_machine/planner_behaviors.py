@@ -5,7 +5,7 @@ Only difference is that pre and postconditions are added.
 import re
 import py_trees as pt
 
-from behavior_tree_learning.learning import RSequence
+from behavior_tree_learning.sbt import RSequence
 from duplo_state_machine import behaviors
 from duplo_state_machine import state_machine as sm
 
