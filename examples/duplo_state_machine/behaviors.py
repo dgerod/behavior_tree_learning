@@ -15,11 +15,7 @@ def get_node_from_string(string, world_interface, verbose=False):
     Returns a py trees behavior or composite given the string
     """
     has_children = False
-    if 'fpick ' in string:
-        node = pt.composites.Selector('Fallback')
-        node.add_child(Picked(string, world_interface, re.findall(r'\d+', string)))
-        node.add_child(Pick(string, world_interface, re.findall(r'\d+', string)))
-    elif 'pick ' in string:
+    if 'pick ' in string:
         node = Pick(string, world_interface, re.findall(r'\d+', string), verbose)
     elif 'place at' in string:
         node = Place(string, world_interface, position=re.findall(r'-?\d+\.\d+|-?\d+', string), verbose=verbose)
