@@ -1,20 +1,31 @@
-"""
-Provides an interface between a GP algorithm and behavior tree functions
-"""
 import random
-from behavior_tree_learning.core.str_bt import StringBehaviorTree
+from interface import implements
+from behavior_tree_learning.core.gp import GeneticOperators
+from behavior_tree_learning.core.sbt import BehaviorTreeStringRepresentation
 
 
-def random_genome(length):
+class Operators(implements(GeneticOperators)):
+
+    def random_genome(self, length):
+        return _random_genome(length)
+
+    def mutate_gene(self, genome, p_add, p_delete):
+        return _mutate_gene(genome, p_add, p_delete)
+
+    def crossover_genome(self, genome1, genome2, replace):
+        return _crossover_genome(genome1, genome2, replace)
+
+
+def _random_genome(length):
     """
     Returns a random genome
     """
 
-    bt = StringBehaviorTree([])
+    bt = BehaviorTreeStringRepresentation([])
     return bt.random(length)
 
 
-def mutate_gene(genome, p_add, p_delete):
+def _mutate_gene(genome, p_add, p_delete):
     """
     Mutate only a single gene.
     """
@@ -25,7 +36,7 @@ def mutate_gene(genome, p_add, p_delete):
     if p_add + p_delete > 1:
         raise Exception("Sum of the mutation probabilities must be less than 1.")
 
-    mutated_individual = StringBehaviorTree([])
+    mutated_individual = BehaviorTreeStringRepresentation([])
     max_attempts = 100
     attempts = 0
     while (not mutated_individual.is_valid() or mutated_individual.bt == genome) and attempts < max_attempts:
@@ -45,21 +56,21 @@ def mutate_gene(genome, p_add, p_delete):
         attempts += 1
 
     if attempts >= max_attempts and (not mutated_individual.is_valid() or mutated_individual.bt == genome):
-        mutated_individual = StringBehaviorTree([])
+        mutated_individual = BehaviorTreeStringRepresentation([])
 
     return mutated_individual.bt
 
 
-def crossover_genome(genome1, genome2, replace=True):
+def _crossover_genome(genome1, genome2, replace=True):
     # pylint: disable=too-many-branches
     """
     Do crossover between genomes at random points
     """
 
-    bt1 = StringBehaviorTree(genome1)
-    bt2 = StringBehaviorTree(genome2)
-    offspring1 = StringBehaviorTree([])
-    offspring2 = StringBehaviorTree([])
+    bt1 = BehaviorTreeStringRepresentation(genome1)
+    bt2 = BehaviorTreeStringRepresentation(genome2)
+    offspring1 = BehaviorTreeStringRepresentation([])
+    offspring2 = BehaviorTreeStringRepresentation([])
 
     if bt1.is_valid() and bt2.is_valid():
         max_attempts = 100
