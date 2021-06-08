@@ -5,12 +5,12 @@ import unittest
 import os
 import shutil
 from behavior_tree_learning.core.logger import logplot
-from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
+from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
 
 
 class TestStringBehaviorTreeForPyTree(unittest.TestCase):
 
-    OUTPUT_DIR = os.path.join(TEST_DIRECTORY, 'tmp')
+    OUTPUT_DIR = 'logs'
     
     def test_trim_logs(self):
         """ Tests trim_logs function """
@@ -27,11 +27,11 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
     def test_plot_fitness(self):
         """ Tests plot_fitness function """
 
-        TEST_DIR = os.path.join(self.OUTPUT_DIR, 'test')
+        LOG_NAME = 'test'
         
-        logplot.clear_logs('test')
-        logplot.plot_fitness('test', [0, 1, 2])
-        assert os.path.isfile(logplot.get_log_folder('test') +  '/Fitness.png')
+        logplot.clear_logs(LOG_NAME)
+        logplot.plot_fitness(LOG_NAME, [0, 1, 2])
+        assert os.path.isfile(logplot.get_log_folder(LOG_NAME) + '/Fitness.png')
         try:
             shutil.rmtree(logplot.get_log_folder('test'))
         except FileNotFoundError:
@@ -40,42 +40,42 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
     def test_extend_gens(self):
         """ Tests plot of learning curves with extended gens """
         
-        TEST_1_DIR = os.path.join(self.OUTPUT_DIR, 'test1')
-        TEST_2_DIR = os.path.join(self.OUTPUT_DIR, 'test2')
-        PDF_FILE_PATH = os.path.join(self.OUTPUT_DIR, 'test.pdf')
+        LOG_NAME_1 = 'test1'
+        LOG_NAME_2 = 'test2'
+        PDF_FILE_NAME = 'test.pdf'
     
-        logplot.clear_logs(TEST_1_DIR)
-        logplot.log_best_fitness(TEST_1_DIR, [1, 2, 3, 4, 5])
-        logplot.log_n_episodes(TEST_1_DIR, [5, 10, 15, 20, 25])
-        logplot.clear_logs(TEST_2_DIR)
-        logplot.log_best_fitness(TEST_2_DIR, [1, 2, 5])
-        logplot.log_n_episodes(TEST_2_DIR, [5, 10, 15])
+        logplot.clear_logs(LOG_NAME_1)
+        logplot.log_best_fitness(LOG_NAME_1, [1, 2, 3, 4, 5])
+        logplot.log_n_episodes(LOG_NAME_1, [5, 10, 15, 20, 25])
+        logplot.clear_logs(LOG_NAME_2)
+        logplot.log_best_fitness(LOG_NAME_2, [1, 2, 5])
+        logplot.log_n_episodes(LOG_NAME_2, [5, 10, 15])
 
         parameters = logplot.PlotParameters()
-        parameters.path = PDF_FILE_PATH
+        parameters.path = PDF_FILE_NAME
         parameters.extend_gens = 5
         parameters.save_fig = True
         parameters.x_max = 30
         
-        logplot.plot_learning_curves([TEST_1_DIR, TEST_2_DIR], parameters)
+        logplot.plot_learning_curves([LOG_NAME_1, LOG_NAME_2], parameters)
 
     def test_plot_learning_curves(self):
         """ Tests plot_learning_curves function """
         
-        TEST_DIR = os.path.join(self.OUTPUT_DIR, 'test')
-        PDF_FILE_PATH = os.path.join(TEST_DIR, 'test.pdf')
+        LOG_NAME = 'test'
+        PDF_FILE_NAME = 'test.pdf'
         
         try:
-            os.remove(PDF_FILE_PATH)
+            os.remove(PDF_FILE_NAME)
         except FileNotFoundError:
             pass
 
-        logplot.clear_logs('test')
-        logplot.log_best_fitness('test', [1, 2, 3, 4, 5])
-        logplot.log_n_episodes('test', [5, 10, 15, 20, 25])
+        logplot.clear_logs(LOG_NAME)
+        logplot.log_best_fitness(LOG_NAME, [1, 2, 3, 4, 5])
+        logplot.log_n_episodes(LOG_NAME, [5, 10, 15, 20, 25])
 
         parameters = logplot.PlotParameters()
-        parameters.path = PDF_FILE_PATH
+        parameters.path = PDF_FILE_NAME
         parameters.extrapolate_y = False
         parameters.plot_mean = False
         parameters.plot_std = False
@@ -83,8 +83,8 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
         parameters.save_fig = False
         parameters.x_max = 0
         parameters.plot_horizontal = True
-        logplot.plot_learning_curves([TEST_DIR], parameters)
-        assert not os.path.isfile(PDF_FILE_PATH)
+        logplot.plot_learning_curves([LOG_NAME], parameters)
+        assert not os.path.isfile(PDF_FILE_NAME)
 
         parameters.extrapolate_y = True
         parameters.plot_mean = True
@@ -94,18 +94,18 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
         parameters.x_max = 100
         parameters.plot_horizontal = True
         parameters.save_fig = True
-        logplot.plot_learning_curves([TEST_DIR], parameters)
-        assert os.path.isfile(PDF_FILE_PATH)
-        os.remove(PDF_FILE_PATH)
+        logplot.plot_learning_curves([LOG_NAME], parameters)
+        assert os.path.isfile(PDF_FILE_NAME)
+        os.remove(PDF_FILE_NAME)
 
         parameters.x_max = 10
         parameters.plot_horizontal = False
-        logplot.plot_learning_curves([TEST_DIR], parameters)
-        assert os.path.isfile(PDF_FILE_PATH)
+        logplot.plot_learning_curves([LOG_NAME], parameters)
+        assert os.path.isfile(PDF_FILE_NAME)
 
-        os.remove(PDF_FILE_PATH)
+        os.remove(PDF_FILE_NAME)
         try:
-            shutil.rmtree(logplot.get_log_folder(TEST_DIR))
+            shutil.rmtree(logplot.get_log_folder(LOG_NAME))
         except FileNotFoundError:
             pass
 

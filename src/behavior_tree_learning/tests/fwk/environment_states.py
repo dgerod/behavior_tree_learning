@@ -5,10 +5,10 @@ that returns a fitness value and a plot_individual() function that
 returns nothing but saves a graphical representation of the individual
 """
 
-from behavior_tree_learning.core.str_bt import StringBehaviorTree
-from behavior_tree_learning.core.gp_operations import fitness_function
-from behavior_tree_learning.core.tests.fwk import behaviors_states as behaviors
-from behavior_tree_learning.core.tests.fwk import state_machine as sm
+from behavior_tree_learning.core.sbt import StringBehaviorTree
+from behavior_tree_learning.tests.fwk import fitness_function
+from behavior_tree_learning.tests.fwk import behaviors_states as behaviors
+from behavior_tree_learning.tests.fwk import state_machine as sm
 
 
 def get_fitness(string):

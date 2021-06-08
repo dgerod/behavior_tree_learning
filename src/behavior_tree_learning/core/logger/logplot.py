@@ -13,6 +13,7 @@ from scipy import interpolate
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 
+
 def open_file(path, mode):
     """
     Attempts to open file at path.
@@ -28,6 +29,7 @@ def open_file(path, mode):
         break
     return f
 
+
 def make_directory(path):
     """
     Attempts to create directory at path.
@@ -41,11 +43,13 @@ def make_directory(path):
             continue
         break
 
+
 def get_log_folder(log_name):
     """ Returns log folder as string """
     if not os.path.exists('logs'):
         os.mkdir('logs')
     return 'logs/log_' + log_name
+
 
 def trim_logs(logs):
     """ Trims a list of logs so that all logs have the same number of entries/generations """
@@ -57,6 +61,7 @@ def trim_logs(logs):
 
     for row in logs:
         del row[min_rowlength:]
+
 
 def clear_logs(log_name):
     """ Clears previous log folders of same same """
@@ -72,6 +77,7 @@ def clear_logs(log_name):
     open(fitness_log_path, "x")
     open(population_log_path, "x")
 
+
 def clear_after_generation(log_name, generation):
     """ Clears fitness and population logs after given generation """
     with open_file(get_log_folder(log_name) + '/fitness_log.txt', 'r') as f:
@@ -85,35 +91,42 @@ def clear_after_generation(log_name, generation):
         for i in range(generation + 1):
             f.write(lines[i])
 
+
 def log_best_individual(log_name, best_individual):
     """ Saves the best individual """
     with open_file(get_log_folder(log_name) + '/best_individual.pickle', 'wb') as f:
         pickle.dump(best_individual, f)
+
 
 def log_fitness(log_name, fitness):
     """ Logs fitness of all individuals """
     with open_file(get_log_folder(log_name) + '/fitness_log.txt', 'a') as f:
         f.write("%s\n" % fitness)
 
+
 def log_best_fitness(log_name, best_fitness):
     """ Logs best fitness of each generation """
     with open_file(get_log_folder(log_name) + '/best_fitness_log.pickle', 'wb') as f:
         pickle.dump(best_fitness, f)
+
 
 def log_n_episodes(log_name, n_episodes):
     """ Logs number of episodes """
     with open_file(get_log_folder(log_name) + '/n_episodes_log.pickle', 'wb') as f:
         pickle.dump(n_episodes, f)
 
+
 def log_population(log_name, population):
     """ Logs full population of the generation"""
     with open_file(get_log_folder(log_name) + '/population_log.txt', 'a') as f:
         f.write("%s\n" % population)
 
+
 def log_last_population(log_name, population):
     """ Logs current population as pickle object """
     with open_file(get_log_folder(log_name) + '/population.pickle', 'wb') as f:
         pickle.dump(population, f)
+
 
 def log_settings(log_name, settings, base_line):
     """ Logs settings used for the run """
@@ -122,6 +135,7 @@ def log_settings(log_name, settings, base_line):
             f.write(key + ' ' + str(value) + '\n')
         f.write('Baseline: ' + str(base_line) + '\n')
 
+
 def log_state(log_name, randomstate, np_randomstate, generation):
     """ Logs the current random state and generation number """
     with open_file(get_log_folder(log_name) + '/states.pickle', 'wb') as f:
@@ -129,17 +143,20 @@ def log_state(log_name, randomstate, np_randomstate, generation):
         pickle.dump(np_randomstate, f)
         pickle.dump(generation, f)
 
+
 def get_best_fitness(log_name):
     """ Gets the best fitness list from the given log """
     with open_file(get_log_folder(log_name) + '/best_fitness_log.pickle', 'rb') as f:
         best_fitness = pickle.load(f)
     return best_fitness
 
+
 def get_n_episodes(log_name):
     """ Gets the list of n_episodes from the given log """
     with open_file(get_log_folder(log_name) + '/n_episodes_log.pickle', 'rb') as f:
         n_episodes = pickle.load(f)
     return n_episodes
+
 
 def get_state(log_name):
     """ Gets the random state and generation number """
@@ -149,17 +166,20 @@ def get_state(log_name):
         generation = pickle.load(f)
     return randomstate, np_randomstate, generation
 
+
 def get_last_population(log_name):
     """ Gets the last population list from the given log """
     with open_file(get_log_folder(log_name) + '/population.pickle', 'rb') as f:
         population = pickle.load(f)
     return population
 
+
 def get_best_individual(log_name):
     """ Return the best individual from the given log """
     with open_file(get_log_folder(log_name) + '/best_individual.pickle', 'rb') as f:
         best_individual = pickle.load(f)
     return best_individual
+
 
 def plot_fitness(log_name, fitness, n_episodes=None):
     """
@@ -174,6 +194,7 @@ def plot_fitness(log_name, fitness, n_episodes=None):
     plt.ylabel("Fitness")
     plt.savefig(get_log_folder(log_name) + '/Fitness.png')
     plt.close()
+
 
 @dataclass
 class PlotParameters:
@@ -200,6 +221,7 @@ class PlotParameters:
     legend_position: str = 'lower right'  #Position of legend
     save_fig: bool = True                #Save figure. If false, more plots is possible.
     path: str = 'logs/plot.svg'          #Path to save log
+
 
 def plot_learning_curves(logs, parameters):
     # pylint: disable=too-many-branches, too-many-statements, too-many-locals

@@ -3,11 +3,11 @@
 import unittest
 
 import os
-from behavior_tree_learning.core.str_bt import behavior_tree
-from behavior_tree_learning.core.str_bt import StringBehaviorTree
+from behavior_tree_learning.core.sbt import behavior_tree
+from behavior_tree_learning.core.sbt import StringBehaviorTree
 from behavior_tree_learning.core.logger import print_ascii_tree
-from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
-from behavior_tree_learning.core.tests.fwk import behaviors_states as behaviors
+from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
+from behavior_tree_learning.tests.fwk import behaviors_states as behaviors
 
 
 class TestStringBehaviorTreeForPyTree(unittest.TestCase):

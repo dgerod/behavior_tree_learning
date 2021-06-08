@@ -6,6 +6,7 @@ For testing
 import py_trees as pt
 from behavior_tree_learning.core.sbt.behaviors import RSequence
 
+
 def get_node_from_string(string, world_interface, _verbose=False):
     """
     Returns a py trees behavior or composite given the string

@@ -3,12 +3,13 @@
 import unittest
 
 import os
-from behavior_tree_learning.core.str_bt import behavior_tree
-from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
-from behavior_tree_learning.core.tests.fwk import environment_states
+from behavior_tree_learning.core.sbt import behavior_tree
+from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
+from behavior_tree_learning.tests.fwk import environment_states
 
 
 behavior_tree.load_settings_from_file(os.path.join(TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml'))
+
 
 class TestStateEnvironment(unittest.TestCase):
     

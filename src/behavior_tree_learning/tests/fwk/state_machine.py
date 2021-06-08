@@ -4,7 +4,7 @@ State Machine Simulator
 from enum import IntEnum
 from dataclasses import dataclass
 from interface import implements
-from behavior_tree_learning.core.world import World
+from behavior_tree_learning.core.sbt import World
 
 class State(IntEnum):
     """

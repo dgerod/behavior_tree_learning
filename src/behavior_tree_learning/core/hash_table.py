@@ -29,6 +29,7 @@ class Node:
                     equal = self.next == other.next
         return equal
 
+
 class HashTable:
     """
     Main hash table class
