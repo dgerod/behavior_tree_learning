@@ -20,8 +20,11 @@ def run():
     behavior_tree.load_settings_from_file(settings_file)
 
     gp_parameters = GeneticParameters()
-    gp_parameters.ind_start_length = 8
+
     gp_parameters.n_population = 16
+    gp_parameters.n_generations = 200
+
+    gp_parameters.ind_start_length = 8
     gp_parameters.f_crossover = 0.5
     gp_parameters.n_offspring_crossover = 2
     gp_parameters.replace_crossover = False
@@ -37,16 +40,18 @@ def run():
     gp_parameters.mutation_p_delete = 0.3
     gp_parameters.allow_identical = False
     gp_parameters.plot = True
-    gp_parameters.n_generations = 200
     gp_parameters.verbose = False
     gp_parameters.fig_last_gen = False
 
-    start_position = [sm.Pos(0.0, 0.05, 0),
-                      sm.Pos(0.0, 0.05, 0.0192),
-                      sm.Pos(0.0, 0.05, 2*0.0192)]
-    world = sm.StateMachine(start_position)
+    start_position = [sm.Pos(-0.05, -0.1, 0),
+                      sm.Pos(0.0,  -0.1, 0),
+                      sm.Pos(0.05, -0.1, 0)]
 
-    target_position = start_position    
+    world = sm.StateMachine(start_position)
+    target_position = [sm.Pos(0.0, 0.05, 0),
+                       sm.Pos(0.0, 0.05, 0.0192),
+                       sm.Pos(0.0, 0.05, 2*0.0192)]
+
     environment = Environment(world, target_position, verbose=False)
     
     n_logs = 10
@@ -55,6 +60,8 @@ def run():
         gp.set_seeds(i)
         gp.set_operators(GeneticOperatorsForStringBehaviorTree())
         gp.run(environment, gp_parameters)
+
+    return
 
     planner_baseline = ['s(', 
                             'f(', 
