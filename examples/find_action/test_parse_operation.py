@@ -7,7 +7,7 @@ PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
 import unittest
-from find_action.parse_text import parse_function
+from find_action.parse_operation import parse_function
 
 
 class TestParseFunctionAsText(unittest.TestCase):
