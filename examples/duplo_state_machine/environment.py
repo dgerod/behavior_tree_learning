@@ -3,7 +3,7 @@ from behavior_tree_learning.gp import GeneticEnvironment
 from behavior_tree_learning.sbt import World
 from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
 
-from duplo_state_machine.behaviors import make_execution_node
+from duplo_state_machine.execution_nodes import make_execution_node
 from duplo_state_machine import fitness_function
 
 
@@ -32,14 +32,14 @@ class Environment(implements(GeneticEnvironment)):
         """ Run the simulation and return the fitness """
 
         behavior_tree = StringBehaviorTree(individual[:], behaviors=self._behavior_factory, 
-            world=self.world, verbose=self.verbose)
+            world=self._world, verbose=self._verbose)
         ticks, _ = behavior_tree.run_bt()
-        return fitness_function.compute_fitness(self.world, behavior_tree, ticks, self.targets, self.fitness_coeff)
+        return fitness_function.compute_fitness(self._world, behavior_tree, ticks, self._targets, self._fitness_coeff)
 
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
 
-        if self.static_tree is not None:
+        if self._static_tree is not None:
             pytree = StringBehaviorTree(self._add_to_static_tree(individual), behaviors=self._behavior_factory)
         else:
             pytree = StringBehaviorTree(individual[:], behaviors=self._behavior_factory)
@@ -48,7 +48,7 @@ class Environment(implements(GeneticEnvironment)):
     def _add_to_static_tree(self, individual):
         """ Add invididual to the static part of the tree in the front """
 
-        new_individual = self.static_tree[:]
+        new_individual = self._static_tree[:]
         new_individual[-2:-2] = individual
         return new_individual
 
@@ -58,7 +58,7 @@ class Environment1(Environment):
 
     def __init__(self, targets, static_tree, verbose=False):
         super().__init__(targets, static_tree, verbose)
-        self.targets = [self.targets[0]]
+        self._targets = [self._targets[0]]
 
     def get_fitness(self, individual):
         return super().get_fitness(self._add_to_static_tree(individual))
@@ -69,7 +69,7 @@ class Environment12(Environment):
 
     def __init__(self, targets, static_tree, verbose=False):
         super().__init__(targets, static_tree, verbose)
-        self.targets = self.targets[:2]
+        self._targets = self._targets[:2]
 
     def get_fitness(self, individual):
         return super().get_fitness(self._add_to_static_tree(individual))
@@ -80,7 +80,7 @@ class Environment123(Environment):
 
     def __init__(self, targets, static_tree, verbose=False):
         super().__init__(targets, static_tree, verbose)
-        self.targets = self.targets[:3]
+        self._targets = self._targets[:3]
 
     def get_fitness(self, individual):
         return super().get_fitness(self._add_to_static_tree(individual))
