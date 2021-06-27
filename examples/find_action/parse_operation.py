@@ -13,22 +13,22 @@ def _check_main_syntax(plain_text):
     #print("left:", function_and_arguments)
     #print("right:", return_values)
 
-    if (function_and_arguments.find("(") == -1 or
-            function_and_arguments.find(")") == -1):
+    if (function_and_arguments.find("[") == -1 or
+            function_and_arguments.find("]") == -1):
         raise Exception("Wrong FUNCTION_DEFINITION syntax, missed parenthesis after name")
 
     if return_values is not None:
-        if (return_values.find("(") == -1 or
-                return_values.find(")") == -1):
+        if (return_values.find("[") == -1 or
+                return_values.find("]") == -1):
             raise Exception("Wrong RETURN_VALUE syntax, missed parenthesis")
-        elif return_values.find("(") == (return_values.find(")") - 1):
+        elif return_values.find("[") == (return_values.find("]") - 1):
             raise Exception("Wrong RETURN_VALUE syntax, any value between parenthesis")
 
     return text
 
 
 def _extract_function_name(text):
-    return text[:text.find("(")]
+    return text[:text.find("[")]
 
 
 def _extract_variable(text):
@@ -49,10 +49,10 @@ def _extract_variables(text):
 
 def _extract_function_arguments(text):
 
-    if text.find("(") == -1 or text.find(")") == -1:
+    if text.find("[") == -1 or text.find("]") == -1:
         raise Exception("Wrong ARGUMENTS syntax, missed parenthesis")
 
-    args_as_text = text[text.find("(") + 1: text.find(")")]
+    args_as_text = text[text.find("[") + 1: text.find("]")]
     if args_as_text == "":
         return None
     else:
@@ -66,7 +66,7 @@ def _extract_function_return_value(text):
         return None
 
     args_as_text = text[idx + 2:]
-    args_as_text = args_as_text[args_as_text.find("(") + 1: args_as_text.find(")")]
+    args_as_text = args_as_text[args_as_text.find("[") + 1: args_as_text.find("]")]
     if args_as_text == "":
         raise Exception("Wrong RETURN_VALUE syntax, missed parenthesis")
 
@@ -80,3 +80,10 @@ def parse_function(text):
     arguments = _extract_function_arguments(text)
     return_value = _extract_function_return_value(text)
     return name, arguments, return_value
+
+
+def print_parsed_function(text):
+
+    name, arguments, return_value = parse_function(text)
+    print("Text: ", text)
+    print("Function name: %s, arguments: %s, return: %s" % (name, arguments, return_value))

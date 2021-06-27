@@ -26,7 +26,7 @@ class TestParseFunctionAsText(unittest.TestCase):
 
     def test_correct_syntax_using_without_arguments_1(self):
 
-        text = "a_function() => (E :bool)"
+        text = "a_function[] => [E :bool]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "a_function")
@@ -35,7 +35,7 @@ class TestParseFunctionAsText(unittest.TestCase):
 
     def test_correct_syntax_using_without_arguments_2(self):
 
-        text = "a_function ()=>(E :bool)"
+        text = "a_function []=>[E :bool]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "a_function")
@@ -44,7 +44,7 @@ class TestParseFunctionAsText(unittest.TestCase):
 
     def test_correct_syntax_using_one_argument(self):
 
-        text = "another_function(A :place) => (E :bool)"
+        text = "another_function[A :place] => [E :bool]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "another_function")
@@ -53,7 +53,7 @@ class TestParseFunctionAsText(unittest.TestCase):
 
     def test_correct_syntax_using_two_argument(self):
 
-        text = "another_function(A:place, B :pose)=>(E :bool)"
+        text = "another_function[A:place, B :pose]=>[E :bool]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "another_function")
@@ -61,7 +61,7 @@ class TestParseFunctionAsText(unittest.TestCase):
         self.assertEqual(return_value, {'E': 'bool'})
 
     def test_correct_syntax_without_return_value_1(self):
-        text = "another_function()"
+        text = "another_function[]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "another_function")
@@ -70,7 +70,7 @@ class TestParseFunctionAsText(unittest.TestCase):
 
     def test_correct_syntax_without_return_value_2(self):
 
-        text = "another_function(A:place)"
+        text = "another_function[A:place]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "another_function")
@@ -79,7 +79,7 @@ class TestParseFunctionAsText(unittest.TestCase):
 
     def test_correct_syntax_without_return_value_3(self):
 
-        text = "another_function(A:place, B :pose)"
+        text = "another_function[A:place, B :pose]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "another_function")
@@ -88,7 +88,7 @@ class TestParseFunctionAsText(unittest.TestCase):
 
     def test_correct_syntax_with_two_return_values(self):
 
-        text = "another_function() => (E :bool, F:place)"
+        text = "another_function[] => [E :bool, F:place]"
         name, arguments, return_value = parse_function(text)
 
         self.assertEqual(name, "another_function")
@@ -98,7 +98,7 @@ class TestParseFunctionAsText(unittest.TestCase):
     def test_wrong_syntax_return_value_without_parenthesis(self):
 
         with self.assertRaises(Exception):
-            text = "another_function() => E :bool"
+            text = "another_function[] => E :bool"
             parse_function(text)
 
     def test_wrong_syntax_function_declaration_without_parenthesis(self):
@@ -110,7 +110,7 @@ class TestParseFunctionAsText(unittest.TestCase):
     def test_wrong_syntax_return_values_only_parenthesis(self):
 
         with self.assertRaises(Exception):
-            text = "another_function() => ()"
+            text = "another_function[] => []"
             parse_function(text)
 
 

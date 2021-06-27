@@ -1,0 +1,15 @@
+fallback_nodes:
+    - 'f('
+sequence_nodes:
+    - 's('              
+condition_nodes:
+    - 'CHECK_picked[gear_1: gear]'    
+action_nodes:
+    - 'DO_move_arm_to[A: place]'    
+    - 'DO_move_arm_to[B: place]'    
+    - 'DO_move_arm_to[C: place]'    
+    - 'DO_move_arm_to[D: place]'    
+    - 'DO_move_arm_to[E: place]'    
+atomic_fallback_nodes:
+up_node:
+    - ')'
