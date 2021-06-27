@@ -4,11 +4,11 @@ import unittest
 
 import os
 import random
-from behavior_tree_learning.core.str_bt import behavior_tree
-from behavior_tree_learning.core.str_bt import BehaviorTreeStringRepresentation, StringBehaviorTree
-from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
-
-import behavior_tree_learning.examples.duplo_state_machine.behaviors as behaviors
+from behavior_tree_learning.core.sbt import behavior_tree
+from behavior_tree_learning.core.sbt import BehaviorTreeStringRepresentation, StringBehaviorTree
+from behavior_tree_learning.core.sbt import BehaviorNodeFactory
+from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
+from behavior_tree_learning.examples.duplo_state_machine.execution_nodes import make_execution_node
 
 
 behavior_tree.load_settings_from_file(os.path.join(TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml'))
@@ -275,8 +275,9 @@ class TestBehaviorTree(unittest.TestCase):
 
     def plot_individual(self, individual, plot_name):
         """ Saves a graphical representation of the individual """
-        
-        pytree = StringBehaviorTree(individual[:], behaviors=behaviors)
+                
+        behavior_factory = BehaviorNodeFactory(make_execution_node)
+        pytree = StringBehaviorTree(individual[:], behaviors=behavior_factory)
         pytree.save_fig('logs/', name=plot_name)
 
     def test_delete_node(self):
