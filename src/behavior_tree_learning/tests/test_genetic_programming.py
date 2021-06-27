@@ -4,14 +4,13 @@ import unittest
 
 import os
 import random
-from behavior_tree_learning.core.str_bt import behavior_tree
-from behavior_tree_learning.core.gp import genetic_programming as gp
+from behavior_tree_learning.core.sbt import behavior_tree
+from behavior_tree_learning.core.gp.hash_table import HashTable
 from behavior_tree_learning.core.gp.parameters import GeneticParameters
 from behavior_tree_learning.core.gp import selection as gps
-
-from behavior_tree_learning.core.hash_table import HashTable
-from behavior_tree_learning.core.tests.fwk.paths import TEST_DIRECTORY
-from behavior_tree_learning.core.tests.fwk import environment_strings as environment
+from behavior_tree_learning.core.gp import gp
+from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
+from behavior_tree_learning.tests.fwk import environment_strings as environment
 
 
 behavior_tree.load_settings_from_file(os.path.join(TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml'))
@@ -75,7 +74,6 @@ class TestGpAlgorithm(unittest.TestCase):
                 if i != j:
                     assert mutated_population[i] != mutated_population[j]
 
-
     def test_crossover(self):
         """ Tests crossover function """
 
@@ -132,7 +130,6 @@ class TestGpAlgorithm(unittest.TestCase):
 
         fitness = gp.get_fitness(['c0'], hash_table, environment, 1)
         assert fitness == 0.9
-
 
     def test_crossover_parent_selection(self):
         """ Tests crossover_parent_selection function """
@@ -294,7 +291,6 @@ class TestGpAlgorithm(unittest.TestCase):
         fitness = [0, 6, 2, 8, 3, 2, 1, 1]
         gp.print_population(population, fitness, 5)
 
-
     def test_run(self):
         """ Tests run function """
 
@@ -331,7 +327,7 @@ class TestGpAlgorithm(unittest.TestCase):
         assert population == population2
         assert fitness == fitness2
 
-    def test_hotstart(self):
+    def test_hot_start(self):
         """ Test with hotstart """
 
         gp_par = GeneticParameters()
@@ -349,14 +345,14 @@ class TestGpAlgorithm(unittest.TestCase):
 
         gp.set_seeds(0)
         gp_par.n_generations = 155
-        gp.run(environment, gp_par, hotstart=False)
+        gp.run(environment, gp_par, hot_start=False)
 
         gp_par.n_generations = 200
-        population, fitness, best_fitness, best_individual = gp.run(environment, gp_par, hotstart=True)
+        population, fitness, best_fitness, best_individual = gp.run(environment, gp_par, hot_start=True)
 
         gp_par.log_name = '2'
         gp.set_seeds(0)
-        population2, fitness2, best_fitness2, best_individual2 = gp.run(environment, gp_par, hotstart=False)
+        population2, fitness2, best_fitness2, best_individual2 = gp.run(environment, gp_par, hot_start=False)
 
         assert population == population2
         assert fitness == fitness2
@@ -365,10 +361,10 @@ class TestGpAlgorithm(unittest.TestCase):
 
         gp.set_seeds(0)
         gp_par.n_generations = 100
-        population, fitness, best_fitness, best_individual = gp.run(environment, gp_par, hotstart=False)
+        population, fitness, best_fitness, best_individual = gp.run(environment, gp_par, hot_start=False)
 
         gp_par.n_generations = 100
-        population2, fitness2, best_fitness2, best_individual2 = gp.run(environment, gp_par, hotstart=True)
+        population2, fitness2, best_fitness2, best_individual2 = gp.run(environment, gp_par, hot_start=True)
 
         assert population == population2
         assert fitness == fitness2

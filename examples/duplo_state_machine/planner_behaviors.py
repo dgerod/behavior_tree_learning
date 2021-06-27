@@ -10,52 +10,37 @@ from duplo_state_machine import behaviors
 from duplo_state_machine import state_machine as sm
 
 
-def get_node_from_string(string, world, condition_parameters):
-    # pylint: disable=too-many-branches
-    """
-    Returns a py trees behavior or composite given the string
-    """
+def make_execution_node(name: str, world, condition_parameters):
 
-    has_children = False
-    if 'pick ' in string:
-        node = Pick(string, world, re.findall(r'\d+', string), condition_parameters)
-    elif 'place at' in string:
-        node = PlaceAt(string, world, re.findall(r'-?\d+\.\d+|-?\d+', string), condition_parameters)
-    elif 'place on' in string:
-        node = PlaceOn(string, world, re.findall(r'\d+', string), condition_parameters)
-    elif 'put' in string and 'at' in string:
-        node = PutAt(string, world, re.findall(r'-?\d+\.\d+|-?\d+', string), condition_parameters)
-    elif 'put' in string and 'on' in string:
-        node = PutOn(string, world, re.findall(r'\d+', string), condition_parameters)
-    elif 'apply force' in string:
-        node = ApplyForce(string, world, re.findall(r'\d+', string), condition_parameters)
-    elif 'picked ' in string:
-        node = Picked(string, world, re.findall(r'\d+', string), condition_parameters)
-    elif 'hand empty' in string:
-        node = HandEmpty(string, world, condition_parameters)
-    elif 'at pos ' in string:
-        node = AtPos(string, world, re.findall(r'-?\d+\.\d+|-?\d+', string), condition_parameters)
-    elif string == 'f(':
-        node = pt.composites.Selector('Fallback')
-        has_children = True
-    elif string == 's(':
-        node = RSequence()
-        has_children = True
-    elif string == 'p(':
-        node = pt.composites.Parallel(
-            name="Parallel",
-            policy=pt.common.ParallelPolicy.SuccessOnAll(synchronise=False))
-        has_children = True
+    if 'pick ' in name:
+        node = Pick(name, world, re.findall(r'\d+', name), condition_parameters)
+    elif 'place at' in name:
+        node = PlaceAt(name, world, re.findall(r'-?\d+\.\d+|-?\d+', name), condition_parameters)
+    elif 'place on' in name:
+        node = PlaceOn(name, world, re.findall(r'\d+', name), condition_parameters)
+    elif 'put' in name and 'at' in name:
+        node = PutAt(name, world, re.findall(r'-?\d+\.\d+|-?\d+', name), condition_parameters)
+    elif 'put' in name and 'on' in name:
+        node = PutOn(name, world, re.findall(r'\d+', name), condition_parameters)
+    elif 'apply force' in name:
+        node = ApplyForce(name, world, re.findall(r'\d+', name), condition_parameters)
+    elif 'picked ' in name:
+        node = Picked(name, world, re.findall(r'\d+', name), condition_parameters)
+    elif 'hand empty' in name:
+        node = HandEmpty(name, world, condition_parameters)
+    elif 'at pos ' in name:
+        node = AtPos(name, world, re.findall(r'-?\d+\.\d+|-?\d+', name), condition_parameters)
     else:
-        raise Exception("Unexpected character", string)
+        node = None
 
-    return node, has_children
+    return node
 
 
-def get_condition_parameters(condition):
+def extract_condition_parameters(condition: str):
     """
     Returns a list of parameters associated with the condition entered
     """
+
     if 'picked ' in condition:
         return re.findall(r'\d+', condition)
     if 'at pos ' in condition:
@@ -66,8 +51,9 @@ def get_condition_parameters(condition):
     return []
 
 
-def get_position_string(position):
+def _get_position_string(position):
     """ Returns a string of the position for creating behavior names """
+
     return '(' + str(position[0]) + ', ' + str(position[1]) + ', ' + str(position[2]) + ')'
 
 
@@ -75,6 +61,7 @@ class PlannedBehavior():
     """
     Class template for planned behaviors
     """
+
     def __init__(self, preconditions, postconditions):
         self.preconditions = preconditions
         self.postconditions = postconditions
@@ -92,6 +79,7 @@ class HandEmpty(behaviors.HandEmpty, PlannedBehavior):
     """
     Check if hand is empty
     """
+
     def __init__(self, name, world, _condition_parameters):
         behaviors.HandEmpty.__init__(self, name, world)
         PlannedBehavior.__init__(self, [], [])
@@ -101,6 +89,7 @@ class Picked(behaviors.Picked, PlannedBehavior):
     """
     Check if brick is picked
     """
+
     def __init__(self, name, world, brick, _condition_parameters):
         behaviors.Picked.__init__(self, name, world, brick)
         PlannedBehavior.__init__(self, [], [])
@@ -110,6 +99,7 @@ class AtPos(behaviors.AtPos, PlannedBehavior):
     """
     Check if brick is at goal
     """
+
     def __init__(self, name, world, brick_and_pos, _condition_parameters):
         behaviors.AtPos.__init__(self, name, world, brick_and_pos)
         PlannedBehavior.__init__(self, [], [])
@@ -119,6 +109,7 @@ class On(behaviors.On, PlannedBehavior):
     """
     Check if brick is at goal
     """
+    
     def __init__(self, name, world, bricks, _condition_parameters):
         behaviors.On.__init__(self, name, world, bricks)
         PlannedBehavior.__init__(self, [], [])
@@ -128,6 +119,7 @@ class Pick(behaviors.Pick, PlannedBehavior):
     """
     Pick up a brick
     """
+
     def __init__(self, name, world, brick, _condition_parameters):
         behaviors.Pick.__init__(self, name, world, brick)
         PlannedBehavior.__init__(self, [], ['picked ' + str(brick[0]) + '?'])
@@ -137,16 +129,18 @@ class PlaceAt(behaviors.Place, PlannedBehavior):
     """
     Place given brick at given position
     """
+
     def __init__(self, name, world, position, condition_parameters):
         behaviors.Place.__init__(self, name, world, position=position)
         PlannedBehavior.__init__(self, ['picked ' + str(condition_parameters[0]) +  '?'], \
-            ['hand empty?', str(condition_parameters[0]) + ' at pos ' + get_position_string(position) + '?'])
+            ['hand empty?', str(condition_parameters[0]) + ' at pos ' + _get_position_string(position) + '?'])
 
 
 class PlaceOn(behaviors.Place, PlannedBehavior):
     """
     Place current brick on other given brick
     """
+
     def __init__(self, name, world, brick, condition_parameters):
         behaviors.Place.__init__(self, name, world, brick=brick)
         PlannedBehavior.__init__(self, ['picked ' + str(condition_parameters[0]) +  '?'], ['hand empty?'])
@@ -165,16 +159,18 @@ class PutAt(behaviors.Put, PlannedBehavior):
     """
     Picks brick and places it at position
     """
+
     def __init__(self, name, world, brick_and_pos, _condition_parameters):
         behaviors.Put.__init__(self, name, world, brick_and_pos)
         PlannedBehavior.__init__(self, [], \
-                                 [str(brick_and_pos[0]) + ' at pos ' + get_position_string(brick_and_pos[1:]) + '?'])
+                                 [str(brick_and_pos[0]) + ' at pos ' + _get_position_string(brick_and_pos[1:]) + '?'])
 
 
 class PutOn(behaviors.Put, PlannedBehavior):
     """
     Picks brick and places it on other brick
     """
+
     def __init__(self, name, world, brick_and_pos, condition_parameters):
         behaviors.Put.__init__(self, name, world, brick_and_pos)
         PlannedBehavior.__init__(self, [], [str(self.brick) + ' on ' + str(self.lower) + '?'])
@@ -187,6 +183,7 @@ class ApplyForce(behaviors.ApplyForce, PlannedBehavior):
     A bit of a cheaty implementation of pre and postconditions here to handle our experiments,
     but we are only using it to create a result that some planner theoretically could generate
     """
+
     def __init__(self, name, world, brick, _condition_parameters):
         behaviors.ApplyForce.__init__(self, name, world, brick)
         PlannedBehavior.__init__(self, [], [])
