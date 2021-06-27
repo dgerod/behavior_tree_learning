@@ -1,4 +1,4 @@
 from behavior_tree_learning.core.sbt.world import World
 from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
+from behavior_tree_learning.core.sbt.behavior_factory import BehaviorNodeFactory
 from behavior_tree_learning.core.sbt.py_tree import StringBehaviorTree
-

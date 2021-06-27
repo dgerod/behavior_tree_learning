@@ -18,14 +18,14 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         self.length = self.bt.length()
         self.world = world
         self.verbose = verbose
-        self.behaviors = behaviors
+        self.behavior_factory = behaviors
         self.failed = False
         self.timeout = False
 
         if root is not None:
             has_children = False
         else:
-            self.root, has_children = behaviors.get_node_from_string(string[0], self.world, self.verbose)
+            self.root, has_children = self.behavior_factory.make_node(string[0], self.world, self.verbose)
             string.pop(0)
 
         super().__init__(root=self.root)
