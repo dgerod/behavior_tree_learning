@@ -3,8 +3,8 @@ import random
 from statistics import mean
 import numpy as np
 
-from behavior_tree_learning.core.hash_table import HashTable
 from behavior_tree_learning.core.logger import logplot
+from behavior_tree_learning.core.gp.hash_table import HashTable
 from behavior_tree_learning.core.gp.environment import GeneticEnvironment
 from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 from behavior_tree_learning.core.gp.operators import GeneticOperators
