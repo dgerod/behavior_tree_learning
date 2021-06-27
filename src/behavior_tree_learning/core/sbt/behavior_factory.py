@@ -25,7 +25,7 @@ class BehaviorNodeFactory:
 
         return node, has_children
 
-    def _make_control_node(text):
+    def _make_control_node(self, text):
         
         node = None
 

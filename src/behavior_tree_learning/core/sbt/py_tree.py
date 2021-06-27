@@ -73,7 +73,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
                 string.pop(0)
                 return node
 
-            new_node, has_children = self.behaviors.get_node_from_string(string[0], self.world, self.verbose)
+            new_node, has_children = self.behavior_factory.make_node(string[0], self.world, self.verbose)
             string.pop(0)
             if has_children:
                 #Node is a control node or decorator with children - add subtree via string and then add to parent
