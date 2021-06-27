@@ -1,9 +1,9 @@
 from interface import implements
 from behavior_tree_learning.gp import GeneticEnvironment
 from behavior_tree_learning.sbt import World
-from behavior_tree_learning.sbt import StringBehaviorTree
+from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
 
-from duplo_state_machine import behaviors
+from duplo_state_machine.behaviors import make_execution_node
 from duplo_state_machine import fitness_function
 
 
@@ -13,24 +13,26 @@ class Environment(implements(GeneticEnvironment)):
     def __init__(self, world: World, target_positions, static_tree=None,
                  verbose=False, sm_pars=None, mode=0, fitness_coeff=None):
 
-        self.world = world
-        self.targets = target_positions
-        self.static_tree = static_tree
-        self.verbose = verbose
-        self.sm_pars = sm_pars
-        self.mode = mode
-        self.fitness_coeff = fitness_coeff
-        self.random_events = False
+        self._behavior_factory = BehaviorNodeFactory(make_execution_node)
+        self._world = world
+        self._targets = target_positions
+        self._static_tree = static_tree
+        self._verbose = verbose
+        self._sm_pars = sm_pars
+        self._mode = mode
+        self._fitness_coeff = fitness_coeff
+        self._random_events = False
 
     def set_random_events(self, random_events):
         """ Sets the random events flag """
 
-        self.random_events = random_events
+        self._random_events = random_events
 
     def run_and_compute(self, individual):
         """ Run the simulation and return the fitness """
 
-        behavior_tree = StringBehaviorTree(individual[:], behaviors=behaviors, world=self.world, verbose=self.verbose)
+        behavior_tree = StringBehaviorTree(individual[:], behaviors=self._behavior_factory, 
+            world=self.world, verbose=self.verbose)
         ticks, _ = behavior_tree.run_bt()
         return fitness_function.compute_fitness(self.world, behavior_tree, ticks, self.targets, self.fitness_coeff)
 
@@ -38,9 +40,9 @@ class Environment(implements(GeneticEnvironment)):
         """ Saves a graphical representation of the individual """
 
         if self.static_tree is not None:
-            pytree = StringBehaviorTree(self._add_to_static_tree(individual), behaviors=behaviors)
+            pytree = StringBehaviorTree(self._add_to_static_tree(individual), behaviors=self._behavior_factory)
         else:
-            pytree = StringBehaviorTree(individual[:], behaviors=behaviors)
+            pytree = StringBehaviorTree(individual[:], behaviors=self._behavior_factory)
         pytree.save_fig(path, name=plot_name)
 
     def _add_to_static_tree(self, individual):

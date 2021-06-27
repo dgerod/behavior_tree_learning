@@ -9,12 +9,10 @@ from behavior_tree_learning.core.sbt.behaviors import RSequence
 import duplo_state_machine.state_machine as sm
 
 
-def get_node_from_string(string, world_interface, verbose=False):
-    # pylint: disable=too-many-branches
-    """
-    Returns a py trees behavior or composite given the string
-    """
-    has_children = False
+def make_execution_node(string, world_interface, verbose=False):    
+    
+    node = None
+    
     if 'pick ' in string:
         node = Pick(string, world_interface, re.findall(r'\d+', string), verbose)
     elif 'place at' in string:
@@ -34,23 +32,11 @@ def get_node_from_string(string, world_interface, verbose=False):
         node = AtPos(string, world_interface, re.findall(r'-?\d+\.\d+|-?\d+', string), verbose)
     elif ' on ' in string:
         node = On(string, world_interface, re.findall(r'\d+', string), verbose)
-
-    elif string == 'f(':
-        node = pt.composites.Selector('Fallback')
-        has_children = True
-    elif string == 's(':
-        node = RSequence()
-        has_children = True
-    elif string == 'p(':
-        node = pt.composites.Parallel(
-            name="Parallel",
-            policy=pt.common.ParallelPolicy.SuccessOnAll(synchronise=False))
-        has_children = True
-    elif string == 'nonpytreesbehavior':
-        return False
     else:
-        raise Exception("Unexpected character", string)
-    return node, has_children
+        node = None
+
+    return node
+
 
 
 class HandEmpty(pt.behaviour.Behaviour):
