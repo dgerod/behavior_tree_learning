@@ -10,7 +10,7 @@ from behavior_tree_learning.sbt import StringBehaviorTree
 from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
 from find_action.paths import EXAMPLE_DIRECTORY
 from find_action.BT import behavior_tree_2 as sbt
-from find_action.execution_nodes import Picked, MoveArmTo
+from find_action.execution_nodes import Anchored, MoveArmTo, RetrieveObjects
 
 from interface import implements
 from behavior_tree_learning.core.sbt import World
@@ -30,11 +30,13 @@ def run():
     print(sbt)
 
     behavior_register = BehaviorRegister()
-    behavior_register.add_condition('CHECK_picked[gear_1: gear]', Picked)
+    behavior_register.add_condition('CHECK_anchored[gear_1: gear]', Anchored)
     behavior_register.add_action('DO_move_arm_to[A: place]', MoveArmTo)
     behavior_register.add_action('DO_move_arm_to[B: place]', MoveArmTo)
     behavior_register.add_action('DO_move_arm_to[C: place]', MoveArmTo)
     behavior_register.add_action('DO_move_arm_to[D: place]', MoveArmTo)
+    behavior_register.add_action('DO_move_arm_to[E: place]', MoveArmTo)
+    behavior_register.add_action('DO_retrive_objects[] => [objects]', RetrieveObjects)
     node_factory = BehaviorNodeFactory(behavior_register)
 
     my_world = DummyWorld()

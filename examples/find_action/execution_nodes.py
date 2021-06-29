@@ -1,47 +1,35 @@
-# pylint: disable=duplicate-code
-"""
-Implementing various py trees behaviors
-For duplo brick handling in a state machine env
-"""
 import re
 import py_trees as pt
 from find_action.parse_operation import parse_function, print_parsed_function
 
-def make_execution_node(text, world, verbose=False):
 
-    if 'CHECK_picked' in text:
-        node = Picked.make(text, verbose)
-    elif 'DO_move_arm_to' in text:
-        node = MoveArmTo.make(text, verbose)
-    else:
-        node = None
-
-    return node
-
-
-class Picked(pt.behaviour.Behaviour):
+class Anchored(pt.behaviour.Behaviour):
 
     @staticmethod
     def make(text, world, verbose=False):
 
-        print_parsed_function(text)        
-        name, arguments, return_value = parse_function(text)      
+        print_parsed_function(text)   
+        operation = parse_function(text)                  
+        return Anchored(text, world, operation, verbose)
 
-        text_2 = name + " " + str(arguments) + " => " + str(return_value)               
-        return Picked(text_2, world, verbose)
-
-    def __init__(self, name, world, verbose):
+    def __init__(self, name, world, operation, verbose):
         
-        super().__init__(name)             
+        super().__init__(name)        
         self._world = world
+        self._operation = operation
         self._verbose = verbose
 
-    def initialise(self):
-        print("Picked::initialise() [%s]", self.name)
+        print_parsed_function(name)   
+        self._operation = parse_function(name)    
 
+    def initialise(self):
+        print("Anchored::initialise() [%s]" % self.name)
+        text = self._operation[0] + " " + str(self._operation[1]) + " => " + str(self._operation[2])           
+        print("operation: ", text)
+        
     def update(self):
-        print("Picked::update() [%s]", self.name)
-        return pt.common.Status.SUCCESS
+        print("Anchored::update() [%s]" % self.name)
+        return pt.common.Status.FAILURE
 
 
 class MoveArmTo(pt.behaviour.Behaviour):
@@ -49,27 +37,52 @@ class MoveArmTo(pt.behaviour.Behaviour):
     @staticmethod
     def make(text, world, verbose=False):
         
-        print_parsed_function(text)        
-        name, arguments, return_value = parse_function(text)             
-        
-        #place = re.findall(r'\[(.*?)\]', text)
-        place = ""
+        print_parsed_function(text)   
+        operation = parse_function(text)       
+        return MoveArmTo(text, world, operation, verbose)
 
-        text_2 = name + " " + str(arguments) + " => " + str(return_value)
-
-        # Retrieve place from SDB
-        return MoveArmTo(text_2, world, place, verbose)
-
-    def __init__(self, name, world, place, verbose):
+    def __init__(self, name, world, operation, verbose):
         
         super().__init__(name)        
         self._world = world
-        self._place = place
+        self._operation = operation
         self._verbose = verbose
 
-    def initialise(self):
-        print("MoveArmTo::initialise() [%s]", self.name)
+        print_parsed_function(name)   
+        self._operation = parse_function(name)      
 
+        #self._place = place        
+
+    def initialise(self):
+        print("MoveArmTo::initialise() [%s]" % self.name)
+        
     def update(self):
-        print("MoveArmTo::update() [%s]", self.name)
+        print("MoveArmTo::update() [%s]" % self.name)
+        return pt.common.Status.SUCCESS
+
+
+class RetrieveObjects(pt.behaviour.Behaviour):
+
+    @staticmethod
+    def make(text, world, verbose=False):
+        
+        print_parsed_function(text)   
+        operation = parse_function(text)       
+        return RetrieveObjects(text, world, operation, verbose)
+
+    def __init__(self, name, world, operation, verbose):
+        
+        super().__init__(name)        
+        self._world = world
+        self._operation = operation
+        self._verbose = verbose
+
+        print_parsed_function(name)   
+        self._operation = parse_function(name)    
+
+    def initialise(self):
+        print("RetrieveObjects::initialise() [%s]" % self.name)
+        
+    def update(self):
+        print("RetrieveObjects::update() [%s]" % self.name)
         return pt.common.Status.SUCCESS
