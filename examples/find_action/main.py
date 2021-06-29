@@ -21,10 +21,10 @@ def run():
 
     behavior_register = BehaviorRegister()
     behavior_register.add_condition('CHECK_picked[gear_1: gear]', Picked)
-    behavior_register.add_action('DO_move_arm_to[A: place]', MoveArmToA)
-    behavior_register.add_action('DO_move_arm_to[B: place]', MoveArmToB)
-    behavior_register.add_action('DO_move_arm_to[C: place]', MoveArmToC)
-    behavior_register.add_action('DO_move_arm_to[D: place]', MoveArmToD)
+    behavior_register.add_action('DO_move_arm_to[A: place]', MoveArmTo)
+    behavior_register.add_action('DO_move_arm_to[B: place]', MoveArmTo)
+    behavior_register.add_action('DO_move_arm_to[C: place]', MoveArmTo)
+    behavior_register.add_action('DO_move_arm_to[D: place]', MoveArmTo)
     node_factory = BehaviorNodeFactory(behavior_register)
 
     tree = StringBehaviorTree(sbt, behaviors=node_factory)
