@@ -60,6 +60,8 @@ class MoveArmTo(pt.behaviour.Behaviour):
         print("MoveArmTo::update() [%s]" % self.name)
         return pt.common.Status.SUCCESS
 
+    def terminate(self, new_status):
+        print("MoveArmTo::terminate() [%s]" % self.name)
 
 class RetrieveObjects(pt.behaviour.Behaviour):
 

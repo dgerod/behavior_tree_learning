@@ -6,15 +6,24 @@ import os
 PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
 
+from interface import implements
 from behavior_tree_learning.sbt import StringBehaviorTree
 from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
+from behavior_tree_learning.sbt import World
+
 from find_action.paths import EXAMPLE_DIRECTORY
 from find_action.BT import behavior_tree_2 as sbt
 from find_action.execution_nodes import Anchored, MoveArmTo, RetrieveObjects
 
-from interface import implements
-from behavior_tree_learning.core.sbt import World
 
+class ExecutionParameters:
+    
+    def __init__(self, max_ticks=30, max_time=30.0, max_straight_fails=1, successes_required=2):
+        
+        self.max_ticks= max_ticks
+        self.max_time = max_time 
+        self.max_straight_fails = max_straight_fails
+        self.successes_required = successes_required
 
 class DummyWorld(implements(World)):
 
@@ -43,7 +52,7 @@ def run():
     tree = StringBehaviorTree(sbt, behaviors=node_factory, world=my_world)
     tree.save_figure(EXAMPLE_DIRECTORY, name='test')
 
-    tree.run_bt()
+    tree.run_bt(parameters=ExecutionParameters(successes_required=1))
 
 
 if __name__ == "__main__":
