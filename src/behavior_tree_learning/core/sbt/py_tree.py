@@ -130,7 +130,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
             self.failed = True
         return ticks, status_ok
 
-    def save_fig(self, path, name='Behavior tree', svg=False):
+    def save_figure(self, path, name='Behavior tree', svg=False):
         """
         Saves the tree as a figure
         """
