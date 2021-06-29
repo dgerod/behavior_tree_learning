@@ -67,17 +67,13 @@ Basically leaf nodes that actually do something and that may be implemented as t
 """
 
 global ALL_NODES
-"""
-All list of all the nodes
-"""
 
 
-def load_settings_from_file(file):
-    # pylint: disable=too-many-statements
+def _initialize_settings():
 
-    """
-    Sets the lists of allowed nodes module wide.
-    """
+    if 'FALLBACK_NODES' in globals():
+        return
+
     global FALLBACK_NODES
     global SEQUENCE_NODES
     global CONTROL_NODES
@@ -99,8 +95,63 @@ def load_settings_from_file(file):
     ATOMIC_SEQUENCE_NODES = []
     LEAF_NODES = []
     BEHAVIOR_NODES = []
+    UP_NODE = []
     ALL_NODES = []
 
+
+def add_node(type_, name):
+
+    _initialize_settings()
+
+    global FALLBACK_NODES
+    global SEQUENCE_NODES
+    global CONTROL_NODES
+    global CONDITION_NODES
+    global ACTION_NODES
+    global LEAF_NODES
+    global BEHAVIOR_NODES
+    global ALL_NODES
+
+    if type_ == 'fallback':
+        FALLBACK_NODES.append(name)
+        CONTROL_NODES.append(name)
+        ALL_NODES.append(name)
+    elif type_ == 'sequence':
+        SEQUENCE_NODES.append(name)
+        CONTROL_NODES.append(name)
+        ALL_NODES.append(name)
+    elif type_ == 'condition':
+        CONDITION_NODES.append(name)
+        LEAF_NODES.append(name)
+        ALL_NODES.append(name)
+    elif type_ == 'action':
+        ACTION_NODES.append(name)
+        BEHAVIOR_NODES.append(name)
+        LEAF_NODES.append(name)
+        ALL_NODES.append(name)
+
+
+def load_settings_from_file(file):
+    # pylint: disable=too-many-statements
+
+    """
+    Sets the lists of allowed nodes module wide.
+    """
+
+    _initialize_settings()
+
+    global FALLBACK_NODES
+    global SEQUENCE_NODES
+    global CONTROL_NODES
+    global CONDITION_NODES
+    global ACTION_NODES
+    global ATOMIC_FALLBACK_NODES
+    global ATOMIC_SEQUENCE_NODES
+    global UP_NODE
+    global LEAF_NODES
+    global BEHAVIOR_NODES
+    global ALL_NODES
+    
     with open(file) as f:
         bt_settings = yaml.load(f, Loader=yaml.FullLoader)
     try:

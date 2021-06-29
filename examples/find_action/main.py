@@ -11,30 +11,27 @@ from find_action.paths import EXAMPLE_DIRECTORY
 from find_action.BT import behavior_tree_2 as sbt
 from find_action.execution_nodes import make_execution_node
 
+from behavior_tree_learning.core.sbt.behavior_factory import BehaviorRegister
+from find_action.execution_nodes import Picked, MoveArmTo
+
 
 def run():
 
     print(sbt)
 
-    settings_file = os.path.join(EXAMPLE_DIRECTORY, 'BT_SETTINGS.yaml')
+    behavior_register = BehaviorRegister()
+    behavior_register.add_condition('CHECK_picked[gear_1: gear]', Picked)
+    behavior_register.add_action('DO_move_arm_to[A: place]', MoveArmToA)
+    behavior_register.add_action('DO_move_arm_to[B: place]', MoveArmToB)
+    behavior_register.add_action('DO_move_arm_to[C: place]', MoveArmToC)
+    behavior_register.add_action('DO_move_arm_to[D: place]', MoveArmToD)
+    node_factory = BehaviorNodeFactory(behavior_register)
 
-    #   Prepare SBT: nodes and its behaviors, they shoudl be set together, there
-    # are two options:
-    #  1)
-    #  nf.register('CHECK_picked(gear_1:gear)', Picked::make)
-    #    do functionality of load_bt_settings internally
-    #  nf.register('DO_move_arm_to(A:place)', MoveArmTo::make)
-    #
-    #  2)
-    #  nf.check_exist(settings) -> raise exception if a element in sbt has not behavior in factory
-    #    internally check if load_bt_settings are correct or not.
-    
-    load_bt_settings(settings_file)
-    node_factory = BehaviorNodeFactory(make_execution_node)
-    
-    # Create SBT
     tree = StringBehaviorTree(sbt, behaviors=node_factory)
     tree.save_fig(EXAMPLE_DIRECTORY, name='test')
+
+    tree.bt
+
 
 if __name__ == "__main__":
     run()
