@@ -37,10 +37,11 @@ class Picked(pt.behaviour.Behaviour):
         self._verbose = verbose
 
     def initialise(self):
-        pass
+        print("Picked::initialise() [%s]", self.name)
 
     def update(self):
-        pass
+        print("Picked::update() [%s]", self.name)
+        return pt.common.Status.SUCCESS
 
 
 class MoveArmTo(pt.behaviour.Behaviour):
@@ -55,6 +56,8 @@ class MoveArmTo(pt.behaviour.Behaviour):
         place = ""
 
         text_2 = name + " " + str(arguments) + " => " + str(return_value)
+
+        # Retrieve place from SDB
         return MoveArmTo(text_2, world, place, verbose)
 
     def __init__(self, name, world, place, verbose):
@@ -65,7 +68,8 @@ class MoveArmTo(pt.behaviour.Behaviour):
         self._verbose = verbose
 
     def initialise(self):
-        pass
+        print("MoveArmTo::initialise() [%s]", self.name)
 
     def update(self):
-        pass
+        print("MoveArmTo::update() [%s]", self.name)
+        return pt.common.Status.SUCCESS
