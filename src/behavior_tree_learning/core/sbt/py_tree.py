@@ -4,6 +4,15 @@ import py_trees as pt
 from behavior_tree_learning.core.sbt.world import World
 from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
 
+class ExecutionParameters:
+
+    def __init__(self, max_ticks=30, max_time=30.0, max_straight_fails=1, successes_required=2):
+        
+        self.max_ticks= max_ticks
+        self.max_time = max_time 
+        self.max_straight_fails = max_straight_fails
+        self.successes_required = successes_required
+        
 
 class StringBehaviorTree(pt.trees.BehaviourTree):
 
@@ -76,25 +85,29 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
             new_node, has_children = self.behavior_factory.make_node(string[0], self.world, self.verbose)
             string.pop(0)
             if has_children:
-                #Node is a control node or decorator with children - add subtree via string and then add to parent
+                # Node is a control node or decorator with children - add subtree via string and then add to parent
                 new_node = self.create_from_string(string, new_node)
                 node.add_child(new_node)
             else:
-                #Node is a leaf/action node - add to parent, then keep looking for siblings
+                # Node is a leaf/action node - add to parent, then keep looking for siblings
                 node.add_child(new_node)
 
-        #This return is only reached if there are too few up nodes
+        # This return is only reached if there are too few up nodes
         return node
 
-    def run_bt(self, max_ticks=30, max_time=30.0):
+    def run_bt(self, parameters = ExecutionParameters()):
         """
         Function executing the behavior tree
         """
+        
+        max_ticks = parameters.max_ticks
+        max_time = parameters.max_time
+        max_straight_fails = parameters.max_straight_fails
+        successes_required = parameters.successes_required        
+        
         ticks = 0
-        max_straight_fails = 1
         straight_fails = 0
-        successes_required = 2
-        successes = 0
+        successes = 0        
         status_ok = True
         start = time.time()
 
@@ -123,11 +136,13 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
                     status_ok = False
                     print("Max time expired")
 
-        print(ticks, time.time()-start)
+        print(ticks, time.time() - start)
+
         if ticks >= max_ticks:
             self.timeout = True
         if straight_fails >= max_straight_fails:
             self.failed = True
+
         return ticks, status_ok
 
     def save_figure(self, path, name='Behavior tree', svg=False):
