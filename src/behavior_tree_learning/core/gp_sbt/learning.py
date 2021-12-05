@@ -7,7 +7,7 @@ from behavior_tree_learning.core.gp_sbt.environment import Environment
 from behavior_tree_learning.core.gp_sbt.gp_operators import Operators as GeneticOperatorsForStringBehaviorTree
 
 
-class LearnBehaviorTree:
+class BehaviorTreeLearner:
 
     def __init__(self, settings_file):
 
@@ -19,8 +19,8 @@ class LearnBehaviorTree:
 
         class EnvironmentAdapter(implements(GeneticEnvironment)):
 
-            def __init__(self, environment):
-                self._environment = environment
+            def __init__(self, environment_):
+                self._environment = environment_
 
             def run_and_compute(self, individual):
                 raise NotImplementedError

@@ -1,14 +1,14 @@
 import time
 import py_trees as pt
-
 from behavior_tree_learning.core.sbt.world import World
 from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
+
 
 class ExecutionParameters:
 
     def __init__(self, max_ticks=30, max_time=30.0, max_straight_fails=1, successes_required=2):
         
-        self.max_ticks= max_ticks
+        self.max_ticks = max_ticks
         self.max_time = max_time 
         self.max_straight_fails = max_straight_fails
         self.successes_required = successes_required
@@ -38,6 +38,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
             string.pop(0)
 
         super().__init__(root=self.root)
+
         if has_children:
             self.create_from_string(string, self.root)
 
@@ -95,7 +96,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         # This return is only reached if there are too few up nodes
         return node
 
-    def run_bt(self, parameters = ExecutionParameters()):
+    def run_bt(self, parameters=ExecutionParameters()):
         """
         Function executing the behavior tree
         """
