@@ -10,7 +10,7 @@ from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
 
 from simple_example.paths import EXAMPLE_DIRECTORY
-from simple_example.behavior_trees import select_bt
+from simple_example import bt_collection
 from simple_example.execution_nodes import PickGearPart, PlaceGearPart, MoveGearPart
 from simple_example.dummy_world import DummyWorld, WorldOperationResults
 
@@ -24,11 +24,13 @@ def run():
 
     node_factory = BehaviorNodeFactory(behavior_register)
 
-    trials = [(select_bt(0), WorldOperationResults(pick_succeed=True, place_succeed=True, move_succeed=True)),
-              (select_bt(0), WorldOperationResults(pick_succeed=False, place_succeed=False, move_succeed=False)),
-              (select_bt(1), WorldOperationResults(pick_succeed=True, place_succeed=True, move_succeed=True)),
-              (select_bt(1), WorldOperationResults(pick_succeed=False, place_succeed=False, move_succeed=False))]
-    feedback_succeed = True
+    sbt_1 = bt_collection.select_bt(0)
+    sbt_2 = bt_collection.select_bt(1)
+    trials = [(sbt_1, WorldOperationResults(pick_succeed=True, place_succeed=True, move_succeed=True)),
+              (sbt_1, WorldOperationResults(pick_succeed=False, place_succeed=False, move_succeed=False)),
+              (sbt_2, WorldOperationResults(pick_succeed=True, place_succeed=True, move_succeed=True)),
+              (sbt_2, WorldOperationResults(pick_succeed=False, place_succeed=False, move_succeed=False))]
+    world_feedback_succeed = True
 
     for tdx, trial in zip(range(0, len(trials)), trials):
 
@@ -40,7 +42,7 @@ def run():
         print("SBT: ", sbt)
         print("World operations: ", world_operations)
 
-        world = DummyWorld(world_operations, feedback_succeed)
+        world = DummyWorld(world_operations, world_feedback_succeed)
         bt_executor = BehaviorTreeExecutor(node_factory, world)
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1))
 
