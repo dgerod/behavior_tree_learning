@@ -1,19 +1,26 @@
 import py_trees as pt
 from behavior_tree_learning.core.sbt import behavior_tree as bt
 from behavior_tree_learning.core.sbt.behaviors import RSequence
+from behavior_tree_learning.core.sbt import parse_operation as operation
 
 
-class DummyExecutionBehavior(pt.behaviour.Behaviour):
+class BehaviorNode(pt.behaviour.Behaviour):
 
-    def __init__(self, name, world, verbose):
-        super().__init__(name)        
+    def __init__(self, name):
+        super().__init__(name)
 
-    def initialise(self):
-        pass
 
-    def update(self):
-        pass
-    
+class BehaviorNodeWithOperation(pt.behaviour.Behaviour):
+
+    @staticmethod
+    def make(text, world, verbose=False):
+        raise NotImplementedError
+
+    def __init__(self, text):
+        operation.print_parsed_function(text)
+        self._operation = operation.parse_function(text)
+        super().__init__(self._operation[0])
+
 
 class BehaviorRegister:
 
