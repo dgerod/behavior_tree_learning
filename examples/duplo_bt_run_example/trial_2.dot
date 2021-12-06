@@ -1,0 +1,19 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+Fallback [fillcolor=cyan, fontcolor=black, fontsize=9, label=Fallback, shape=octagon, style=filled];
+"0 at pos (0.0, 0.05, 0.0)?" [fillcolor=gray, fontcolor=black, fontsize=9, label="0 at pos (0.0, 0.05, 0.0)?", shape=ellipse, style=filled];
+Fallback -> "0 at pos (0.0, 0.05, 0.0)?";
+Sequence [fillcolor=cyan, fontcolor=black, fontsize=9, label=Sequence, shape=octagon, style=filled];
+Fallback -> Sequence;
+"pick 1!" [fillcolor=gray, fontcolor=black, fontsize=9, label="pick 1!", shape=ellipse, style=filled];
+Sequence -> "pick 1!";
+"place on 0!" [fillcolor=gray, fontcolor=black, fontsize=9, label="place on 0!", shape=ellipse, style=filled];
+Sequence -> "place on 0!";
+"pick 2!" [fillcolor=gray, fontcolor=black, fontsize=9, label="pick 2!", shape=ellipse, style=filled];
+Sequence -> "pick 2!";
+"place on 1!" [fillcolor=gray, fontcolor=black, fontsize=9, label="place on 1!", shape=ellipse, style=filled];
+Sequence -> "place on 1!";
+}
