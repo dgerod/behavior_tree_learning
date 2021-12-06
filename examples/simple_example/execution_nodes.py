@@ -1,58 +1,115 @@
 import py_trees as pt
+from behavior_tree_learning.sbt import BehaviorRegister, BehaviorNode, BehaviorNodeWithOperation
 
 
-class PickGearPart(pt.behaviour.Behaviour):
+_behavior_register = None
+
+
+class CheckGearPartPicked(BehaviorNodeWithOperation):
 
     @staticmethod
     def make(text, world, verbose=False):
-        return PickGearPart(text, world, verbose)
+        return CheckGearPartPicked(text, world, verbose)
+
+    def __init__(self, name, world, verbose):
+        super().__init__(name)
+        self._world = world
+
+    def initialise(self):
+        pass
+
+    def update(self):
+        print("CheckGearPartPicked::update() [%s]" % self.name)
+        success = self._world.is_gear_part_picked()
+        return pt.common.Status.SUCCESS if success else pt.common.Status.FAILURE
+
+
+class CheckGearPartPlaced(BehaviorNodeWithOperation):
+
+    @staticmethod
+    def make(text, world, verbose=False):
+        return CheckGearPartPlaced(text, world, verbose)
+
+    def __init__(self, name, world, verbose):
+        super().__init__(name)
+        self._world = world
+
+    def initialise(self):
+        pass
+
+    def update(self):
+        print("CheckGearPartPlaced::update() [%s]" % self.name)
+        success = self._world.is_gear_part_placed()
+        return pt.common.Status.SUCCESS if success else pt.common.Status.FAILURE
+
+
+class DoPickGearPart(BehaviorNodeWithOperation):
+
+    @staticmethod
+    def make(text, world, verbose=False):
+        return DoPickGearPart(text, world, verbose)
 
     def __init__(self, name, world, verbose):
         super().__init__(name)        
         self._world = world
 
     def initialise(self):
-        print("PickGearPart::initialise() [%s]" % self.name)
+        pass
         
     def update(self):
-        print("PickGearPart::update() [%s]" % self.name)
+        print("DoPickGearPart::update() [%s]" % self.name)
         success = self._world.pick_gear_part()
         return pt.common.Status.SUCCESS if success else pt.common.Status.FAILURE
 
 
-class PlaceGearPart(pt.behaviour.Behaviour):
+class DoPlaceGearPart(BehaviorNodeWithOperation):
 
     @staticmethod
     def make(text, world, verbose=False):
-        return PlaceGearPart(text, world, verbose)
+        return DoPlaceGearPart(text, world, verbose)
 
     def __init__(self, name, world, verbose):
         super().__init__(name)
         self._world = world
 
     def initialise(self):
-        print("PlaceGearPart::initialise() [%s]" % self.name)
+        pass
 
     def update(self):
-        print("PlaceGearPart::update() [%s]" % self.name)
+        print("DoPlaceGearPart::update() [%s]" % self.name)
         success = self._world.place_gear_part()
         return pt.common.Status.SUCCESS if success else pt.common.Status.FAILURE
 
 
-class MoveGearPart(pt.behaviour.Behaviour):
+class DoMoveGearPart(BehaviorNodeWithOperation):
 
     @staticmethod
     def make(text, world, verbose=False):
-        return MoveGearPart(text, world, verbose)
+        return DoMoveGearPart(text, world, verbose)
 
     def __init__(self, name, world, verbose):
         super().__init__(name)
         self._world = world
 
     def initialise(self):
-        print("MoveGearPart::initialise() [%s]" % self.name)
+        pass
 
     def update(self):
-        print("MoveGearPart::update() [%s]" % self.name)
+        print("DoMoveGearPart::update() [%s]" % self.name)
         success = self._world.move_gear_part()
         return pt.common.Status.SUCCESS if success else pt.common.Status.FAILURE
+
+
+def get_behaviors():
+
+    global _behavior_register
+
+    if not _behavior_register:
+        _behavior_register = BehaviorRegister()
+        _behavior_register.add_condition('CHECK_GearPartPlaced[]', CheckGearPartPlaced)
+        _behavior_register.add_condition('CHECK_GearPartPicked[]', CheckGearPartPicked)
+        _behavior_register.add_action('DO_PickGearPart[]', DoPickGearPart)
+        _behavior_register.add_action('DO_PlaceGearPart[]', DoPlaceGearPart)
+        _behavior_register.add_action('DO_MoveGearPart[P: place]', DoMoveGearPart)
+
+    return _behavior_register

@@ -4,7 +4,8 @@ from behavior_tree_learning.sbt import World
 
 
 WorldOperationResults = \
-    collections.namedtuple('WorldOperationResults', 'pick_succeed place_succeed move_succeed')
+    collections.namedtuple('WorldOperationResults',
+                           'is_picked_succeed is_placed_succeed do_pick_succeed do_place_succeed do_move_succeed')
 
 
 class DummyWorld(implements(World)):
@@ -19,11 +20,17 @@ class DummyWorld(implements(World)):
     def send_references(self):
         pass
 
+    def is_gear_part_picked(self):
+        return self._operation_results.is_picked_succeed
+
+    def is_gear_part_placed(self):
+        return self._operation_results.is_placed_succeed
+
     def pick_gear_part(self):
-        return self._operation_results.pick_succeed
+        return self._operation_results.do_pick_succeed
 
     def place_gear_part(self):
-        return self._operation_results.place_succeed
+        return self._operation_results.do_place_succeed
 
     def move_gear_part(self):
-        return self._operation_results.move_succeed
+        return self._operation_results.do_move_succeed

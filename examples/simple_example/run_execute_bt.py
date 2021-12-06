@@ -11,25 +11,24 @@ from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
 
 from simple_example.paths import EXAMPLE_DIRECTORY
 from simple_example import bt_collection
-from simple_example.execution_nodes import PickGearPart, PlaceGearPart, MoveGearPart
+from simple_example.execution_nodes import get_behaviors
 from simple_example.dummy_world import DummyWorld, WorldOperationResults
 
 
 def run():
 
-    behavior_register = BehaviorRegister()
-    behavior_register.add_action('PickGearPart', PickGearPart)
-    behavior_register.add_action('PlaceGearPart', PlaceGearPart)
-    behavior_register.add_action('MoveGearPart', MoveGearPart)
-
-    node_factory = BehaviorNodeFactory(behavior_register)
+    node_factory = BehaviorNodeFactory(get_behaviors())
 
     sbt_1 = bt_collection.select_bt(0)
     sbt_2 = bt_collection.select_bt(1)
-    trials = [(sbt_1, WorldOperationResults(pick_succeed=True, place_succeed=True, move_succeed=True)),
-              (sbt_1, WorldOperationResults(pick_succeed=False, place_succeed=False, move_succeed=False)),
-              (sbt_2, WorldOperationResults(pick_succeed=True, place_succeed=True, move_succeed=True)),
-              (sbt_2, WorldOperationResults(pick_succeed=False, place_succeed=False, move_succeed=False))]
+    trials = [(sbt_1, WorldOperationResults(is_picked_succeed=True, is_placed_succeed=True,
+                                            do_pick_succeed=True, do_place_succeed=True, do_move_succeed=True)),
+              (sbt_1, WorldOperationResults(is_picked_succeed=False, is_placed_succeed=False,
+                                            do_pick_succeed=False, do_place_succeed=False, do_move_succeed=False)),
+              (sbt_2, WorldOperationResults(is_picked_succeed=True, is_placed_succeed=True,
+                                            do_pick_succeed=True, do_place_succeed=True, do_move_succeed=True)),
+              (sbt_2, WorldOperationResults(is_picked_succeed=False, is_placed_succeed=False,
+                                            do_pick_succeed=False, do_place_succeed=False, do_move_succeed=False))]
     world_feedback_succeed = True
 
     for tdx, trial in zip(range(0, len(trials)), trials):

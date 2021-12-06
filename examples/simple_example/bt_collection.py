@@ -1,15 +1,15 @@
 _bt_1 = ['s(',
-             'PickGearPart',
-             'MoveGearPart',
-             'PlaceGearPart',
+             'DO_PickGearPart[]',
+             'DO_MoveGearPart[P: place]',
+             'DO_PlaceGearPart[]',
          ')']
 
 _bt_2 = ['f(',
-             'PlaceGearPart',
+             'CHECK_GearPartPlaced[]',
              's(',
-                 'PickGearPart',
-                 'MoveGearPart',
-                 'PlaceGearPart',
+                 'DO_PickGearPart[]',
+                 'DO_MoveGearPart[P: place]',
+                 'DO_PlaceGearPart[]',
              ')',
          ')']
 
