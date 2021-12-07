@@ -10,14 +10,20 @@ WorldOperationResults = \
 
 class DummyWorld(implements(World)):
 
-    def __init__(self, operation_results: WorldOperationResults, feedback_succeed: bool = True):
-        self._feedback_succeed = feedback_succeed
+    def __init__(self, operation_results: WorldOperationResults, is_alive: bool = True):
+        self._is_alive = is_alive
         self._operation_results = operation_results
 
     def get_feedback(self):
-        return self._feedback_succeed
+        return self._is_alive
 
-    def send_references(self):
+    def startup(self):
+        return True
+
+    def is_alive(self):
+        return self._is_alive
+
+    def shutdown(self):
         pass
 
     def is_gear_part_picked(self):

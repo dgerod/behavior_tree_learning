@@ -3,8 +3,11 @@ from interface import Interface
 
 class World(Interface):
 
-    def get_feedback(self):
+    def startup(self):
         pass
 
-    def send_references(self):
+    def is_alive(self):
+        pass
+
+    def shutdown(self):
         pass

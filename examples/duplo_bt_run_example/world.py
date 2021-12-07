@@ -74,20 +74,14 @@ class WorldSimulator(implements(World)):
         for pos in start_positions:
             self.state.bricks.append(copy(pos))
 
-    def get_feedback(self):
-        # pylint: disable=no-self-use
-        """ Dummy to fit template """
+    def startup(self):
         return True
 
-    def get_sensor_data(self):
-         # pylint: disable=no-self-use
-        """ Dummy to fit template """
+    def is_alive(self):
         return True
 
-    def send_references(self):
-         # pylint: disable=no-self-use
-        """ Dummy to fit template """
-        return
+    def shutdown(self):
+        pass
 
     def random_event(self):
         """

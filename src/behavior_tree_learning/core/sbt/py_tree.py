@@ -100,7 +100,10 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         """
         Function executing the behavior tree
         """
-        
+
+        if not self.world.startup():
+            return False, 0
+
         max_ticks = parameters.max_ticks
         max_time = parameters.max_time
         max_straight_fails = parameters.max_straight_fails
@@ -112,15 +115,14 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         status_ok = True
         start = time.time()
 
-        while (self.root.status is not pt.common.Status.FAILURE or straight_fails < max_straight_fails) and \
-              (self.root.status is not pt.common.Status.SUCCESS or successes < successes_required) and \
-              ticks < max_ticks and status_ok:
+        while (self.root.status is not pt.common.Status.FAILURE or straight_fails < max_straight_fails) \
+                and (self.root.status is not pt.common.Status.SUCCESS or successes < successes_required) \
+                and ticks < max_ticks and status_ok:
 
-            status_ok = self.world.get_feedback()
+            status_ok = self.world.is_alive()
 
             if status_ok:
                 self.root.tick_once()
-                self.world.send_references()
 
                 ticks += 1
                 if self.root.status is pt.common.Status.SUCCESS:
@@ -144,7 +146,9 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         if straight_fails >= max_straight_fails:
             self.failed = True
 
-        return ticks, status_ok
+        self.world.shutdown()
+
+        return status_ok, ticks
 
     def save_figure(self, path, name='Behavior tree', svg=False):
         """

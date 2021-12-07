@@ -11,5 +11,5 @@ class BehaviorTreeExecutor:
 
     def run(self, sbt: str, parameters: ExecutionParameters):
         tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=self._world)
-        ticks, success = tree.run_bt(parameters=parameters)
+        success, ticks = tree.run_bt(parameters=parameters)
         return success, ticks, tree
