@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 
-import sys
-import os
-
-PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
+import paths
+paths.add_modules_to_path()
 
 from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
 from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParameters, GeneticSelectionMethods
 
-from duplo_bt_run_example.paths import EXAMPLE_DIRECTORY
-from duplo_bt_run_example.execution_nodes import get_behaviors
-from duplo_bt_run_example.world import Pos as WorldPos
-from duplo_bt_run_example.world import WorldSimulator
-from duplo_bt_run_example.environment import Environment
+from duplo.execution_nodes import get_behaviors
+from duplo.world import Pos as WorldPos
+from duplo.world import WorldSimulator
+from duplo.environment import Environment
 
 
 def run():

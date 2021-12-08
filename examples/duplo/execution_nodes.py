@@ -1,7 +1,7 @@
 import re
 import py_trees as pt
 from behavior_tree_learning.sbt import BehaviorRegister, BehaviorNode
-import duplo_bt_run_example.world as sm
+from duplo import world as sm
 
 
 class HandEmpty(BehaviorNode):

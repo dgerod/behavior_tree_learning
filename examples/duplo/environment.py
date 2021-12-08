@@ -3,7 +3,7 @@ from interface import implements
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
 from behavior_tree_learning.gp import GeneticEnvironment
-from duplo_bt_run_example.world import WorldSimulator
+from duplo.world import WorldSimulator
 
 
 @dataclass

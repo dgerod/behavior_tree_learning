@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 
-import sys
-import os
-
-PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
+import paths
+paths.add_modules_to_path()
 
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
 
-from duplo_bt_run_example.paths import EXAMPLE_DIRECTORY
-from duplo_bt_run_example import bt_collection
-from duplo_bt_run_example.execution_nodes import get_behaviors
-from duplo_bt_run_example.world import WorldSimulator
-from duplo_bt_run_example.world import Pos as WorldPos
+from duplo.paths import get_example_directory
+from duplo import bt_collection
+from duplo.execution_nodes import get_behaviors
+from duplo.world import WorldSimulator
+from duplo.world import Pos as WorldPos
 
 
 def run():
@@ -38,7 +35,7 @@ def run():
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1))
 
         file_name = 'trial_%d' % (tdx + 1)
-        tree.save_figure(EXAMPLE_DIRECTORY, name=file_name)
+        tree.save_figure(get_example_directory(), name=file_name)
         print("Succeed: ", success)
 
 
