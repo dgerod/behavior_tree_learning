@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
-import os
-
-PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
+import paths
+paths.add_modules_to_path()
 
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
 
-from simple_example.paths import EXAMPLE_DIRECTORY
+from simple_example.paths import get_example_directory
 from simple_example import bt_collection
 from simple_example.execution_nodes import get_behaviors
 from simple_example.dummy_world import DummyWorld, WorldOperationResults
@@ -46,7 +43,7 @@ def run():
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1))
 
         file_name = 'trial_%d' % (tdx + 1)
-        tree.save_figure(EXAMPLE_DIRECTORY, name=file_name)
+        tree.save_figure(get_example_directory(), name=file_name)
         print("Succeed: ", success)
 
 
