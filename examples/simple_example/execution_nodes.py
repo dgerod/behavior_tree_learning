@@ -2,9 +2,6 @@ import py_trees as pt
 from behavior_tree_learning.sbt import BehaviorRegister, BehaviorNode, BehaviorNodeWithOperation
 
 
-_behavior_register = None
-
-
 class CheckGearPartPicked(BehaviorNodeWithOperation):
 
     @staticmethod
@@ -102,14 +99,10 @@ class DoMoveGearPart(BehaviorNodeWithOperation):
 
 def get_behaviors():
 
-    global _behavior_register
-
-    if not _behavior_register:
-        _behavior_register = BehaviorRegister()
-        _behavior_register.add_condition('CHECK_GearPartPlaced[]', CheckGearPartPlaced)
-        _behavior_register.add_condition('CHECK_GearPartPicked[]', CheckGearPartPicked)
-        _behavior_register.add_action('DO_PickGearPart[]', DoPickGearPart)
-        _behavior_register.add_action('DO_PlaceGearPart[]', DoPlaceGearPart)
-        _behavior_register.add_action('DO_MoveGearPart[P: place]', DoMoveGearPart)
-
-    return _behavior_register
+    behavior_register = BehaviorRegister()
+    behavior_register.add_condition('CHECK_GearPartPlaced[]', CheckGearPartPlaced)
+    behavior_register.add_condition('CHECK_GearPartPicked[]', CheckGearPartPicked)
+    behavior_register.add_action('DO_PickGearPart[]', DoPickGearPart)
+    behavior_register.add_action('DO_PlaceGearPart[]', DoPlaceGearPart)
+    behavior_register.add_action('DO_MoveGearPart[P: place]', DoMoveGearPart)
+    return behavior_register

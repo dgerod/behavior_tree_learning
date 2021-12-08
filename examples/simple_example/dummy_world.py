@@ -14,9 +14,6 @@ class DummyWorld(implements(World)):
         self._is_alive = is_alive
         self._operation_results = operation_results
 
-    def get_feedback(self):
-        return self._is_alive
-
     def startup(self):
         return True
 
