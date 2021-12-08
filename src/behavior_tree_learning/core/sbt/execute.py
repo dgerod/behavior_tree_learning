@@ -9,7 +9,7 @@ class BehaviorTreeExecutor:
         self._node_factory = node_factory
         self._world = world
 
-    def run(self, sbt: str, parameters: ExecutionParameters):
-        tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=self._world)
+    def run(self, sbt: str, parameters: ExecutionParameters, verbose=False):
+        tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=self._world, verbose=verbose)
         success, ticks = tree.run_bt(parameters=parameters)
         return success, ticks, tree

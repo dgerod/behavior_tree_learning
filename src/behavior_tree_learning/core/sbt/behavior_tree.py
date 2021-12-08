@@ -233,12 +233,14 @@ class BehaviorTreeStringRepresentation:
         """
         Creates a bt
         """
+
         self.bt = bt[:]
 
     def set(self, bt):
         """
         Sets bt string
         """
+
         self.bt = bt[:]
         return self
 
@@ -247,6 +249,7 @@ class BehaviorTreeStringRepresentation:
         Creates a random bt of the given length
         Tries to follow some of the rules for valid trees to speed up the process
         """
+
         self.bt = []
         while not self.is_valid():
             if length == 1:
@@ -281,9 +284,10 @@ class BehaviorTreeStringRepresentation:
         Checks if bt is a valid behavior tree.
         Checks are somewhat in order of likelihood to fail.
         """
+
         valid = True
 
-        #Empty string
+        # Empty string
         if len(self.bt) <= 0:
             valid = False
 
@@ -293,10 +297,12 @@ class BehaviorTreeStringRepresentation:
 
         else:
             for i in range(len(self.bt) - 1):
-                #'up' directly after a control node
+
+                # 'up' directly after a control node
                 if (self.bt[i] in CONTROL_NODES) and (self.bt[i+1] in UP_NODE):
                     valid = False
-                #Identical condition nodes directly after one another - waste
+
+                # Identical condition nodes directly after one another - waste
                 elif self.bt[i] in CONDITION_NODES and self.bt[i] == self.bt[i+1]:
                     valid = False
                 # check for non-SBT elements
@@ -317,6 +323,7 @@ class BehaviorTreeStringRepresentation:
                 elif self.bt[0] in SEQUENCE_NODES:
                     sequence_allowed = False
                 valid = self.is_subtree_valid(self.bt[1:], fallback_allowed, sequence_allowed)
+
         return valid
 
     def is_subtree_valid(self, string, fallback_allowed, sequence_allowed):
@@ -326,6 +333,7 @@ class BehaviorTreeStringRepresentation:
         1. Fallbacks must not be children of fallbacks
         2. Sequences must not be children of sequences
         """
+
         while len(string) > 0:
             node = string.pop(0)
 
@@ -360,9 +368,10 @@ class BehaviorTreeStringRepresentation:
         """
         Adds missing up nodes at the end, or removes from the end if too many
         """
+
         open_subtrees = 0
 
-        #Make sure tree always ends with up node if starts with control node
+        # Make sure tree always ends with up node if starts with control node
         if len(self.bt) > 0:
             if self.bt[0] in CONTROL_NODES and self.bt[len(self.bt)-1] not in UP_NODE:
                 self.bt += UP_NODE
@@ -378,7 +387,7 @@ class BehaviorTreeStringRepresentation:
                 self.bt += UP_NODE
         elif open_subtrees < 0:
             for _ in range(-open_subtrees):
-                #Do not remove the very last node, and only up nodes
+                # Do not remove the very last node, and only up nodes
                 for j in range(len(self.bt) - 2, 0, -1): # pragma: no branch, we will always find an up
                     if self.bt[j] in UP_NODE:
                         self.bt.pop(j)
@@ -388,6 +397,7 @@ class BehaviorTreeStringRepresentation:
         """
         Removes control nodes with only one child
         """
+
         for index in range(len(self.bt)-1, 0, -1):
             if self.bt[index] in CONTROL_NODES:
                 children = self.find_children(index)
@@ -397,8 +407,8 @@ class BehaviorTreeStringRepresentation:
                     if len(children) == 1:
                         parent = self.find_parent(index)
                         if parent is not None and self.bt[parent] == self.bt[children[0]]:
-                            #Parent and only child will be identical control nodes,
-                            #child can be removed
+                            # Parent and only child will be identical control nodes,
+                            #   child can be removed
                             up_node_index = self.find_up_node(children[0])
                             self.bt.pop(up_node_index)
                             self.bt.pop(children[0])
@@ -408,6 +418,7 @@ class BehaviorTreeStringRepresentation:
         """
         Returns depth of the bt
         """
+
         depth = 0
         max_depth = 0
 
@@ -429,6 +440,7 @@ class BehaviorTreeStringRepresentation:
         """
         Counts number of nodes in bt. Doesn't count up characters.
         """
+
         length = 0
         for node in self.bt:
             if node not in UP_NODE:
@@ -444,14 +456,17 @@ class BehaviorTreeStringRepresentation:
         be approximately 50-50 between node types so this function reflects that.
         (Typically slightly more leaf nodes than control nodes, but this really depends)
         """
+
         if random.random() < 0.5:
             return random.choice(CONTROL_NODES)
+
         return random.choice(LEAF_NODES)
 
     def change_node(self, index, new_node=None):
         """
         Changes node at index
         """
+
         if self.bt[index] in UP_NODE:
             return
 
@@ -481,11 +496,12 @@ class BehaviorTreeStringRepresentation:
         """
         Adds new node at index
         """
+
         if new_node is None:
             new_node = BehaviorTreeStringRepresentation.random_node()
         if new_node in CONTROL_NODES:
             if index == 0:
-                #Adding new control node to encapsulate entire tree
+                # Adding new control node to encapsulate entire tree
                 self.bt.insert(index, new_node)
                 self.bt.append(UP_NODE[0])
             else:
@@ -500,6 +516,7 @@ class BehaviorTreeStringRepresentation:
         """
         Deletes node at index
         """
+
         if self.bt[index] in UP_NODE:
             return
 
@@ -514,6 +531,7 @@ class BehaviorTreeStringRepresentation:
         """
         Returns index of the closest parent to the node at input index
         """
+
         if index == 0:
             return None
 
@@ -533,6 +551,7 @@ class BehaviorTreeStringRepresentation:
         """
         Finds all children to the node at index
         """
+
         children = []
         if self.bt[index] in CONTROL_NODES:
             child = index + 1
@@ -553,6 +572,7 @@ class BehaviorTreeStringRepresentation:
         """
         Returns index of the up node connected to the control node at input index
         """
+
         if self.bt[index] not in CONTROL_NODES:
             raise Exception('Invalid call. Node at index not a control node')
 
@@ -578,6 +598,7 @@ class BehaviorTreeStringRepresentation:
         """
         Get subtree starting at index
         """
+
         subtree = []
 
         if self.bt[index] in LEAF_NODES:
@@ -593,6 +614,7 @@ class BehaviorTreeStringRepresentation:
         """
         Insert subtree at given index
         """
+
         for i in range(len(subtree)):
             self.bt.insert(index + i, subtree.pop(0))
 
@@ -600,6 +622,7 @@ class BehaviorTreeStringRepresentation:
         """
         Swaps two subtrees at given indices
         """
+
         subtree1 = self.get_subtree(index1)
         subtree2 = bt2.get_subtree(index2)
 
@@ -617,4 +640,5 @@ class BehaviorTreeStringRepresentation:
         """
         Checks if node at index is root of a subtree
         """
+
         return bool(0 <= index < len(self.bt) and self.bt[index] not in UP_NODE)

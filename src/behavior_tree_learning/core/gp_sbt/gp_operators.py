@@ -41,7 +41,11 @@ def _mutate_gene(genome, p_add, p_delete):
     attempts = 0
     while (not mutated_individual.is_valid() or mutated_individual.bt == genome) and attempts < max_attempts:
         mutated_individual.set(genome)
-        index = random.randint(0, len(genome) - 1)
+        try:
+            index = random.randint(0, len(genome) - 1)
+        except:
+            import pdb; pdb.set_trace()
+
         mutation = random.random()
 
         if mutation < p_delete:

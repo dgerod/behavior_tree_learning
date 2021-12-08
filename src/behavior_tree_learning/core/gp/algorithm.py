@@ -53,21 +53,21 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         population = _create_population(gp_par.n_population, gp_par.ind_start_length)
         logplot.clear_logs(gp_par.log_name)
         best_fitness = []
-        n_episodes = []
-        n_episodes.append(hash_table.n_values)
+        n_episodes = [hash_table.n_values]
         last_generation = 0
 
         if base_line is not None:
             population[0] = base_line
             baseline_index = 0
 
+    # Calculate fitness of the population
     fitness = []
     for individual in population:
-        fitness.append(_calculate_fitness(individual, hash_table, environment, rerun=0))
+        fitness.append(_calculate_fitness(list(individual), hash_table, environment, rerun=0))
 
+    # Select best candidate
     if not hot_start:
         best_fitness.append(max(fitness))
-
         if gp_par.verbose:
             _print_population(population, fitness, last_generation)
             print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
@@ -75,18 +75,19 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         logplot.log_fitness(gp_par.log_name, fitness)
         logplot.log_population(gp_par.log_name, population)
 
-    generation = gp_par.n_generations - 1 #In case loop is skipped due to hotstart
+    generation = gp_par.n_generations - 1 # In case loop is skipped due to hotstart
     for generation in range(last_generation + 1, gp_par.n_generations):
         if gp_par.keep_baseline:
-            if base_line is not None and not base_line in population:
-                population.append(base_line) #Make sure we are always able to source from baseline
+            if base_line is not None and base_line not in population:
+                population.append(base_line) # Make sure we are always able to source from baseline
 
         if generation > 1:
             fitness = []
             for index, individual in enumerate(population):
-                fitness.append(_calculate_fitness(individual, hash_table, environment, gp_par.rerun_fitness))
+                fitness.append(_calculate_fitness(list(individual), hash_table, environment, gp_par.rerun_fitness))
                 if base_line is not None and individual == base_line:
                     baseline_index = index
+
         if gp_par.keep_baseline and gp_par.boost_baseline and base_line is not None:
             baseline_fitness = fitness[baseline_index]
             fitness[baseline_index] = max(fitness)
@@ -94,18 +95,19 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         co_parents = _crossover_parent_selection(population, fitness, gp_par)
         co_offspring = _crossover(population, co_parents, gp_par)
         for offspring in co_offspring:
-            fitness.append(_calculate_fitness(offspring, hash_table, environment, gp_par.rerun_fitness))
+            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness))
 
         if gp_par.boost_baseline and gp_par.boost_baseline_only_co and base_line is not None:
-            fitness[baseline_index] = baseline_fitness #Restore original fitness for survivor selection
+            fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
 
         mutation_parents = _mutation_parent_selection(population, fitness, co_parents, co_offspring, gp_par)
         mutated_offspring = _mutation(population + co_offspring, mutation_parents, gp_par)
+
         for offspring in mutated_offspring:
-            fitness.append(_calculate_fitness(offspring, hash_table, environment, gp_par.rerun_fitness))
+            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness))
 
         if gp_par.boost_baseline and base_line is not None:
-            fitness[baseline_index] = baseline_fitness #Restore original fitness for survivor selection
+            fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
 
         population, fitness = _survivor_selection(population, fitness, co_offspring, mutated_offspring, gp_par)
 
@@ -144,22 +146,27 @@ def _create_population(population_size, genome_length):
     Creates an initial random population
     """
 
+    print("[gpa::_create_population] --- {")
+    print("Requested population: %d" % population_size)
+    print("Genome length: %d" % genome_length)
+
     new_population = []
     max_attempts = 100
 
     for _ in range(population_size):
-        individual = []
         attempts = 0
-
         while attempts < max_attempts:
-
-            #individual = _operators['random_genome'](genome_length)
             individual = _operators.random_genome(genome_length)
             if individual != [] and individual not in new_population:
                 new_population.append(individual)
                 break
             attempts += 1
 
+    print("New population: %d" % len(new_population))
+    for genome in new_population:
+        print(genome)
+
+    print("} ---")
     return new_population
 
 
@@ -183,8 +190,8 @@ def _mutation(population, parents, gp_par):
                 #    _operators['mutate_gene'](population[parent], gp_par.mutation_p_add, gp_par.mutation_p_delete)
                 mutated_individual = \
                     _operators.mutate_gene(population[parent], gp_par.mutation_p_add, gp_par.mutation_p_delete)
-                if len(mutated_individual) >= gp_par.min_length and \
-                    (gp_par.allow_identical or (mutated_individual not in population + mutated_population)):
+                if (len(mutated_individual) >= gp_par.min_length
+                        and (gp_par.allow_identical or (mutated_individual not in population + mutated_population))):
                     mutated_population.append(mutated_individual)
                     break
                 attempts += 1
@@ -233,7 +240,7 @@ def _crossover(population, parents, gp_par):
 
         if attempts == max_attempts and len(unused_parents) > 0 and \
             gp_par.n_offspring_mutation <= 1 and gp_par.n_offspring_crossover <= 1:
-            #Fill up with mutation in case we can't find enough good crossovers
+            # Fill up with mutation in case we can't find enough good crossovers
             crossover_offspring += _mutation(population + crossover_offspring, unused_parents, gp_par)
 
     return crossover_offspring
@@ -267,8 +274,8 @@ def _calculate_fitness(individual, hash_table, environment: GeneticEnvironment, 
         if values is None:
             values = [fitness]
 
-    print(values)
-    #new_values = list(map(int, values))
+    print('Calculated fitness: ', values)
+    # new_values = list(map(int, values))
     return mean(values)
 
 
@@ -280,7 +287,7 @@ def _crossover_parent_selection(population, fitness, gp_par):
     n_parents_crossover = int(round(gp_par.f_crossover * gp_par.n_population))
     if n_parents_crossover <= 0:
         return []
-    return selection(gp_par.parent_selection,range(len(population)), fitness, n_parents_crossover)
+    return selection(gp_par.parent_selection, range(len(population)), fitness, n_parents_crossover)
 
 
 def _mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, gp_par):
@@ -360,8 +367,9 @@ def _print_population(population, fitness, generation):
 
     print("Generation: ", generation)
     for i in range(len(population)):
-        print(population[i])
-        print("Fitness: ", fitness[i])
+        print("(%d) Genome: %s" % (i, population[i]))
+        print("(%d) Fitness: %d" % (i, fitness[i]))
+
     best = np.argmax(fitness)
     print("Best individual: ", best)
     print(population[best])

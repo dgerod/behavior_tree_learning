@@ -38,6 +38,7 @@ def _elite_selection(population, fitness, n_elites):
     """
     Elite selection from population
     """
+
     sorted_population = sorted(zip(fitness, population), reverse=True)
 
     return [x for _, x in sorted_population[:n_elites]]
@@ -47,6 +48,7 @@ def _tournament_selection(population, fitness, n_winners):
     """
     Tournament selection.
     """
+
     tournament_size = n_winners
     while tournament_size < len(population):
         tournament_size *= 2
@@ -55,7 +57,7 @@ def _tournament_selection(population, fitness, n_winners):
     random.shuffle(tournament_population)
 
     for i in range(tournament_size - len(population)):
-        #Add dummies to make sure we have a full tournament
+        # Add dummies to make sure we have a full tournament
         tournament_population.insert(i * 2, (-float("inf"), []))
 
     winner_fitness, winners = [list(x) for x in zip(*tournament_population)]
@@ -79,6 +81,7 @@ def _rank_selection(population, fitness, n_selected):
     and the lowest ranked individual gets 1. The weights are then scaled so
     that they sum to 1.
     """
+
     sorted_population = sorted(zip(fitness, population), reverse=True)
     _, sorted_indices = [list(x) for x in zip(*sorted_population)]
     n_ranks = len(sorted_indices)

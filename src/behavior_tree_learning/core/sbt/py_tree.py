@@ -78,6 +78,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         """
         Recursive function to generate the tree from a string
         """
+
         while len(string) > 0:
             if string[0] == ')':
                 string.pop(0)
@@ -139,7 +140,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
                     status_ok = False
                     print("Max time expired")
 
-        print(ticks, time.time() - start)
+        print("Ticks: %d, Time: %s" % (ticks, time.time() - start))
 
         if ticks >= max_ticks:
             self.timeout = True
@@ -154,6 +155,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         """
         Saves the tree as a figure
         """
+
         if svg:
             pt.display.render_dot_tree(self.root, name=name, target_directory=path, png=False, svg=True)
         else:

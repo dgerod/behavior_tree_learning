@@ -1,5 +1,6 @@
 from behavior_tree_learning.core.gp import GeneticParameters
 from behavior_tree_learning.core.gp import GeneticSelectionMethods
-from behavior_tree_learning.core.sbt import BehaviorTreeStringRepresentation, World, StringBehaviorTree, ExecutionParameters
-from behavior_tree_learning.core.sbt import BehaviorNodeFactory, BehaviorRegister 
+from behavior_tree_learning.core.sbt import World, StringBehaviorTree, ExecutionParameters
+from behavior_tree_learning.core.sbt import BehaviorNodeFactory, BehaviorRegister
+from behavior_tree_learning.core.sbt import BehaviorTreeStringRepresentation
 from behavior_tree_learning.core.gp_sbt import Environment, BehaviorTreeLearner
