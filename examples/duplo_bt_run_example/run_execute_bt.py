@@ -12,18 +12,19 @@ from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
 from duplo_bt_run_example.paths import EXAMPLE_DIRECTORY
 from duplo_bt_run_example import bt_collection
 from duplo_bt_run_example.execution_nodes import get_behaviors
-from duplo_bt_run_example import world
+from duplo_bt_run_example.world import WorldSimulator
+from duplo_bt_run_example.world import Pos as WorldPos
 
 
 def run():
 
-    node_factory = BehaviorNodeFactory(get_behaviors())
+    node_factory = BehaviorNodeFactory(get_behaviors('tower'))
 
     sbt_1 = bt_collection.select_bt(0)
     sbt_2 = bt_collection.select_bt(1)
     trials = [sbt_1, sbt_2]
 
-    start_position = [world.Pos(-0.05, -0.1, 0), world.Pos(0.0, -0.1, 0), world.Pos(0.05, -0.1, 0)]
+    start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.0, -0.1, 0), WorldPos(0.05, -0.1, 0)]
 
     for tdx, trial in zip(range(0, len(trials)), trials):
 
@@ -32,7 +33,7 @@ def run():
         sbt = list(trial)
         print("SBT: ", sbt)
 
-        simulated_world = world.WorldSimulator(start_position)
+        simulated_world = WorldSimulator(start_position)
         bt_executor = BehaviorTreeExecutor(node_factory, simulated_world)
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1))
 

@@ -4,9 +4,6 @@ from behavior_tree_learning.sbt import BehaviorRegister, BehaviorNode
 import duplo_bt_run_example.world as sm
 
 
-_behavior_register = None
-
-
 class HandEmpty(BehaviorNode):
     """
     Check if hand is empty
@@ -295,35 +292,38 @@ class ApplyForce(StateMachineBehavior):
         return self._state
 
 
-def get_behaviors():
+def _make_tower_nodes():
 
-    global _behavior_register
+    behavior_register = BehaviorRegister()
+    behavior_register.add_condition('picked 0?', Picked)
+    behavior_register.add_condition('picked 1?', Picked)
+    behavior_register.add_condition('picked 2?', Picked)
+    behavior_register.add_condition('0 at pos (0.0, 0.05, 0.0)?', AtPos)
+    behavior_register.add_condition('1 at pos (0.0, 0.05, 0.0192)?', AtPos)
+    behavior_register.add_condition('2 at pos (0.0, 0.05, 0.0384)?', AtPos)
+    behavior_register.add_condition('0 on 1?', On)
+    behavior_register.add_condition('0 on 2?', On)
+    behavior_register.add_condition('1 on 0?', On)
+    behavior_register.add_condition('1 on 2?', On)
+    behavior_register.add_condition('2 on 0?', On)
+    behavior_register.add_condition('2 on 1?', On)
+    behavior_register.add_action('pick 0!', Pick)
+    behavior_register.add_action('pick 1!', Pick)
+    behavior_register.add_action('pick 2!', Pick)
+    behavior_register.add_action('place at (0.0, 0.05, 0.0)!', Place)
+    behavior_register.add_action('place on 0!', Place)
+    behavior_register.add_action('place on 1!', Place)
+    behavior_register.add_action('place on 2!', Place)
+    behavior_register.add_action('apply force 0!', ApplyForce)
+    behavior_register.add_action('apply force 1!', ApplyForce)
+    behavior_register.add_action('apply force 2!', ApplyForce)
 
-    if not _behavior_register:
+    return behavior_register
 
-        _behavior_register = BehaviorRegister()
 
-        _behavior_register.add_condition('picked 0?', Picked)
-        _behavior_register.add_condition('picked 1?', Picked)
-        _behavior_register.add_condition('picked 2?', Picked)
-        _behavior_register.add_action('0 at pos (0.0, 0.05, 0.0)?', AtPos)
-        _behavior_register.add_action('1 at pos (0.0, 0.05, 0.0192)?', AtPos)
-        _behavior_register.add_action('2 at pos (0.0, 0.05, 0.0384)?', AtPos)
-        _behavior_register.add_action('0 on 1?', On)
-        _behavior_register.add_action('0 on 2?', On)
-        _behavior_register.add_action('1 on 0?', On)
-        _behavior_register.add_action('1 on 2?', On)
-        _behavior_register.add_action('2 on 0?', On)
-        _behavior_register.add_action('2 on 1?', On)
-        _behavior_register.add_action('pick 0!', Pick)
-        _behavior_register.add_action('pick 1!', Pick)
-        _behavior_register.add_action('pick 2!', Pick)
-        _behavior_register.add_action('place at (0.0, 0.05, 0.0)!', Place)
-        _behavior_register.add_action('place on 0!', Place)
-        _behavior_register.add_action('place on 1!', Place)
-        _behavior_register.add_action('place on 2!', Place)
-        _behavior_register.add_action('apply force 0!', ApplyForce)
-        _behavior_register.add_action('apply force 1!', ApplyForce)
-        _behavior_register.add_action('apply force 2!', ApplyForce)
+def get_behaviors(name):
 
-    return _behavior_register
+    if name == 'tower':
+        return _make_tower_nodes()
+    else:
+        raise ValueError('Unknown %s name', name)
