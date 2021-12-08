@@ -1,5 +1,5 @@
 import py_trees as pt
-from behavior_tree_learning.sbt import BehaviorRegister, BehaviorNode, BehaviorNodeWithOperation
+from behavior_tree_learning.sbt import BehaviorRegister, BehaviorNodeWithOperation
 
 
 class CheckGearPartPicked(BehaviorNodeWithOperation):

@@ -4,7 +4,7 @@ import paths
 paths.add_modules_to_path()
 
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
-from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
+from behavior_tree_learning.sbt import BehaviorNodeFactory
 
 from simple_example.paths import get_example_directory
 from simple_example import bt_collection

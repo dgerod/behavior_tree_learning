@@ -3,7 +3,7 @@
 import paths
 paths.add_modules_to_path()
 
-from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorRegister
+from behavior_tree_learning.sbt import BehaviorNodeFactory
 from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParameters, GeneticSelectionMethods
 
 from duplo.execution_nodes import get_behaviors
