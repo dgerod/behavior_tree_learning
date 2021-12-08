@@ -2,8 +2,10 @@
 """
 Class for handling string representations of behavior trees
 """
+import os
 import random
 import yaml
+from behavior_tree_learning.core.sbt.behavior_factory import BehaviorNodeFactory
 
 # Below are lists of the possible node types
 global FALLBACK_NODES
@@ -69,10 +71,7 @@ Basically leaf nodes that actually do something and that may be implemented as t
 global ALL_NODES
 
 
-def _initialize_settings():
-
-    if 'FALLBACK_NODES' in globals():
-        return
+def _clean_settings():
 
     global FALLBACK_NODES
     global SEQUENCE_NODES
@@ -99,9 +98,63 @@ def _initialize_settings():
     ALL_NODES = []
 
 
-def add_node(type_, name):
+def _load_default_settings():
 
-    _initialize_settings()
+    _clean_settings()
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bt_settings.yaml')
+    nodes = _load_settings(file_path)
+    return nodes
+
+
+def _load_settings(file_path):
+
+    nodes = {}
+    tags = ["fallback_nodes", "sequence_nodes", "condition_nodes", "action_nodes",
+            "atomic_fallback_nodes", "atomic_sequence_nodes", "up_node"]
+
+    file = file_path
+    with open(file) as f:
+        bt_settings = yaml.load(f, Loader=yaml.FullLoader)
+
+    for tag in tags:
+        nodes[tag] = []
+        try:
+            loaded_nodes = bt_settings[tag]
+            if loaded_nodes is not None:
+                nodes[tag] = loaded_nodes
+        except KeyError:
+            pass
+
+    more_tags = ['all_nodes', 'control_node', 'behavior_nodes', 'leaf_nodes']
+    for tag in more_tags:
+        nodes[tag] = []
+
+    nodes['control_nodes'] += nodes['fallback_nodes']
+    nodes['control_nodes'] += nodes['sequence_nodes']
+
+    nodes['behavior_nodes'] += nodes['action_nodes']
+    nodes['behavior_nodes'] += nodes['atomic_fallback_nodes']
+    nodes['behavior_nodes'] += nodes['atomic_sequence_nodes']
+
+    nodes['leaf_nodes'] += nodes['condition_nodes']
+    nodes['leaf_nodes'] += nodes['behavior_nodes']
+
+    nodes['all_nodes'] += nodes['control_nodes']
+    nodes['all_nodes'] += nodes['condition_nodes']
+    nodes['all_nodes'] += nodes['action_nodes']
+    nodes['all_nodes'] += nodes['atomic_fallback_nodes']
+    nodes['all_nodes'] += nodes['atomic_sequence_nodes']
+    nodes['all_nodes'] += nodes['up_node']
+
+    return nodes
+
+
+def initialize_settings():
+
+    _clean_settings()
+
+
+def add_node(type_, name):
 
     global FALLBACK_NODES
     global SEQUENCE_NODES
@@ -110,6 +163,7 @@ def add_node(type_, name):
     global ACTION_NODES
     global LEAF_NODES
     global BEHAVIOR_NODES
+    global UP_NODE
     global ALL_NODES
 
     if type_ == 'fallback':
@@ -129,16 +183,15 @@ def add_node(type_, name):
         BEHAVIOR_NODES.append(name)
         LEAF_NODES.append(name)
         ALL_NODES.append(name)
+    elif type_ == 'up_node':
+        UP_NODE.append(name)
+        ALL_NODES.append(name)
 
 
-def load_settings_from_file(file):
-    # pylint: disable=too-many-statements
+def load_settings_from_file(file_path):
 
-    """
-    Sets the lists of allowed nodes module wide.
-    """
-
-    _initialize_settings()
+    _clean_settings()
+    nodes = _load_settings(file_path)
 
     global FALLBACK_NODES
     global SEQUENCE_NODES
@@ -151,68 +204,22 @@ def load_settings_from_file(file):
     global LEAF_NODES
     global BEHAVIOR_NODES
     global ALL_NODES
-    
-    with open(file) as f:
-        bt_settings = yaml.load(f, Loader=yaml.FullLoader)
-    try:
-        FALLBACK_NODES = bt_settings["fallback_nodes"]
-        if FALLBACK_NODES is None:
-            FALLBACK_NODES = []
-    except KeyError:
-        pass
-    try:
-        SEQUENCE_NODES = bt_settings["sequence_nodes"]
-        if SEQUENCE_NODES is None:
-            SEQUENCE_NODES = []
-    except KeyError:
-        pass
-    try:
-        CONTROL_NODES = bt_settings["control_nodes"]
-    except KeyError:
-        pass
-    CONTROL_NODES += FALLBACK_NODES
-    CONTROL_NODES += SEQUENCE_NODES
-    ALL_NODES += CONTROL_NODES
-    try:
-        CONDITION_NODES = bt_settings["condition_nodes"]
-    except KeyError:
-        pass
-    LEAF_NODES += CONDITION_NODES
-    ALL_NODES += CONDITION_NODES
-    try:
-        ACTION_NODES = bt_settings["action_nodes"]
-    except KeyError:
-        pass
-    BEHAVIOR_NODES += ACTION_NODES
-    ALL_NODES += ACTION_NODES
-    try:
-        ATOMIC_FALLBACK_NODES = bt_settings["atomic_fallback_nodes"]
-        if ATOMIC_FALLBACK_NODES is None:
-            ATOMIC_FALLBACK_NODES = []
-    except KeyError:
-        pass
-    BEHAVIOR_NODES += ATOMIC_FALLBACK_NODES
-    ALL_NODES += ATOMIC_FALLBACK_NODES
-    try:
-        ATOMIC_SEQUENCE_NODES = bt_settings["atomic_sequence_nodes"]
-        if ATOMIC_SEQUENCE_NODES is None:
-            ATOMIC_SEQUENCE_NODES = []
-    except KeyError:
-        pass
-    BEHAVIOR_NODES += ATOMIC_SEQUENCE_NODES
-    ALL_NODES += ATOMIC_SEQUENCE_NODES
-    try:
-        UP_NODE = bt_settings["up_node"]
-    except KeyError:
-        pass
-    ALL_NODES += UP_NODE
-    LEAF_NODES += BEHAVIOR_NODES
+
+    FALLBACK_NODES = nodes['fallback_nodes']
+    SEQUENCE_NODES = nodes['sequence_nodes']
+    CONTROL_NODES = nodes['control_nodes']
+    CONDITION_NODES = nodes['condition_nodes']
+    ACTION_NODES = nodes['action_nodes']
+    ATOMIC_FALLBACK_NODES = nodes['atomic_fallback_nodes']
+    ATOMIC_SEQUENCE_NODES = nodes['atomic_sequence_nodes']
+    UP_NODE = nodes['up_node']
+    LEAF_NODES = nodes['leaf_nodes']
+    BEHAVIOR_NODES = nodes['behavior_nodes']
+    ALL_NODES = nodes['all_nodes']
 
 
 def get_action_list():
-    """
-    Returns list of actions
-    """
+
     global ACTION_NODES
     return ACTION_NODES
 
@@ -381,7 +388,7 @@ class BehaviorTreeStringRepresentation:
         """
         Removes control nodes with only one child
         """
-        for index in range(len(self.bt) -1, 0, -1):
+        for index in range(len(self.bt)-1, 0, -1):
             if self.bt[index] in CONTROL_NODES:
                 children = self.find_children(index)
                 if len(children) <= 1:

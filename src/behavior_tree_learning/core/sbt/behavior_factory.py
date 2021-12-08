@@ -5,6 +5,19 @@ from behavior_tree_learning.core.sbt import parse_operation as operation
 
 
 class BehaviorNode(pt.behaviour.Behaviour):
+    """
+    From 'pt.behaviour.Behaviour':
+
+        def initialise(self):
+            pass
+        def update(self):
+            return pt.common.Status.SUCCESS
+        def terminate(self, new_status):
+            pass
+
+    The initialize() method should call World::is_alive(), same for
+        'BehaviorNodeWithOperation'
+    """
 
     def __init__(self, name):
         super().__init__(name)
@@ -48,7 +61,7 @@ class BehaviorNodeFactory:
     
         if execution_behavior_register is not None:
             self._execution_behavior_register = execution_behavior_register
-            self._load_sbt_setting()
+            self._load_sbt_settings()
         else:
             self._execution_behavior_register = None
 
@@ -70,10 +83,13 @@ class BehaviorNodeFactory:
 
         return node, has_children
 
-    def _load_sbt_setting(self):
+    def _load_sbt_settings(self):
 
+        bt.initialize_settings()
         bt.add_node('fallback', 'f(')
         bt.add_node('sequence', 's(')
+        bt.add_node('parallel', 'p(')
+        bt.add_node('up_node', ')')
 
         behaviors = self._execution_behavior_register.behaviors()
         for key in behaviors.keys():
@@ -97,6 +113,8 @@ class BehaviorNodeFactory:
         elif name == 'p(':
             node = pt.composites.Parallel(name="Parallel",
                                           policy=pt.common.ParallelPolicy.SuccessOnAll(synchronise=False))
+        elif name == ')':
+            node = None
 
         return node
 
