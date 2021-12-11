@@ -40,7 +40,7 @@ def set_operators(operators: GeneticOperators):
     _operators = operators
 
 
-def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None):
+def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None, verbose=False):
     """
     Runs the genetic programming algorithm
     """
@@ -63,7 +63,8 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
     # Calculate fitness of the population
     fitness = []
     for individual in population:
-        fitness.append(_calculate_fitness(list(individual), hash_table, environment, rerun=0))
+        fitness.append(_calculate_fitness(list(individual), hash_table, environment, rerun=0,
+                                          verbose=verbose))
 
     # Select best candidate
     if not hot_start:
@@ -84,7 +85,8 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         if generation > 1:
             fitness = []
             for index, individual in enumerate(population):
-                fitness.append(_calculate_fitness(list(individual), hash_table, environment, gp_par.rerun_fitness))
+                fitness.append(_calculate_fitness(list(individual), hash_table, environment, gp_par.rerun_fitness,
+                                                  verbose=verbose))
                 if base_line is not None and individual == base_line:
                     baseline_index = index
 
@@ -95,7 +97,8 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         co_parents = _crossover_parent_selection(population, fitness, gp_par)
         co_offspring = _crossover(population, co_parents, gp_par)
         for offspring in co_offspring:
-            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness))
+            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness,
+                                              verbose=verbose))
 
         if gp_par.boost_baseline and gp_par.boost_baseline_only_co and base_line is not None:
             fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
@@ -104,7 +107,8 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         mutated_offspring = _mutation(population + co_offspring, mutation_parents, gp_par)
 
         for offspring in mutated_offspring:
-            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness))
+            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness,
+                                              verbose=verbose))
 
         if gp_par.boost_baseline and base_line is not None:
             fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
@@ -120,7 +124,7 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         if gp_par.verbose:
             print("Generation: ", generation, "Fitness: ", fitness, "Best fitness: ", best_fitness[generation])
 
-        if (generation + 1) % 25 == 0 and generation < gp_par.n_generations - 1: #Last generation will be saved later
+        if (generation + 1) % 25 == 0 and generation < gp_par.n_generations - 1: # Last generation will be saved later
             _save_state(gp_par, population, None, best_fitness, n_episodes, base_line, generation, hash_table)
 
     print("\nFINAL POPULATION: ")
@@ -257,7 +261,7 @@ def _rerun_probability(n_runs):
     return 1 / n_runs**2
 
 
-def _calculate_fitness(individual, hash_table, environment: GeneticEnvironment, rerun=0):
+def _calculate_fitness(individual, hash_table, environment: GeneticEnvironment, rerun=0, verbose=False):
     """
     Gets fitness from hash table if possible, otherwise gets it from simulation
     rerun = 0 means never rerun
@@ -268,7 +272,7 @@ def _calculate_fitness(individual, hash_table, environment: GeneticEnvironment, 
     values = hash_table.find(individual)
 
     if values is None or rerun == 2 or (rerun == 1 and random.random() < _rerun_probability(len(values))):
-        fitness = environment.run_and_compute(individual)
+        fitness = environment.run_and_compute(individual, verbose)
         hash_table.insert(individual, fitness)
 
         if values is None:
@@ -407,7 +411,7 @@ class GeneticProgramming:
     def __init__(self, operations):
         self._operations = operations
 
-    def run(self, environment: GeneticEnvironment, parameters, hot_start=False, base_line=None):
+    def run(self, environment: GeneticEnvironment, parameters, hot_start=False, base_line=None, verbose=False):
         set_operators(self._operations)
-        return run(environment, parameters, hot_start, base_line)
+        return run(environment, parameters, hot_start, base_line, verbose)
 

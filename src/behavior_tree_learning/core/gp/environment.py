@@ -3,7 +3,7 @@ from interface import Interface
 
 class GeneticEnvironment(Interface):
 
-    def run_and_compute(self, individual):
+    def run_and_compute(self, individual, verbose):
         """ Run the simulation and return the fitness """
         pass
 

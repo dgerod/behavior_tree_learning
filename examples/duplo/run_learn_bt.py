@@ -19,7 +19,7 @@ def run():
     target_position = [WorldPos(0.0, 0.05, 0), WorldPos(0.0, 0.05, 0.0192), WorldPos(0.0, 0.05, 2*0.0192)]
 
     world = WorldSimulator(start_position)
-    environment = Environment(node_factory, world, target_position, verbose=True)
+    environment = Environment(node_factory, world, target_position)
 
     parameters = GeneticParameters()
     parameters.n_population = 16
@@ -40,7 +40,6 @@ def run():
     parameters.mutation_p_delete = 0.3
     parameters.allow_identical = False
     parameters.plot = True
-    #parameters.verbose = False
     parameters.fig_last_gen = False
 
     bt_learner = BehaviorTreeLearner(environment)

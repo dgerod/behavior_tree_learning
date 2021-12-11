@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from interface import implements
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
@@ -11,32 +10,34 @@ class Environment(implements(GeneticEnvironment)):
 
     def __init__(self, node_factory: BehaviorNodeFactory, world: WorldSimulator,
                  target_positions,
-                 static_tree=None, verbose=False, sm_pars=None, mode=0, fitness_coefficients=None):
+                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None):
 
         self._node_factory = node_factory
         self._world = world
 
         self._targets = target_positions
         self._static_tree = static_tree
-        self._verbose = verbose
         self._sm_pars = sm_pars
         self._mode = mode
         self._fitness_coefficients = fitness_coefficients
         self._random_events = False
 
-    def run_and_compute(self, individual):
+    def run_and_compute(self, individual, verbose):
 
         print('[Environment::run_and_compute] -- {')
 
         sbt = individual
-        print("SBT: ", sbt)
+        if verbose:
+            print("SBT: ", sbt)
 
         tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=self._world)
         success, ticks = tree.run_bt(parameters=ExecutionParameters(successes_required=1))
 
         fitness_value = FitnessFunction().compute_cost(self._world, tree, ticks, self._targets,
-                                                       self._fitness_coefficients, verbose=self._verbose)
-        print("fitness: ", fitness_value)
+                                                       self._fitness_coefficients, verbose=verbose)
+
+        if verbose:
+            print("fitness: ", fitness_value)
 
         print('} --')
         return fitness_value
