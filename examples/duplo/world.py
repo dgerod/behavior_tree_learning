@@ -74,7 +74,7 @@ class WorldSimulator(implements(World)):
         for pos in start_positions:
             self.state.bricks.append(copy(pos))
 
-    def startup(self):
+    def startup(self, verbose):
         return True
 
     def is_alive(self):

@@ -16,6 +16,11 @@ class ExecutionParameters:
 
 class StringBehaviorTree(pt.trees.BehaviourTree):
 
+    class TraceInfo:
+
+        def __init__(self, verbose):
+            self.verbose = verbose
+
     def __init__(self, string, behaviors, world: World = None, root=None, verbose=False):
 
         if root is not None:
@@ -25,16 +30,17 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         self.bt = BehaviorTreeStringRepresentation(string)
         self.depth = self.bt.depth()
         self.length = self.bt.length()
-        self.world = world
-        self.verbose = verbose
-        self.behavior_factory = behaviors
         self.failed = False
         self.timeout = False
+
+        self._world = world
+        self._behavior_factory = behaviors
+        self._trace_info = self.TraceInfo(verbose)
 
         if root is not None:
             has_children = False
         else:
-            self.root, has_children = self.behavior_factory.make_node(string[0], self.world, self.verbose)
+            self.root, has_children = self._behavior_factory.make_node(string[0], self._world, self._trace_info.verbose)
             string.pop(0)
 
         super().__init__(root=self.root)
@@ -84,7 +90,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
                 string.pop(0)
                 return node
 
-            new_node, has_children = self.behavior_factory.make_node(string[0], self.world, self.verbose)
+            new_node, has_children = self._behavior_factory.make_node(string[0], self._world, self._trace_info.verbose)
             string.pop(0)
             if has_children:
                 # Node is a control node or decorator with children - add subtree via string and then add to parent
@@ -102,7 +108,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         Function executing the behavior tree
         """
 
-        if not self.world.startup():
+        if not self._world.startup(self._trace_info.verbose):
             return False, 0
 
         max_ticks = parameters.max_ticks
@@ -120,7 +126,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
                 and (self.root.status is not pt.common.Status.SUCCESS or successes < successes_required) \
                 and ticks < max_ticks and status_ok:
 
-            status_ok = self.world.is_alive()
+            status_ok = self._world.is_alive()
 
             if status_ok:
                 self.root.tick_once()
@@ -147,7 +153,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         if straight_fails >= max_straight_fails:
             self.failed = True
 
-        self.world.shutdown()
+        self._world.shutdown()
 
         return status_ok, ticks
 

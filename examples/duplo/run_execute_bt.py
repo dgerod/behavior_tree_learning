@@ -32,7 +32,9 @@ def run():
 
         simulated_world = WorldSimulator(start_position)
         bt_executor = BehaviorTreeExecutor(node_factory, simulated_world)
-        success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1))
+
+        success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1),
+                                               verbose=True)
 
         file_name = 'trial_%d' % (tdx + 1)
         tree.save_figure(get_example_directory(), name=file_name)
