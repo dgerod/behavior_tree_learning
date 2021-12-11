@@ -14,7 +14,7 @@ class DummyWorld(implements(World)):
         self._is_alive = is_alive
         self._operation_results = operation_results
 
-    def startup(self):
+    def startup(self, verbose):
         return True
 
     def is_alive(self):
