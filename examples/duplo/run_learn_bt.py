@@ -21,30 +21,30 @@ def run():
     world = WorldSimulator(start_position)
     environment = Environment(node_factory, world, target_position, verbose=True)
 
-    gp_parameters = GeneticParameters()
-    gp_parameters.n_population = 16
-    gp_parameters.n_generations = 200
-    gp_parameters.ind_start_length = 8
-    gp_parameters.f_crossover = 0.5
-    gp_parameters.n_offspring_crossover = 2
-    gp_parameters.replace_crossover = False
-    gp_parameters.f_mutation = 0.5
-    gp_parameters.n_offspring_mutation = 2
-    gp_parameters.parent_selection = GeneticSelectionMethods.RANK
-    gp_parameters.survivor_selection = GeneticSelectionMethods.RANK
-    gp_parameters.f_elites = 0.1
-    gp_parameters.f_parents = gp_parameters.f_elites
-    gp_parameters.mutate_co_offspring = False
-    gp_parameters.mutate_co_parents = True
-    gp_parameters.mutation_p_add = 0.4
-    gp_parameters.mutation_p_delete = 0.3
-    gp_parameters.allow_identical = False
-    gp_parameters.plot = True
-    #gp_parameters.verbose = False
-    gp_parameters.fig_last_gen = False
+    parameters = GeneticParameters()
+    parameters.n_population = 16
+    parameters.n_generations = 200
+    parameters.ind_start_length = 8
+    parameters.f_crossover = 0.5
+    parameters.n_offspring_crossover = 2
+    parameters.replace_crossover = False
+    parameters.f_mutation = 0.5
+    parameters.n_offspring_mutation = 2
+    parameters.parent_selection = GeneticSelectionMethods.RANK
+    parameters.survivor_selection = GeneticSelectionMethods.RANK
+    parameters.f_elites = 0.1
+    parameters.f_parents = parameters.f_elites
+    parameters.mutate_co_offspring = False
+    parameters.mutate_co_parents = True
+    parameters.mutation_p_add = 0.4
+    parameters.mutation_p_delete = 0.3
+    parameters.allow_identical = False
+    parameters.plot = True
+    #parameters.verbose = False
+    parameters.fig_last_gen = False
 
     bt_learner = BehaviorTreeLearner(environment)
-    success = bt_learner.run(gp_parameters, verbose=True)
+    success = bt_learner.run(parameters, verbose=True)
     print("Succeed: ", success)
 
 
