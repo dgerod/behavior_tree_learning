@@ -5,6 +5,7 @@ import numpy as np
 
 from behavior_tree_learning.core.logger import logplot
 from behavior_tree_learning.core.gp.hash_table import HashTable
+from behavior_tree_learning.core.gp.parameters import GeneticParameters
 from behavior_tree_learning.core.gp.environment import GeneticEnvironment
 from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 from behavior_tree_learning.core.gp.operators import GeneticOperators
@@ -40,18 +41,18 @@ def set_operators(operators: GeneticOperators):
     _operators = operators
 
 
-def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None, verbose=False):
+def run(environment: GeneticEnvironment, parameters: GeneticParameters, hot_start=False, base_line=None, verbose=False):
     """
     Runs the genetic programming algorithm
     """
 
-    hash_table = HashTable(gp_par.hash_table_size, gp_par.log_name)
+    hash_table = HashTable(parameters.hash_table_size, parameters.log_name)
 
     if hot_start:
-        best_fitness, n_episodes, last_generation, population = _load_state(gp_par.log_name, hash_table)
+        best_fitness, n_episodes, last_generation, population = _load_state(parameters.log_name, hash_table)
     else:
-        population = _create_population(gp_par.n_population, gp_par.ind_start_length)
-        logplot.clear_logs(gp_par.log_name)
+        population = _create_population(parameters.n_population, parameters.ind_start_length)
+        logplot.clear_logs(parameters.log_name)
         best_fitness = []
         n_episodes = [hash_table.n_values]
         last_generation = 0
@@ -73,74 +74,79 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
             _print_population(population, fitness, last_generation)
             print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
 
-        logplot.log_fitness(gp_par.log_name, fitness)
-        logplot.log_population(gp_par.log_name, population)
+        logplot.log_fitness(parameters.log_name, fitness)
+        logplot.log_population(parameters.log_name, population)
 
-    generation = gp_par.n_generations - 1 # In case loop is skipped due to hotstart
-    for generation in range(last_generation + 1, gp_par.n_generations):
-        if gp_par.keep_baseline:
+    generation = parameters.n_generations - 1 # In case loop is skipped due to hotstart
+    for generation in range(last_generation + 1, parameters.n_generations):
+
+        if parameters.keep_baseline:
             if base_line is not None and base_line not in population:
                 population.append(base_line) # Make sure we are always able to source from baseline
 
         if generation > 1:
             fitness = []
             for index, individual in enumerate(population):
-                fitness.append(_calculate_fitness(list(individual), hash_table, environment, gp_par.rerun_fitness,
+                fitness.append(_calculate_fitness(list(individual), hash_table, environment, parameters.rerun_fitness,
                                                   verbose=verbose))
                 if base_line is not None and individual == base_line:
                     baseline_index = index
 
-        if gp_par.keep_baseline and gp_par.boost_baseline and base_line is not None:
+        if parameters.keep_baseline and parameters.boost_baseline and base_line is not None:
             baseline_fitness = fitness[baseline_index]
             fitness[baseline_index] = max(fitness)
 
-        co_parents = _crossover_parent_selection(population, fitness, gp_par)
-        co_offspring = _crossover(population, co_parents, gp_par)
+        co_parents = _crossover_parent_selection(population, fitness, parameters)
+        co_offspring = _crossover(population, co_parents, parameters)
         for offspring in co_offspring:
-            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness,
+            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness,
                                               verbose=verbose))
 
-        if gp_par.boost_baseline and gp_par.boost_baseline_only_co and base_line is not None:
+        if parameters.boost_baseline and parameters.boost_baseline_only_co and base_line is not None:
             fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
 
-        mutation_parents = _mutation_parent_selection(population, fitness, co_parents, co_offspring, gp_par)
-        mutated_offspring = _mutation(population + co_offspring, mutation_parents, gp_par)
+        mutation_parents = _mutation_parent_selection(population, fitness, co_parents, co_offspring, parameters)
+        mutated_offspring = _mutation(population + co_offspring, mutation_parents, parameters)
 
         for offspring in mutated_offspring:
-            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, gp_par.rerun_fitness,
+            fitness.append(_calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness,
                                               verbose=verbose))
 
-        if gp_par.boost_baseline and base_line is not None:
+        if parameters.boost_baseline and base_line is not None:
             fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
 
-        population, fitness = _survivor_selection(population, fitness, co_offspring, mutated_offspring, gp_par)
+        population, fitness = _survivor_selection(population, fitness, co_offspring, mutated_offspring, parameters)
 
         best_fitness.append(max(fitness))
         n_episodes.append(hash_table.n_values)
 
-        logplot.log_fitness(gp_par.log_name, fitness)
-        logplot.log_population(gp_par.log_name, population)
+        logplot.log_fitness(parameters.log_name, fitness)
+        logplot.log_population(parameters.log_name, population)
+
+        print("Generation: %f/%d, Best fitness: %s" %
+              (generation, parameters.n_generations, best_fitness[generation]))
 
         if verbose:
-            print("Generation: ", generation, "Fitness: ", fitness, "Best fitness: ", best_fitness[generation])
+            print(generation, "Fitness: ", fitness)
 
-        if (generation + 1) % 25 == 0 and generation < gp_par.n_generations - 1: # Last generation will be saved later
-            _save_state(gp_par, population, None, best_fitness, n_episodes, base_line, generation, hash_table)
+        if (generation + 1) % 25 == 0 and generation < parameters.n_generations - 1: # Last generation will be saved later
+            _save_state(parameters, population, None, best_fitness, n_episodes, base_line, generation, hash_table)
 
-    print("\nFINAL POPULATION: ")
-    _print_population(population, fitness, generation)
+    if verbose:
+        print("\nFINAL POPULATION: ")
+        _print_population(population, fitness, generation)
 
     best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1)[0]
 
-    _save_state(gp_par, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table)
+    _save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table)
 
-    if gp_par.plot:
-        logplot.plot_fitness(gp_par.log_name, best_fitness, n_episodes)
-    if gp_par.fig_best:
-        environment.plot_individual(logplot.get_log_folder(gp_par.log_name), 'best individual', best_individual)
-    if gp_par.fig_last_gen:
-        for i in range(gp_par.n_population):
-            environment.plot_individual(logplot.get_log_folder(gp_par.log_name), 'individual_' + str(i), population[i])
+    if parameters.plot:
+        logplot.plot_fitness(parameters.log_name, best_fitness, n_episodes)
+    if parameters.fig_best:
+        environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'best individual', best_individual)
+    if parameters.fig_last_gen:
+        for i in range(parameters.n_population):
+            environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'individual_' + str(i), population[i])
 
     return population, fitness, best_fitness, best_individual
 
@@ -150,7 +156,6 @@ def _create_population(population_size, genome_length):
     Creates an initial random population
     """
 
-    print("[gpa::_create_population] --- {")
     print("Requested population: %d" % population_size)
     print("Genome length: %d" % genome_length)
 
@@ -170,11 +175,10 @@ def _create_population(population_size, genome_length):
     for genome in new_population:
         print(genome)
 
-    print("} ---")
     return new_population
 
 
-def _mutation(population, parents, gp_par):
+def _mutation(population, parents, parameters):
     """
     Generate offspring by mutating a gene
     """
@@ -183,19 +187,16 @@ def _mutation(population, parents, gp_par):
     max_attempts = 100
 
     for parent in parents:
-        for _ in range(gp_par.n_offspring_mutation):
+        for _ in range(parameters.n_offspring_mutation):
 
-            mutated_individual = []
             attempts = 0
-
             while attempts < max_attempts:
 
-                #mutated_individual = \
-                #    _operators['mutate_gene'](population[parent], gp_par.mutation_p_add, gp_par.mutation_p_delete)
                 mutated_individual = \
-                    _operators.mutate_gene(population[parent], gp_par.mutation_p_add, gp_par.mutation_p_delete)
-                if (len(mutated_individual) >= gp_par.min_length
-                        and (gp_par.allow_identical or (mutated_individual not in population + mutated_population))):
+                    _operators.mutate_gene(population[parent], parameters.mutation_p_add, parameters.mutation_p_delete)
+                if (len(mutated_individual) >= parameters.min_length
+                        and (parameters.allow_identical
+                             or (mutated_individual not in population + mutated_population))):
                     mutated_population.append(mutated_individual)
                     break
                 attempts += 1
@@ -203,7 +204,7 @@ def _mutation(population, parents, gp_par):
     return mutated_population
 
 
-def _crossover(population, parents, gp_par):
+def _crossover(population, parents, parameters):
     """
     Generates offspring by crossovers
     """
@@ -214,7 +215,7 @@ def _crossover(population, parents, gp_par):
     crossover_offspring = []
     max_attempts = 100
 
-    for _ in range(gp_par.n_offspring_crossover):
+    for _ in range(parameters.n_offspring_crossover):
         unused_parents = list(parents)
         attempts = 0
 
@@ -224,12 +225,10 @@ def _crossover(population, parents, gp_par):
             parent1 = unused_parents[int(crossover_parents[0])] 
             parent2 = unused_parents[int(crossover_parents[1])]
 
-            #offspring1, offspring2 = \
-            #    _operators['crossover_genome'](population[parent1], population[parent2], gp_par.replace_crossover)
             offspring1, offspring2 = \
-                _operators.crossover_genome(population[parent1], population[parent2], gp_par.replace_crossover)
-            if len(offspring1) >= gp_par.min_length and len(offspring2) >= gp_par.min_length and \
-                (gp_par.allow_identical or
+                _operators.crossover_genome(population[parent1], population[parent2], parameters.replace_crossover)
+            if len(offspring1) >= parameters.min_length and len(offspring2) >= parameters.min_length and \
+                (parameters.allow_identical or
                  (offspring1 not in population + crossover_offspring and
                   offspring2 not in population + crossover_offspring)):
                 crossover_offspring.append(offspring1)
@@ -242,10 +241,10 @@ def _crossover(population, parents, gp_par):
             else:
                 attempts += 1
 
-        if attempts == max_attempts and len(unused_parents) > 0 and \
-            gp_par.n_offspring_mutation <= 1 and gp_par.n_offspring_crossover <= 1:
+        if (attempts == max_attempts and len(unused_parents) > 0
+                and parameters.n_offspring_mutation <= 1 and parameters.n_offspring_crossover <= 1):
             # Fill up with mutation in case we can't find enough good crossovers
-            crossover_offspring += _mutation(population + crossover_offspring, unused_parents, gp_par)
+            crossover_offspring += _mutation(population + crossover_offspring, unused_parents, parameters)
 
     return crossover_offspring
 
@@ -278,23 +277,24 @@ def _calculate_fitness(individual, hash_table, environment: GeneticEnvironment, 
         if values is None:
             values = [fitness]
 
-    print('Calculated fitness: ', values)
-    # new_values = list(map(int, values))
+    if verbose:
+        print('Calculated fitness: ', values)
+
     return mean(values)
 
 
-def _crossover_parent_selection(population, fitness, gp_par):
+def _crossover_parent_selection(population, fitness, parameters):
     """
     Select parents for crossover. Returns indices of parents.
     """
 
-    n_parents_crossover = int(round(gp_par.f_crossover * gp_par.n_population))
+    n_parents_crossover = int(round(parameters.f_crossover * parameters.n_population))
     if n_parents_crossover <= 0:
         return []
-    return selection(gp_par.parent_selection, range(len(population)), fitness, n_parents_crossover)
+    return selection(parameters.parent_selection, range(len(population)), fitness, n_parents_crossover)
 
 
-def _mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, gp_par):
+def _mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, parameters):
     """
     Select parents for crossover
     Input fitness contains fitness for crossover offspring after fitness for the rest of the population
@@ -305,23 +305,24 @@ def _mutation_parent_selection(population, fitness, crossover_parents, crossover
     mutable_population = population[:]
     mutable_fitness = fitness[:]
 
-    if not gp_par.mutate_co_parents:
+    if not parameters.mutate_co_parents:
         crossover_parents.sort(reverse=True)
         for i in crossover_parents:
             mutable_population.pop(i)
             mutable_fitness.pop(i)
-    if gp_par.mutate_co_offspring:
+
+    if parameters.mutate_co_offspring:
         mutable_population += crossover_offspring
     else:
         mutable_fitness = mutable_fitness[:len(population)]
 
-    n_parents_mutation = int(round(gp_par.f_mutation * gp_par.n_population))
+    n_parents_mutation = int(round(parameters.f_mutation * parameters.n_population))
     if n_parents_mutation <= 0:
         return []
-    return selection(gp_par.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation)
+    return selection(parameters.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation)
 
 
-def _survivor_selection(population, fitness, crossover_offspring, mutated_offspring, gp_par):
+def _survivor_selection(population, fitness, crossover_offspring, mutated_offspring, parameters):
     """
     Select survivors for next generation
     """
@@ -331,20 +332,20 @@ def _survivor_selection(population, fitness, crossover_offspring, mutated_offspr
     survivors = []
     survivor_fitness = []
 
-    #Pick out selectable parents using elitism.
-    n_parents = int(round(gp_par.f_parents * gp_par.n_population))
+    # Pick out selectable parents using elitism.
+    n_parents = int(round(parameters.f_parents * parameters.n_population))
     if n_parents > 0:
         parents = selection(SelectionMethods.ELITISM, range(len(population)), fitness[:len(population)], n_parents)
         for i in parents:
             selectable.append(population[i])
             selectable_fitness.append(fitness[i])
 
-    #Add offspring
+    # Add offspring
     selectable += crossover_offspring + mutated_offspring
     selectable_fitness += fitness[len(population):]
 
-    #Pick out elites
-    n_elites = int(round(gp_par.f_elites * gp_par.n_population))
+    # Pick out elites
+    n_elites = int(round(parameters.f_elites * parameters.n_population))
     if n_elites > 0:
         elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, n_elites)
         elites.sort(reverse=True)
@@ -354,8 +355,8 @@ def _survivor_selection(population, fitness, crossover_offspring, mutated_offspr
             selectable.pop(i)
             selectable_fitness.pop(i)
 
-    n_to_select = gp_par.n_population - len(survivors)
-    selected = selection(gp_par.survivor_selection, range(len(selectable)), selectable_fitness, n_to_select)
+    n_to_select = parameters.n_population - len(survivors)
+    selected = selection(parameters.survivor_selection, range(len(selectable)), selectable_fitness, n_to_select)
 
     for i in selected:
         survivors.append(selectable[i])
@@ -379,16 +380,16 @@ def _print_population(population, fitness, generation):
     print(population[best])
 
 
-def _save_state(gp_par, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table):
+def _save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table):
     """ Saves state for later hotstart """
 
-    logplot.log_last_population(gp_par.log_name, population)
+    logplot.log_last_population(parameters.log_name, population)
     if best_individual is not None:
-        logplot.log_best_individual(gp_par.log_name, best_individual)
-    logplot.log_best_fitness(gp_par.log_name, best_fitness)
-    logplot.log_n_episodes(gp_par.log_name, n_episodes)
-    logplot.log_settings(gp_par.log_name, gp_par, base_line)
-    logplot.log_state(gp_par.log_name, random.getstate(), np.random.get_state(), generation)
+        logplot.log_best_individual(parameters.log_name, best_individual)
+    logplot.log_best_fitness(parameters.log_name, best_fitness)
+    logplot.log_n_episodes(parameters.log_name, n_episodes)
+    logplot.log_settings(parameters.log_name, parameters, base_line)
+    logplot.log_state(parameters.log_name, random.getstate(), np.random.get_state(), generation)
     hash_table.write_table()
 
 
@@ -411,7 +412,11 @@ class GeneticProgramming:
     def __init__(self, operations):
         self._operations = operations
 
-    def run(self, environment: GeneticEnvironment, parameters, hot_start=False, base_line=None, verbose=False):
+    def run(self, environment: GeneticEnvironment, parameters: GeneticParameters,
+            seed=None, hot_start=False, base_line=None, verbose=False):
+
         set_operators(self._operations)
+        if seed:
+            set_seeds(seed)
         return run(environment, parameters, hot_start, base_line, verbose)
 

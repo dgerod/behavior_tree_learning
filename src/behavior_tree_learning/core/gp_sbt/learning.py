@@ -28,9 +28,9 @@ class BehaviorTreeLearner:
         self._gp_operators = GeneticOperatorsForSBT()
         self._environment_adapter = EnvironmentAdapter(environment)
 
-    def run(self, parameters: GeneticParameters, hot_start=False, base_line=None, verbose=False):
+    def run(self, parameters: GeneticParameters, seed=None, hot_start=False, base_line=None, verbose=False):
 
         gp_algorithm = GeneticProgramming(self._gp_operators)
-        gp_algorithm.run(self._environment_adapter, parameters, hot_start, base_line, verbose)
+        gp_algorithm.run(self._environment_adapter, parameters, seed, hot_start, base_line, verbose)
 
         return True

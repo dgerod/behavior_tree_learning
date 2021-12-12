@@ -144,9 +144,11 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
 
                 if time.time() - start > max_time:
                     status_ok = False
-                    print("Max time expired")
+                    if self._trace_info.verbose:
+                        print("Max time expired")
 
-        print("Ticks: %d, Time: %s" % (ticks, time.time() - start))
+        if self._trace_info.verbose:
+            print("Status: %s Ticks: %d, Time: %s" % (status_ok, ticks, time.time() - start))
 
         if ticks >= max_ticks:
             self.timeout = True
