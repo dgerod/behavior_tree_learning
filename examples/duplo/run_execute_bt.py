@@ -3,10 +3,11 @@
 import paths
 paths.add_modules_to_path()
 
+import os
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import BehaviorNodeFactory
 
-from duplo.paths import get_example_directory
+from duplo.paths import get_log_directory
 from duplo import bt_collection
 from duplo.execution_nodes import get_behaviors
 from duplo.world import WorldSimulator
@@ -36,8 +37,13 @@ def run():
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1),
                                                verbose=True)
 
+        try:
+            os.mkdir(get_log_directory())
+        except OSError:
+            pass
+
         file_name = 'trial_%d' % (tdx + 1)
-        tree.save_figure(get_example_directory(), name=file_name)
+        tree.save_figure(get_log_directory(), name=file_name)
         print("Succeed: ", success)
 
 

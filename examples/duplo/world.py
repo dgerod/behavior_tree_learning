@@ -43,8 +43,8 @@ class SMParameters:
     not_pressed_dist: float = 0.002
     pos_margin: float = 0.001
     ontop_margin: float = 0.003
-    random_events: bool = False         #Random events
-    verbose: bool = False               #Extra prints
+    random_events: bool = False         # Random events
+    verbose: bool = False               # Extra prints
 
 
 class SMMode(IntEnum):

@@ -3,10 +3,11 @@
 import paths
 paths.add_modules_to_path()
 
+import os
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import BehaviorNodeFactory
 
-from simple_example.paths import get_example_directory
+from simple_example.paths import get_log_directory
 from simple_example import bt_collection
 from simple_example.execution_nodes import get_behaviors
 from simple_example.dummy_world import DummyWorld, WorldOperationResults
@@ -42,8 +43,14 @@ def run():
         bt_executor = BehaviorTreeExecutor(node_factory, world)
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1))
 
+        try:
+            os.mkdir(get_log_directory())
+        except OSError:
+            pass
+
         file_name = 'trial_%d' % (tdx + 1)
-        tree.save_figure(get_example_directory(), name=file_name)
+
+        tree.save_figure(get_log_directory(), name=file_name)
         print("Succeed: ", success)
 
 
