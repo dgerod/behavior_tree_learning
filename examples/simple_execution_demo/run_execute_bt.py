@@ -7,10 +7,10 @@ import os
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import BehaviorNodeFactory
 
-from simple_example.paths import get_log_directory
-from simple_example import bt_collection
-from simple_example.execution_nodes import get_behaviors
-from simple_example.dummy_world import DummyWorld, WorldOperationResults
+from simple_execution_demo.paths import get_log_directory
+from simple_execution_demo import bt_collection
+from simple_execution_demo.execution_nodes import get_behaviors
+from simple_execution_demo.dummy_world import DummyWorld, WorldOperationResults
 
 
 def run():
