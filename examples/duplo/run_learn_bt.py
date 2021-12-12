@@ -14,12 +14,7 @@ from duplo.environment import Environment
 
 def run():
 
-    node_factory = BehaviorNodeFactory(get_behaviors('tower'))
-    start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.0, -0.1, 0), WorldPos(0.05, -0.1, 0)]
-    target_position = [WorldPos(0.0, 0.05, 0), WorldPos(0.0, 0.05, 0.0192), WorldPos(0.0, 0.05, 2*0.0192)]
-
-    world = WorldSimulator(start_position)
-    environment = Environment(node_factory, world, target_position)
+    scenario = 'tower'
 
     parameters = GeneticParameters()
     parameters.n_population = 16
@@ -39,12 +34,27 @@ def run():
     parameters.mutation_p_add = 0.4
     parameters.mutation_p_delete = 0.3
     parameters.allow_identical = False
+
     parameters.plot = True
     parameters.fig_last_gen = False
 
-    bt_learner = BehaviorTreeLearner(environment)
-    success = bt_learner.run(parameters, verbose=True)
-    print("Succeed: ", success)
+    num_trials = 10
+    for tdx in range(1, num_trials+1):
+
+        parameters.log_name = scenario + '_' + str(tdx)
+        seed = tdx
+
+        node_factory = BehaviorNodeFactory(get_behaviors(scenario))
+        start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.0, -0.1, 0), WorldPos(0.05, -0.1, 0)]
+        target_position = [WorldPos(0.0, 0.05, 0), WorldPos(0.0, 0.05, 0.0192), WorldPos(0.0, 0.05, 2 * 0.0192)]
+
+        simulated_world = WorldSimulator(start_position)
+        environment = Environment(node_factory, simulated_world, target_position)
+
+        bt_learner = BehaviorTreeLearner(environment)
+        success = bt_learner.run(parameters, seed, verbose=True)
+
+        print("Trial: %d, Succeed: %s" % (tdx, success))
 
 
 if __name__ == "__main__":

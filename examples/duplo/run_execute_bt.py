@@ -24,7 +24,7 @@ def run():
 
     start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.0, -0.1, 0), WorldPos(0.05, -0.1, 0)]
 
-    for tdx, trial in zip(range(0, len(trials)), trials):
+    for tdx, trial in zip(range(1, len(trials)+1), trials):
 
         print("Trial: %d" % tdx)
 
