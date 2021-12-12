@@ -16,10 +16,6 @@ class Environment(implements(GeneticEnvironment)):
         self._node_factory = node_factory
         self._scenario = scenario
 
-        #self._deterministic = deterministic
-        #settings_file = os.path.join(EXAMPLE_DIRECTORY, 'BT_SCENARIO_' + str(self.scenario) + '.yaml')
-        #bt.load_settings_from_file(settings_file)
-
     def run_and_compute(self, individual, verbose):
         """ Run the simulation and return the fitness """
 
@@ -64,6 +60,5 @@ class Environment(implements(GeneticEnvironment)):
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
 
-        sbt = individual
-        pytree = StringBehaviorTree(sbt[:], behaviors=self._node_factory)
-        pytree.save_fig(path, name=plot_name)
+        tree = StringBehaviorTree(individual[:], behaviors=self._node_factory)
+        tree.save_figure(path, name=plot_name)

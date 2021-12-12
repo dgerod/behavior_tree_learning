@@ -21,10 +21,6 @@ def run():
     scenario = 'scenario_1'
     deterministic = False
 
-    node_factory = BehaviorNodeFactory(get_behaviors(scenario))
-    simulated_world = WorldSimulator(scenario, deterministic)
-    environment = Environment(node_factory, simulated_world, scenario)
-
     parameters = GeneticParameters()
     parameters.ind_start_length = 4
     parameters.n_population = 30
@@ -45,9 +41,20 @@ def run():
     parameters.plot = True
     parameters.fig_last_gen = False
 
-    bt_learner = BehaviorTreeLearner(environment)
-    success = bt_learner.run(parameters, verbose=True)
-    print("Succeed: ", success)
+    num_trials = 10
+    for tdx in range(1, num_trials+1):
+
+        parameters.log_name = scenario + '_' + str(tdx)
+        seed = tdx
+
+        node_factory = BehaviorNodeFactory(get_behaviors(scenario))
+        simulated_world = WorldSimulator(scenario, deterministic)
+        environment = Environment(node_factory, simulated_world, scenario)
+
+        bt_learner = BehaviorTreeLearner(environment)
+        success = bt_learner.run(parameters, seed, verbose=False)
+
+        print("Trial: %d, Succeed: %s" % (tdx, success))
 
 
 if __name__ == "__main__":
