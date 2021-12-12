@@ -14,19 +14,21 @@ from tiago_pnp.world import WorldSimulator
 def run():
 
     scenario = 'scenario_1'
+    deterministic = False
 
-    node_factory = BehaviorNodeFactory(get_behaviors(scenario))
+    node_factory_1 = BehaviorNodeFactory(get_behaviors(scenario))
     sbt_1 = bt_collection.select_bt(scenario)
-    trials = [sbt_1]
+    trials = [(sbt_1, node_factory_1)]
 
     for tdx, trial in zip(range(0, len(trials)), trials):
 
         print("Trial: %d" % tdx)
 
-        sbt = list(trial)
+        sbt = list(trial[0])
+        node_factory = trial[1]
         print("SBT: ", sbt)
 
-        simulated_world = WorldSimulator(scenario)
+        simulated_world = WorldSimulator(scenario, deterministic)
         bt_executor = BehaviorTreeExecutor(node_factory, simulated_world)
 
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1),
