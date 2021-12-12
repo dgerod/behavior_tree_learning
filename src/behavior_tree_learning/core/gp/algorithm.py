@@ -69,7 +69,7 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
     # Select best candidate
     if not hot_start:
         best_fitness.append(max(fitness))
-        if gp_par.verbose:
+        if verbose:
             _print_population(population, fitness, last_generation)
             print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
 
@@ -121,7 +121,7 @@ def run(environment: GeneticEnvironment, gp_par, hot_start=False, base_line=None
         logplot.log_fitness(gp_par.log_name, fitness)
         logplot.log_population(gp_par.log_name, population)
 
-        if gp_par.verbose:
+        if verbose:
             print("Generation: ", generation, "Fitness: ", fitness, "Best fitness: ", best_fitness[generation])
 
         if (generation + 1) % 25 == 0 and generation < gp_par.n_generations - 1: # Last generation will be saved later
