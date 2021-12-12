@@ -227,7 +227,7 @@ class PickUp(BehaviorNode):
             elif self._world.current[sm.State.POSE] == self._world.poses.pick_table2:
                 self._world.current[sm.State.VISITED][2] = True
 
-        return self.state
+        return self._state
 
 
 class Placed(BehaviorNode):
@@ -238,7 +238,9 @@ class Placed(BehaviorNode):
     @staticmethod
     def make(text, world, verbose=False):
 
-        cube_id = re.findall(r'[0-9]+', text)
+        cube_id = int(re.findall(r'[0-9]+', text)[0])
+        if verbose:
+            print('Cube id: %d' % cube_id)
         return Placed(text, world, verbose, cube_id)
 
     def __init__(self, name, world, verbose, cube_id):
