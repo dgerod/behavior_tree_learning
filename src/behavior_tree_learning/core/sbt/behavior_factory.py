@@ -122,7 +122,7 @@ class BehaviorNodeFactory:
 
         behaviors = self._execution_behavior_register.behaviors()
         for key in behaviors.keys():
-            if name in key:
+            if name == key:
                 return behaviors[key][1].make(name, world, verbose)
         
         return None
