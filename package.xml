@@ -5,7 +5,7 @@
 
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="45998292+jstyrud@users.noreply.github.com">jstyrud</maintainer>
+  <maintainer email="dgerod@xyz-lab.org.es">Diego Escudero</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>catkin</buildtool_depend>
