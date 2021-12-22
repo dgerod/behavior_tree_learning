@@ -14,7 +14,11 @@ References:
 * __Behavior Trees inRobotics and AI__.
   Colledanchise, Michele & Ogren, Petter. 
   June 2020. [PDF](https://arxiv.org/pdf/1709.00084.pdf)
-* __Genetic Programming__. Accessed on December 22, 2021. [Web](https://geneticprogramming.com)
+* __Genetic Programming__. 
+  Accessed on December 22, 2021. [Web](https://geneticprogramming.com)
+* __A Field Guide to Genetic Programming__. 
+  Poli, Riccardo & Langdon, William & Mcphee, Nicholas.  
+  2008. ISBN 978-1-4092-0073-4.
 * __Learning Behavior Trees with Genetic Programming in Unpredictable Environments__.
   Iovino, Matteo & Styrud, Jonathan & Falco, Pietro & Smith, Christian.
   ICRA 2021, May 2021. DOI:10.1109/ICRA48506.2021.9562088. [PDF](https://arxiv.org/pdf/2011.03252v1.pdf)
