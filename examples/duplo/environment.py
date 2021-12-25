@@ -2,18 +2,19 @@ from interface import implements
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
 from behavior_tree_learning.gp import GeneticEnvironment
-from duplo.world import WorldSimulator
+from duplo.world import WorldFactory
 from duplo.fitness_function import FitnessFunction
 
 
 class Environment(implements(GeneticEnvironment)):
 
-    def __init__(self, node_factory: BehaviorNodeFactory, world: WorldSimulator,
+    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
                  target_positions,
-                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None):
+                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
 
         self._node_factory = node_factory
-        self._world = world
+        self._world_factory = world_factory
+        self._verbose = verbose
 
         self._targets = target_positions
         self._static_tree = static_tree
@@ -24,22 +25,22 @@ class Environment(implements(GeneticEnvironment)):
 
     def run_and_compute(self, individual, verbose):
 
-        print('[Environment::run_and_compute] -- {')
+        verbose_enabled = self._verbose or verbose
 
         sbt = individual
-        if verbose:
+        if verbose_enabled:
             print("SBT: ", sbt)
 
-        tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=self._world, verbose=verbose)
-        success, ticks = tree.run_bt(parameters=ExecutionParameters(successes_required=1))
+        world = self._world_factory.make()
 
-        fitness_value = FitnessFunction().compute_cost(self._world, tree, ticks, self._targets,
+        tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=world, verbose=verbose)
+        success, ticks = tree.run_bt(parameters=ExecutionParameters(successes_required=1))
+        fitness_value = FitnessFunction().compute_cost(world, tree, ticks, self._targets,
                                                        self._fitness_coefficients, verbose=verbose)
 
-        if verbose:
+        if verbose_enabled:
             print("fitness: ", fitness_value)
 
-        print('} --')
         return fitness_value
 
     def plot_individual(self, path, plot_name, individual):
@@ -63,8 +64,13 @@ class Environment(implements(GeneticEnvironment)):
 class Environment1(Environment):
     """ Test class for only running first target in list  """
 
-    def __init__(self, targets, static_tree, verbose=False):
-        super().__init__(targets, static_tree, verbose)
+    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
+                 target_positions,
+                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
+
+        super().__init__(node_factory, world_factory,
+                         target_positions,
+                         static_tree, sm_pars, mode, fitness_coefficients, verbose)
         self._targets = [self._targets[0]]
 
     def get_fitness(self, individual):
@@ -74,8 +80,13 @@ class Environment1(Environment):
 class Environment12(Environment):
     """ Test class for only running first two targets in list  """
 
-    def __init__(self, targets, static_tree, verbose=False):
-        super().__init__(targets, static_tree, verbose)
+    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
+                 target_positions,
+                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
+
+        super().__init__(node_factory, world_factory,
+                         target_positions,
+                         static_tree, sm_pars, mode, fitness_coefficients, verbose)
         self._targets = self._targets[:2]
 
     def get_fitness(self, individual):
@@ -85,8 +96,13 @@ class Environment12(Environment):
 class Environment123(Environment):
     """ Test class for only running first three targets in list  """
 
-    def __init__(self, targets, static_tree, verbose=False):
-        super().__init__(targets, static_tree, verbose)
+    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
+                 target_positions,
+                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
+
+        super().__init__(node_factory, world_factory,
+                         target_positions,
+                         static_tree, sm_pars, mode, fitness_coefficients, verbose)
         self._targets = self._targets[:3]
 
     def get_fitness(self, individual):

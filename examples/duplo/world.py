@@ -56,6 +56,14 @@ class SMMode(IntEnum):
     BLOCKING = 3
 
 
+def move_brick_to(brick, position):
+    """ Move brick to given position """
+
+    brick.x = position.x
+    brick.y = position.y
+    brick.z = position.z
+
+
 class WorldSimulator(implements(World)):
     """
     Class for handling the State Machine Simulator
@@ -190,9 +198,13 @@ class WorldSimulator(implements(World)):
         return False
 
 
-def move_brick_to(brick, position):
-    """ Move brick to given position """
+class WorldFactory:
 
-    brick.x = position.x
-    brick.y = position.y
-    brick.z = position.z
+    def __init__(self, start_position, random_events=False, parameters=None, mode=0):
+        self._start_position = start_position
+        self._random_events = random_events
+        self._parameters = parameters
+        self._mode = mode
+
+    def make(self):
+        return WorldSimulator(self._start_position, self._random_events, self._parameters, self._mode)

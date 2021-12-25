@@ -8,7 +8,7 @@ from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParamete
 
 from duplo.execution_nodes import get_behaviors
 from duplo.world import Pos as WorldPos
-from duplo.world import WorldSimulator
+from duplo.world import WorldSimulator, WorldFactory
 from duplo.environment import Environment
 
 
@@ -48,11 +48,11 @@ def run():
         start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.0, -0.1, 0), WorldPos(0.05, -0.1, 0)]
         target_position = [WorldPos(0.0, 0.05, 0), WorldPos(0.0, 0.05, 0.0192), WorldPos(0.0, 0.05, 2 * 0.0192)]
 
-        simulated_world = WorldSimulator(start_position)
-        environment = Environment(node_factory, simulated_world, target_position)
+        world_factory = WorldFactory(start_position)
+        environment = Environment(node_factory, world_factory, target_position, verbose=True)
 
         bt_learner = BehaviorTreeLearner(environment)
-        success = bt_learner.run(parameters, seed, verbose=True)
+        success = bt_learner.run(parameters, seed, verbose=False)
 
         print("Trial: %d, Succeed: %s" % (tdx, success))
 
