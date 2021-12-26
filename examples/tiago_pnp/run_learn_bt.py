@@ -7,7 +7,7 @@ from behavior_tree_learning.sbt import BehaviorNodeFactory
 from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParameters, GeneticSelectionMethods
 
 from tiago_pnp.execution_nodes import get_behaviors
-from tiago_pnp.world import WorldSimulator
+from tiago_pnp.world import WorldSimulator, WorldFactory
 from tiago_pnp.environment import Environment
 
 
@@ -38,19 +38,19 @@ def run():
     parameters.allow_identical = False
     parameters.n_generations = 8000
 
-    parameters.plot = True
-    parameters.fig_last_gen = False
-
     num_trials = 10
     for tdx in range(1, num_trials+1):
 
+        # add specific class for plot_parametes
+        parameters.plot = True
+        parameters.fig_last_gen = False
         parameters.log_name = scenario + '_' + str(tdx)
-        seed = tdx
 
         node_factory = BehaviorNodeFactory(get_behaviors(scenario))
-        simulated_world = WorldSimulator(scenario, deterministic)
-        environment = Environment(node_factory, simulated_world, scenario)
+        world_factory = WorldFactory(scenario, deterministic)
+        environment = Environment(node_factory, world_factory, scenario)
 
+        seed = tdx*100
         bt_learner = BehaviorTreeLearner(environment)
         success = bt_learner.run(parameters, seed, verbose=False)
 

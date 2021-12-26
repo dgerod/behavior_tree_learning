@@ -82,6 +82,15 @@ class SMParameters:
     verbose: bool = False                                  # Extra prints
 
 
+def distance(pose1, pose2):
+    """ Function implementing the distance """
+    argument = 0
+    for i in range(len(pose1)):
+        argument += (pose1[i]-pose2[i])**2
+
+    return math.sqrt(argument)
+
+
 class WorldSimulator(implements(World)):
     """
     Class for handling the State Machine Simulator
@@ -465,10 +474,13 @@ class WorldSimulator(implements(World)):
         return True
 
 
-def distance(pose1, pose2):
-    """ Function implementing the distance """
-    argument = 0
-    for i in range(len(pose1)):
-        argument += (pose1[i]-pose2[i])**2
+class WorldFactory:
 
-    return math.sqrt(argument)
+    def __init__(self, scenario: str, deterministic=False, verbose=False, pose_id=0):
+        self._scenario = scenario
+        self._deterministic = deterministic
+        self._verbose = verbose
+        self._pose_id = pose_id
+
+    def make(self):
+        return WorldSimulator(self._scenario, self._deterministic, self._verbose, self._pose_id)
