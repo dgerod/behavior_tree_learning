@@ -198,29 +198,32 @@ def plot_fitness(log_name, fitness, n_episodes=None):
 
 @dataclass
 class PlotParameters:
-    """ Data class for parameters for plotting """
-    plot_mean: bool = True               #Plot the mean of the logs
-    mean_color: str = 'b'                #Color for mean curve
-    plot_std: bool = True                #Plot the standard deviation
-    std_color: str = 'b'                 #Color of the std fill
-    plot_minmax: bool = False            #Plots minmax instead of std, should not be combined
-    plot_ind: bool = False               #Plot each individual log
-    ind_color: str = 'aquamarine'        #Ind color
-    label: str = ''                      #Label name
-    title: str = ''                      #Plot title
-    xlabel: str = ''                     #Label of x axis
-    x_max: int = 0                       #Upper limit of x axis
-    extend_gens: int = 0                 #Extend until this minimum number of gens
-    ylabel: str = ''                     #Label of y axis
-    extrapolate_y: bool = False          #Extrapolate y as constant to x_max
-    logarithmic_y: bool = False          #Logarithmic y scale
-    plot_horizontal: bool = True         #Plot thin horizontal line
-    horizontal: float = 0                #Horizontal value to plot
-    horizontal_label: str = ''           #Label of horizontal line
-    horizontal_linestyle: str = 'dashed' #Style of horizontal line
-    legend_position: str = 'lower right'  #Position of legend
-    save_fig: bool = True                #Save figure. If false, more plots is possible.
-    path: str = 'logs/plot.svg'          #Path to save log
+    """
+    Data class for parameters for plotting
+    """
+
+    plot_mean: bool = True                # Plot the mean of the logs
+    mean_color: str = 'b'                 # Color for mean curve
+    plot_std: bool = True                 # Plot the standard deviation
+    std_color: str = 'b'                  # Color of the std fill
+    plot_minmax: bool = False             # Plots minmax instead of std, should not be combined
+    plot_ind: bool = False                # Plot each individual log
+    ind_color: str = 'aquamarine'         # Ind color
+    label: str = ''                       # Label name
+    title: str = ''                       # Plot title
+    xlabel: str = ''                      # Label of x axis
+    x_max: int = 0                        # Upper limit of x axis
+    extend_gens: int = 0                  # Extend until this minimum number of gens
+    ylabel: str = ''                      # Label of y axis
+    extrapolate_y: bool = False           # Extrapolate y as constant to x_max
+    logarithmic_y: bool = False           # Logarithmic y scale
+    plot_horizontal: bool = True          # Plot thin horizontal line
+    horizontal: float = 0                 # Horizontal value to plot
+    horizontal_label: str = ''            # Label of horizontal line
+    horizontal_linestyle: str = 'dashed'  # Style of horizontal line
+    legend_position: str = 'lower right'  # Position of legend
+    save_fig: bool = True                 # Save figure. If false, more plots is possible.
+    path: str = 'logs/plot.svg'           # Path to save log
 
 
 def plot_learning_curves(logs, parameters):
@@ -228,6 +231,7 @@ def plot_learning_curves(logs, parameters):
     """
     Plots mean and standard deviation of a number of logs in the same figure
     """
+
     fitness = []
     n_episodes = []
     for log_name in logs:
@@ -237,8 +241,8 @@ def plot_learning_curves(logs, parameters):
     n_logs = len(logs)
 
     if parameters.extend_gens > 0:
-        #Extend until this minimum number of gens, assuming shorter logs are stopped because
-        #they have converged there is no difference to end result
+        # Extend until this minimum number of gens, assuming shorter logs are stopped because
+        #   they have converged there is no difference to end result
         for i in range(n_logs):
             if len(fitness[i]) < parameters.extend_gens:
                 last_fitness = fitness[i][-1]

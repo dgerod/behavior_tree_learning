@@ -70,19 +70,22 @@ def run(environment: GeneticEnvironment, parameters: GeneticParameters, hot_star
     # Select best candidate
     if not hot_start:
         best_fitness.append(max(fitness))
-        if verbose:
-            _print_population(population, fitness, last_generation)
-            print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
-
         logplot.log_fitness(parameters.log_name, fitness)
         logplot.log_population(parameters.log_name, population)
 
-    generation = parameters.n_generations - 1 # In case loop is skipped due to hotstart
+    if verbose:
+        _print_population(population, fitness, last_generation)
+        _print_best_individual(population, fitness, last_generation)
+        print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
+
+    generation = parameters.n_generations - 1  # In case loop is skipped due to hotstart
     for generation in range(last_generation + 1, parameters.n_generations):
+
+        print("Generation: %d/%d" % (generation, parameters.n_generations))
 
         if parameters.keep_baseline:
             if base_line is not None and base_line not in population:
-                population.append(base_line) # Make sure we are always able to source from baseline
+                population.append(base_line)  # Make sure we are always able to source from baseline
 
         if generation > 1:
             fitness = []
@@ -96,8 +99,8 @@ def run(environment: GeneticEnvironment, parameters: GeneticParameters, hot_star
             baseline_fitness = fitness[baseline_index]
             fitness[baseline_index] = max(fitness)
 
-        co_parents = _crossover_parent_selection(population, fitness, parameters)
-        co_offspring = _crossover(population, co_parents, parameters)
+        co_parents = _crossover_parent_selection(population, fitness, parameters, verbose=verbose)
+        co_offspring = _crossover(population, co_parents, parameters, verbose=verbose)
         for offspring in co_offspring:
             fitness.append(_calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness,
                                               verbose=verbose))
@@ -105,38 +108,44 @@ def run(environment: GeneticEnvironment, parameters: GeneticParameters, hot_star
         if parameters.boost_baseline and parameters.boost_baseline_only_co and base_line is not None:
             fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
 
-        mutation_parents = _mutation_parent_selection(population, fitness, co_parents, co_offspring, parameters)
-        mutated_offspring = _mutation(population + co_offspring, mutation_parents, parameters)
+        mutation_parents = _mutation_parent_selection(population, fitness, co_parents, co_offspring,
+                                                      parameters, verbose=verbose)
+        mutated_offspring = _mutation(population + co_offspring, mutation_parents,
+                                      parameters, verbose=verbose)
 
         for offspring in mutated_offspring:
             fitness.append(_calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness,
                                               verbose=verbose))
 
         if parameters.boost_baseline and base_line is not None:
-            fitness[baseline_index] = baseline_fitness # Restore original fitness for survivor selection
+            fitness[baseline_index] = baseline_fitness  # Restore original fitness for survivor selection
 
-        population, fitness = _survivor_selection(population, fitness, co_offspring, mutated_offspring, parameters)
+        population, fitness = _survivor_selection(population, fitness,
+                                                  co_offspring, mutated_offspring, parameters,
+                                                  verbose=verbose)
 
         best_fitness.append(max(fitness))
         n_episodes.append(hash_table.n_values)
 
+        if verbose:
+            _print_population(population, fitness, last_generation)
+            _print_best_individual(population, fitness, last_generation)
+
         logplot.log_fitness(parameters.log_name, fitness)
         logplot.log_population(parameters.log_name, population)
 
-        print("Generation: %f/%d, Best fitness: %s" %
+        print("Generation: %d/%d, Best fitness: %f" %
               (generation, parameters.n_generations, best_fitness[generation]))
 
-        if verbose:
-            print(generation, "Fitness: ", fitness)
-
-        if (generation + 1) % 25 == 0 and generation < parameters.n_generations - 1: # Last generation will be saved later
+        if (generation + 1) % 25 == 0 and generation < parameters.n_generations - 1:
+            # Last generation will be saved later
             _save_state(parameters, population, None, best_fitness, n_episodes, base_line, generation, hash_table)
 
     if verbose:
         print("\nFINAL POPULATION: ")
         _print_population(population, fitness, generation)
 
-    best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1)[0]
+    best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1, verbose)[0]
 
     _save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table)
 
@@ -178,7 +187,7 @@ def _create_population(population_size, genome_length):
     return new_population
 
 
-def _mutation(population, parents, parameters):
+def _mutation(population, parents, parameters, verbose=False):
     """
     Generate offspring by mutating a gene
     """
@@ -193,7 +202,8 @@ def _mutation(population, parents, parameters):
             while attempts < max_attempts:
 
                 mutated_individual = \
-                    _operators.mutate_gene(population[parent], parameters.mutation_p_add, parameters.mutation_p_delete)
+                    _operators.mutate_gene(population[parent], parameters.mutation_p_add, parameters.mutation_p_delete,
+                                           verbose=verbose)
                 if (len(mutated_individual) >= parameters.min_length
                         and (parameters.allow_identical
                              or (mutated_individual not in population + mutated_population))):
@@ -204,7 +214,7 @@ def _mutation(population, parents, parameters):
     return mutated_population
 
 
-def _crossover(population, parents, parameters):
+def _crossover(population, parents, parameters, verbose=False):
     """
     Generates offspring by crossovers
     """
@@ -244,7 +254,7 @@ def _crossover(population, parents, parameters):
         if (attempts == max_attempts and len(unused_parents) > 0
                 and parameters.n_offspring_mutation <= 1 and parameters.n_offspring_crossover <= 1):
             # Fill up with mutation in case we can't find enough good crossovers
-            crossover_offspring += _mutation(population + crossover_offspring, unused_parents, parameters)
+            crossover_offspring += _mutation(population + crossover_offspring, unused_parents, parameters, verbose)
 
     return crossover_offspring
 
@@ -283,7 +293,7 @@ def _calculate_fitness(individual, hash_table, environment: GeneticEnvironment, 
     return mean(values)
 
 
-def _crossover_parent_selection(population, fitness, parameters):
+def _crossover_parent_selection(population, fitness, parameters, verbose=False):
     """
     Select parents for crossover. Returns indices of parents.
     """
@@ -291,10 +301,10 @@ def _crossover_parent_selection(population, fitness, parameters):
     n_parents_crossover = int(round(parameters.f_crossover * parameters.n_population))
     if n_parents_crossover <= 0:
         return []
-    return selection(parameters.parent_selection, range(len(population)), fitness, n_parents_crossover)
+    return selection(parameters.parent_selection, range(len(population)), fitness, n_parents_crossover, verbose)
 
 
-def _mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, parameters):
+def _mutation_parent_selection(population, fitness, crossover_parents, crossover_offspring, parameters, verbose=False):
     """
     Select parents for crossover
     Input fitness contains fitness for crossover offspring after fitness for the rest of the population
@@ -319,10 +329,10 @@ def _mutation_parent_selection(population, fitness, crossover_parents, crossover
     n_parents_mutation = int(round(parameters.f_mutation * parameters.n_population))
     if n_parents_mutation <= 0:
         return []
-    return selection(parameters.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation)
+    return selection(parameters.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation, verbose)
 
 
-def _survivor_selection(population, fitness, crossover_offspring, mutated_offspring, parameters):
+def _survivor_selection(population, fitness, crossover_offspring, mutated_offspring, parameters, verbose=False):
     """
     Select survivors for next generation
     """
@@ -335,7 +345,7 @@ def _survivor_selection(population, fitness, crossover_offspring, mutated_offspr
     # Pick out selectable parents using elitism.
     n_parents = int(round(parameters.f_parents * parameters.n_population))
     if n_parents > 0:
-        parents = selection(SelectionMethods.ELITISM, range(len(population)), fitness[:len(population)], n_parents)
+        parents = selection(SelectionMethods.ELITISM, range(len(population)), fitness[:len(population)], n_parents, verbose)
         for i in parents:
             selectable.append(population[i])
             selectable_fitness.append(fitness[i])
@@ -347,7 +357,7 @@ def _survivor_selection(population, fitness, crossover_offspring, mutated_offspr
     # Pick out elites
     n_elites = int(round(parameters.f_elites * parameters.n_population))
     if n_elites > 0:
-        elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, n_elites)
+        elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, n_elites, verbose)
         elites.sort(reverse=True)
         for i in elites:
             survivors.append(selectable[i])
@@ -356,7 +366,7 @@ def _survivor_selection(population, fitness, crossover_offspring, mutated_offspr
             selectable_fitness.pop(i)
 
     n_to_select = parameters.n_population - len(survivors)
-    selected = selection(parameters.survivor_selection, range(len(selectable)), selectable_fitness, n_to_select)
+    selected = selection(parameters.survivor_selection, range(len(selectable)), selectable_fitness, n_to_select, verbose)
 
     for i in selected:
         survivors.append(selectable[i])
@@ -373,15 +383,22 @@ def _print_population(population, fitness, generation):
     print("Generation: ", generation)
     for i in range(len(population)):
         print("(%d) Genome: %s" % (i, population[i]))
-        print("(%d) Fitness: %d" % (i, fitness[i]))
+        print("     Fitness: %f" % fitness[i])
+
+
+def _print_best_individual(population, fitness, generation):
 
     best = np.argmax(fitness)
-    print("Best individual: ", best)
-    print(population[best])
+    print("Best individual: %d" % best, population[best])
+    print("   Genome: %s" % population[best])
+    print("   Fitness: %f" % fitness[best])
+    print("Fitness average: %f, std dev: %f" % (np.average(fitness), np.std(fitness)))
 
 
 def _save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table):
-    """ Saves state for later hotstart """
+    """
+    Saves state for later hot-start
+    """
 
     logplot.log_last_population(parameters.log_name, population)
     if best_individual is not None:
@@ -394,7 +411,9 @@ def _save_state(parameters, population, best_individual, best_fitness, n_episode
 
 
 def _load_state(log_name, hash_table):
-    """ Loads state for hotstart """
+    """
+    Loads state for hot-start
+    """
 
     population = logplot.get_last_population(log_name)
     best_fitness = logplot.get_best_fitness(log_name)

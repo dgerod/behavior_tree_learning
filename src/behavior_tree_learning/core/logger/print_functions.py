@@ -1,4 +1,3 @@
-import os
 import py_trees as pt
 
 

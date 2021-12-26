@@ -3,7 +3,8 @@ from behavior_tree_learning.core.gp import GeneticEnvironment
 from behavior_tree_learning.core.gp import GeneticParameters
 from behavior_tree_learning.core.gp import GeneticProgramming
 from behavior_tree_learning.core.gp_sbt.environment import Environment
-from behavior_tree_learning.core.gp_sbt.gp_operators import Operators as GeneticOperatorsForSBT
+from behavior_tree_learning.core.gp_sbt.gp_operators \
+    import Operators as GeneticOperatorsForSBT
 
 
 class BehaviorTreeLearner:

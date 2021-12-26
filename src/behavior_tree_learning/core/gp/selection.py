@@ -3,48 +3,24 @@ import random
 import numpy as np
 
 
-class SelectionMethods(Enum):
-    """ Enum class for selection methods """
-
-    ELITISM = auto()
-    TOURNAMENT = auto()
-    RANK = auto()
-    RANDOM = auto()
-    ALL = auto()
-
-
-def selection(selection_method, population, fitness, n_selected ):
-    """
-    Select individuals from population
-    """
-
-    if selection_method == SelectionMethods.ELITISM:
-        selected = _elite_selection(population, fitness, n_selected)
-    elif selection_method == SelectionMethods.TOURNAMENT:
-        selected = _tournament_selection(population, fitness, n_selected)
-    elif selection_method == SelectionMethods.RANK:
-        selected = _rank_selection(population, fitness, n_selected)
-    elif selection_method == SelectionMethods.RANDOM:
-        selected = _random_selection(population, n_selected)
-    elif selection_method == SelectionMethods.ALL:
-        selected = population
-    else:
-        raise Exception('Invalid selection method')
-
-    return selected
-
-
-def _elite_selection(population, fitness, n_elites):
+def _elite_selection(population, fitness, n_elites, verbose):
     """
     Elite selection from population
     """
 
     sorted_population = sorted(zip(fitness, population), reverse=True)
+    selected = [x for _, x in sorted_population[:n_elites]]
 
-    return [x for _, x in sorted_population[:n_elites]]
+    if verbose:
+        print('Elite selection - population: %d, num selected: %d' % (len(population), n_elites))
+        print('Sorted: population:')
+        for fitness, genome in sorted_population:
+            print('fitness: %f, genome: %s' % (fitness, genome))
+
+    return selected
 
 
-def _tournament_selection(population, fitness, n_winners):
+def _tournament_selection(population, fitness, n_winners, verbose):
     """
     Tournament selection.
     """
@@ -73,7 +49,7 @@ def _tournament_selection(population, fitness, n_winners):
     return winners
 
 
-def _rank_selection(population, fitness, n_selected):
+def _rank_selection(population, fitness, n_selected, verbose):
     """
     Rank proportional selection
     Probabilities for each individual are scaled linearly according to rank
@@ -89,5 +65,38 @@ def _rank_selection(population, fitness, n_selected):
     return list(np.random.choice(sorted_indices, size=n_selected, replace=False, p=p))
 
 
-def _random_selection(population, n_selected):
+def _random_selection(population, n_selected, verbose):
     return random.sample(population, n_selected)
+
+
+class SelectionMethods(Enum):
+    """
+    Enum class for selection methods
+    """
+
+    ELITISM = auto()
+    TOURNAMENT = auto()
+    RANK = auto()
+    RANDOM = auto()
+    ALL = auto()
+
+
+def selection(selection_method, population, fitness, n_selected, verbose=False):
+    """
+    Select individuals from population
+    """
+
+    if selection_method == SelectionMethods.ELITISM:
+        selected = _elite_selection(population, fitness, n_selected, verbose)
+    elif selection_method == SelectionMethods.TOURNAMENT:
+        selected = _tournament_selection(population, fitness, n_selected, verbose)
+    elif selection_method == SelectionMethods.RANK:
+        selected = _rank_selection(population, fitness, n_selected, verbose)
+    elif selection_method == SelectionMethods.RANDOM:
+        selected = _random_selection(population, n_selected, verbose)
+    elif selection_method == SelectionMethods.ALL:
+        selected = population
+    else:
+        raise Exception('Invalid selection method')
+
+    return selected

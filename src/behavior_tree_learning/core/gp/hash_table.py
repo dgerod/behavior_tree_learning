@@ -12,6 +12,7 @@ class Node:
     """
     Node data structure - essentially a LinkedList node
     """
+
     def __init__(self, key, value):
         self.key = key
         self.value = [value]
@@ -38,12 +39,14 @@ class HashTable:
         """
         Initialize hash table to fixed size
         """
+
         self.size = size
         self.buckets = [None]*self.size
         self.n_values = 0
         self.log_name = log_name
 
     def __eq__(self, other):
+
         if not isinstance(other, HashTable):
             return False
 
@@ -60,6 +63,7 @@ class HashTable:
         Input:  string key
         Output: hash
         """
+
         string = ''.join(key)
         new_hash = hashlib.md5()
         new_hash.update(string.encode('utf-8'))
@@ -73,6 +77,7 @@ class HashTable:
         Input:  key - string
                 value - anything
         """
+
         index = self.hash(key)
         node = self.buckets[index]
         if node is None:
@@ -88,6 +93,7 @@ class HashTable:
                     done = True
                 else:
                     node = node.next
+
         self.n_values += 1
 
     def find(self, key):
@@ -96,6 +102,7 @@ class HashTable:
         Input:  key - string
         Output: value stored under "key" or None if not found
         """
+
         index = self.hash(key)
         node = self.buckets[index]
         while node is not None and node.key != key:
@@ -109,6 +116,7 @@ class HashTable:
         """
         Loads hash table information.
         """
+
         with open(logplot.get_log_folder(self.log_name) + '/hash_log.txt', 'r') as f:
             lines = f.read().splitlines()
 
@@ -117,7 +125,7 @@ class HashTable:
                 individual = individual[5:].split(", value: ")
                 key = ast.literal_eval(individual[0])
                 individual = individual[1].split(", count: ")
-                values = individual[0][1:-1].split(", ") #Remove brackets and split multiples
+                values = individual[0][1:-1].split(", ") # Remove brackets and split multiples
                 for value in values:
                     self.insert(key, float(value))
 
@@ -125,6 +133,7 @@ class HashTable:
         """
         Writes table contents to a file
         """
+
         with open(logplot.get_log_folder(self.log_name) + '/hash_log.txt', "w") as f:
             for node in filter(lambda x: x is not None, self.buckets):
                 while node is not None:
