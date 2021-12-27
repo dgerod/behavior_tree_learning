@@ -40,14 +40,14 @@ class GeneticProgramming:
             self._set_seed(seed)
         self._verbose = verbose
 
-        return self._run(environment, parameters, hot_start, base_line, verbose)
+        return self._run(environment, parameters, hot_start, base_line)
 
     def _set_seed(self, seed):
 
         random.seed(seed)
         np.random.seed(seed)
 
-    def _run(self, environment: GeneticEnvironment, parameters: GeneticParameters, hot_start=False, base_line=None, verbose=False):
+    def _run(self, environment: GeneticEnvironment, parameters: GeneticParameters, hot_start=False, base_line=None):
         """
         Runs the genetic programming algorithm
         """
@@ -72,8 +72,7 @@ class GeneticProgramming:
         # Calculate fitness of the population
         fitness = []
         for individual in population:
-            fitness.append(self._calculate_fitness(list(individual), hash_table, environment, rerun=0,
-                                              verbose=verbose))
+            fitness.append(self._calculate_fitness(list(individual), hash_table, environment, rerun=0))
 
         # Select best candidate
         if not hot_start:
@@ -81,7 +80,7 @@ class GeneticProgramming:
             logplot.log_fitness(parameters.log_name, fitness)
             logplot.log_population(parameters.log_name, population)
 
-        if verbose:
+        if self._verbose:
             self._print_population(population, fitness, last_generation)
             self._print_best_individual(population, fitness, last_generation)
             print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
@@ -99,8 +98,7 @@ class GeneticProgramming:
             if generation > 1:
                 fitness = []
                 for index, individual in enumerate(population):
-                    fitness.append(self._calculate_fitness(list(individual), hash_table, environment, parameters.rerun_fitness,
-                                                      verbose=verbose))
+                    fitness.append(self._calculate_fitness(list(individual), hash_table, environment, parameters.rerun_fitness))
                     if base_line is not None and individual == base_line:
                         baseline_index = index
 
@@ -108,35 +106,32 @@ class GeneticProgramming:
                 baseline_fitness = fitness[baseline_index]
                 fitness[baseline_index] = max(fitness)
 
-            co_parents = self._crossover_parent_selection(population, fitness, parameters, verbose=verbose)
-            co_offspring = self._crossover(population, co_parents, parameters, verbose=verbose)
+            co_parents = self._crossover_parent_selection(population, fitness, parameters)
+            co_offspring = self._crossover(population, co_parents, parameters)
             for offspring in co_offspring:
-                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness,
-                                                       verbose=verbose))
+                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness))
 
             if parameters.boost_baseline and parameters.boost_baseline_only_co and base_line is not None:
                 fitness[baseline_index] = baseline_fitness  # Restore original fitness for survivor selection
 
             mutation_parents = self._mutation_parent_selection(population, fitness, co_parents, co_offspring,
-                                                               parameters, verbose=verbose)
+                                                               parameters)
             mutated_offspring = self._mutation(population + co_offspring, mutation_parents,
-                                               parameters, verbose=verbose)
+                                               parameters)
 
             for offspring in mutated_offspring:
-                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness,
-                                                       verbose=verbose))
+                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness))
 
             if parameters.boost_baseline and base_line is not None:
                 fitness[baseline_index] = baseline_fitness  # Restore original fitness for survivor selection
 
             population, fitness = self._survivor_selection(population, fitness,
-                                                           co_offspring, mutated_offspring, parameters,
-                                                           verbose=verbose)
+                                                           co_offspring, mutated_offspring, parameters)
 
             best_fitness.append(max(fitness))
             n_episodes.append(hash_table.n_values)
 
-            if verbose:
+            if self._verbose:
                 self._print_population(population, fitness, last_generation)
                 self._print_best_individual(population, fitness, last_generation)
 
@@ -150,13 +145,13 @@ class GeneticProgramming:
                 # Last generation will be saved later
                 self._save_state(parameters, population, None, best_fitness, n_episodes, base_line, generation, hash_table)
 
-        if verbose:
+        if self._verbose:
             print("\nFINAL POPULATION: ")
             self._print_population(population, fitness, generation)
 
         _logger.info("Final population")
 
-        best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1, verbose)[0]
+        best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1, self._verbose)[0]
         self._save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table)
 
         if parameters.plot:
@@ -197,7 +192,7 @@ class GeneticProgramming:
 
         return new_population
 
-    def _mutation(self, population, parents, parameters, verbose=False):
+    def _mutation(self, population, parents, parameters):
         """
         Generate offspring by mutating a gene
         """
@@ -222,7 +217,7 @@ class GeneticProgramming:
 
         return mutated_population
 
-    def _crossover(self, population, parents, parameters, verbose=False):
+    def _crossover(self, population, parents, parameters):
         """
         Generates offspring by crossovers
         """
@@ -244,7 +239,8 @@ class GeneticProgramming:
                 parent2 = unused_parents[int(crossover_parents[1])]
 
                 offspring1, offspring2 = \
-                    self._operators.crossover_genome(population[parent1], population[parent2], parameters.replace_crossover)
+                    self._operators.crossover_genome(population[parent1], population[parent2],
+                                                     parameters.replace_crossover)
                 if len(offspring1) >= parameters.min_length and len(offspring2) >= parameters.min_length and \
                         (parameters.allow_identical or
                          (offspring1 not in population + crossover_offspring and
@@ -262,7 +258,7 @@ class GeneticProgramming:
             if (attempts == max_attempts and len(unused_parents) > 0
                     and parameters.n_offspring_mutation <= 1 and parameters.n_offspring_crossover <= 1):
                 # Fill up with mutation in case we can't find enough good crossovers
-                crossover_offspring += self._mutation(population + crossover_offspring, unused_parents, parameters, verbose)
+                crossover_offspring += self._mutation(population + crossover_offspring, unused_parents, parameters)
 
         return crossover_offspring
 
@@ -293,12 +289,12 @@ class GeneticProgramming:
             if values is None:
                 values = [fitness]
 
-        if verbose:
+        if self._verbose:
             print('Calculated fitness: ', values)
 
         return mean(values)
 
-    def _crossover_parent_selection(self, population, fitness, parameters, verbose=False):
+    def _crossover_parent_selection(self, population, fitness, parameters):
         """
         Select parents for crossover. Returns indices of parents.
         """
@@ -306,9 +302,10 @@ class GeneticProgramming:
         n_parents_crossover = int(round(parameters.f_crossover * parameters.n_population))
         if n_parents_crossover <= 0:
             return []
-        return selection(parameters.parent_selection, range(len(population)), fitness, n_parents_crossover, verbose)
+        return selection(parameters.parent_selection, range(len(population)), fitness, n_parents_crossover,
+                         self._verbose)
 
-    def _mutation_parent_selection(self, population, fitness, crossover_parents, crossover_offspring, parameters, verbose=False):
+    def _mutation_parent_selection(self, population, fitness, crossover_parents, crossover_offspring, parameters):
         """
         Select parents for crossover
         Input fitness contains fitness for crossover offspring after fitness for the rest of the population
@@ -333,9 +330,10 @@ class GeneticProgramming:
         n_parents_mutation = int(round(parameters.f_mutation * parameters.n_population))
         if n_parents_mutation <= 0:
             return []
-        return selection(parameters.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation, verbose)
+        return selection(parameters.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation,
+                         self._verbose)
 
-    def _survivor_selection(self, population, fitness, crossover_offspring, mutated_offspring, parameters, verbose=False):
+    def _survivor_selection(self, population, fitness, crossover_offspring, mutated_offspring, parameters):
 
         selectable = []
         selectable_fitness = []
@@ -346,7 +344,7 @@ class GeneticProgramming:
         n_parents = int(round(parameters.f_parents * parameters.n_population))
         if n_parents > 0:
             parents = selection(SelectionMethods.ELITISM, range(len(population)), fitness[:len(population)], n_parents,
-                                verbose)
+                                self._verbose)
             for i in parents:
                 selectable.append(population[i])
                 selectable_fitness.append(fitness[i])
@@ -358,7 +356,8 @@ class GeneticProgramming:
         # Pick out elites
         n_elites = int(round(parameters.f_elites * parameters.n_population))
         if n_elites > 0:
-            elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, n_elites, verbose)
+            elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, n_elites,
+                               self._verbose)
             elites.sort(reverse=True)
             for i in elites:
                 survivors.append(selectable[i])
@@ -368,7 +367,7 @@ class GeneticProgramming:
 
         n_to_select = parameters.n_population - len(survivors)
         selected = selection(parameters.survivor_selection, range(len(selectable)), selectable_fitness, n_to_select,
-                             verbose)
+                             self._verbose)
 
         for i in selected:
             survivors.append(selectable[i])
@@ -391,7 +390,8 @@ class GeneticProgramming:
         print("   Fitness: %f" % fitness[best])
         print("Fitness average: %f, std dev: %f" % (np.average(fitness), np.std(fitness)))
 
-    def _save_state(self, parameters, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table):
+    def _save_state(self, parameters, population, best_individual, best_fitness, n_episodes, base_line, generation,
+                    hash_table):
         """
         Saves state for later hot-start
         """
