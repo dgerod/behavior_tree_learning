@@ -1,7 +1,8 @@
-from interface import implements
+import logging
 import random
 from statistics import mean
 import numpy as np
+from interface import implements
 
 from behavior_tree_learning.core.logger import logplot
 from behavior_tree_learning.core.gp.hash_table import HashTable
@@ -9,10 +10,6 @@ from behavior_tree_learning.core.gp.parameters import GeneticParameters
 from behavior_tree_learning.core.gp.environment import GeneticEnvironment
 from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 from behavior_tree_learning.core.gp.operators import GeneticOperators
-
-
-import logging
-_logger = logging.getLogger("gp")
 
 
 class DefaultGeneticOperator(implements(GeneticOperators)):
@@ -32,34 +29,44 @@ class GeneticProgramming:
     def __init__(self, operators):
         self._operators = operators
         self._verbose = False
+        self._logger = logging.getLogger("gp")
 
     def run(self, environment: GeneticEnvironment, parameters: GeneticParameters,
             seed=None, hot_start=False, base_line=None, verbose=False):
 
-        if seed:
-            self._set_seed(seed)
+        self._initialize_random_generator(seed)
         self._verbose = verbose
-
         return self._run(environment, parameters, hot_start, base_line)
 
-    def _set_seed(self, seed):
+    def _print_verbose_message(self, message, *args):
 
-        random.seed(seed)
-        np.random.seed(seed)
+        if self._verbose:
+            print(message % args)
+        self._logger.debug(message % args)
+
+    def _print_message(self, message, *args):
+
+        print(message % args)
+        self._logger.info(message % args)
+
+    def _initialize_random_generator(self, seed):
+
+        if seed:
+            random.seed(seed)
+            np.random.seed(seed)
 
     def _run(self, environment: GeneticEnvironment, parameters: GeneticParameters, hot_start=False, base_line=None):
         """
         Runs the genetic programming algorithm
         """
 
-        _logger.debug('[run] BEGIN')
-
+        self._logger.debug('[run] BEGIN')
         hash_table = HashTable(parameters.hash_table_size, parameters.log_name)
 
         if hot_start:
             best_fitness, n_episodes, last_generation, population = self._load_state(parameters.log_name, hash_table)
         else:
-            population = self._create_population(parameters.n_population, parameters.ind_start_length)
+            population = self._create_random_population(parameters.n_population, parameters.ind_start_length)
             logplot.clear_logs(parameters.log_name)
             best_fitness = []
             n_episodes = [hash_table.n_values]
@@ -80,16 +87,16 @@ class GeneticProgramming:
             logplot.log_fitness(parameters.log_name, fitness)
             logplot.log_population(parameters.log_name, population)
 
-        if self._verbose:
-            self._print_population(population, fitness, last_generation)
-            self._print_best_individual(population, fitness, last_generation)
-            print("Generation: ", last_generation, " Best fitness: ", best_fitness[-1])
+        self._print_message("=== Generation: %d ===" % last_generation)
+        self._print_population("Population", population, fitness)
+        self._print_best_individual(population, fitness)
 
-        generation = parameters.n_generations - 1  # In case loop is skipped due to hotstart
+        generation = parameters.n_generations - 1  # In case loop is skipped due to hot-start
         for generation in range(last_generation + 1, parameters.n_generations):
 
-            print("Generation: %d/%d" % (generation, parameters.n_generations))
-            _logger.info("Generation: %d/%d" % (generation, parameters.n_generations))
+            self._print_message("=== Generation: %d/%d ===" % (generation, parameters.n_generations))
+            self._print_population("Population", population, fitness)
+            self._print_best_individual(population, fitness)
 
             if parameters.keep_baseline:
                 if base_line is not None and base_line not in population:
@@ -106,53 +113,53 @@ class GeneticProgramming:
                 baseline_fitness = fitness[baseline_index]
                 fitness[baseline_index] = max(fitness)
 
-            co_parents = self._crossover_parent_selection(population, fitness, parameters)
-            co_offspring = self._crossover(population, co_parents, parameters)
-            for offspring in co_offspring:
-                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness))
+            crossover_parents = self._crossover_parent_selection(population, fitness, parameters)
+            crossover_offspring = self._crossover(population, crossover_parents, parameters)
+            for offspring in crossover_offspring:
+                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment,
+                                                       parameters.rerun_fitness))
+            self._print_offspring("Crossover", crossover_parents, crossover_offspring)
 
             if parameters.boost_baseline and parameters.boost_baseline_only_co and base_line is not None:
                 fitness[baseline_index] = baseline_fitness  # Restore original fitness for survivor selection
 
-            mutation_parents = self._mutation_parent_selection(population, fitness, co_parents, co_offspring,
-                                                               parameters)
-            mutated_offspring = self._mutation(population + co_offspring, mutation_parents,
+            mutation_parents = self._mutation_parent_selection(population, fitness,
+                                                               crossover_parents, crossover_offspring, parameters)
+            mutated_offspring = self._mutation(population + crossover_offspring, mutation_parents,
                                                parameters)
-
             for offspring in mutated_offspring:
-                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment, parameters.rerun_fitness))
+                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment,
+                                                       parameters.rerun_fitness))
+            self._print_offspring("Mutation", mutation_parents, mutated_offspring)
 
             if parameters.boost_baseline and base_line is not None:
                 fitness[baseline_index] = baseline_fitness  # Restore original fitness for survivor selection
 
             population, fitness = self._survivor_selection(population, fitness,
-                                                           co_offspring, mutated_offspring, parameters)
-
+                                                           crossover_offspring, mutated_offspring, parameters)
             best_fitness.append(max(fitness))
             n_episodes.append(hash_table.n_values)
 
-            if self._verbose:
-                self._print_population(population, fitness, last_generation)
-                self._print_best_individual(population, fitness, last_generation)
+            self._print_population("Survivors", population, fitness)
+            self._print_best_individual(population, fitness)
+            self._print_message("Best fitness: %f" % best_fitness[-1])
 
             logplot.log_fitness(parameters.log_name, fitness)
             logplot.log_population(parameters.log_name, population)
 
-            print("Generation: %d/%d, Best fitness: %f" %
-                  (generation, parameters.n_generations, best_fitness[generation]))
-
             if (generation + 1) % 25 == 0 and generation < parameters.n_generations - 1:
                 # Last generation will be saved later
-                self._save_state(parameters, population, None, best_fitness, n_episodes, base_line, generation, hash_table)
-
-        if self._verbose:
-            print("\nFINAL POPULATION: ")
-            self._print_population(population, fitness, generation)
-
-        _logger.info("Final population")
+                self._save_state(parameters, population, None, best_fitness, n_episodes, base_line, generation,
+                                 hash_table)
 
         best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1, self._verbose)[0]
-        self._save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation, hash_table)
+
+        self._print_population("Final population", population, fitness)
+        self._print_best_individual(population, fitness)
+        self._print_verbose_message("Best individual: %s" % best_individual)
+
+        self._save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation,
+                         hash_table)
 
         if parameters.plot:
             logplot.plot_fitness(parameters.log_name, best_fitness, n_episodes)
@@ -163,16 +170,14 @@ class GeneticProgramming:
                 environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'individual_' + str(i),
                                             population[i])
 
-        _logger.debug('[run] END')
+        self._logger.debug('[run] END')
         return population, fitness, best_fitness, best_individual
 
-    def _create_population(self, population_size, genome_length):
-        """
-        Creates an initial random population
-        """
+    def _create_random_population(self, population_size, genome_length):
 
-        print("Requested population: %d" % population_size)
-        print("Genome length: %d" % genome_length)
+        self._print_verbose_message("Create random population")
+        self._print_verbose_message("   Requested population: %d" % population_size)
+        self._print_verbose_message("   Genome length: %d" % genome_length)
 
         new_population = []
         max_attempts = 100
@@ -185,10 +190,6 @@ class GeneticProgramming:
                     new_population.append(individual)
                     break
                 attempts += 1
-
-        print("New population: %d" % len(new_population))
-        for genome in new_population:
-            print(genome)
 
         return new_population
 
@@ -262,17 +263,17 @@ class GeneticProgramming:
 
         return crossover_offspring
 
-    def _rerun_probability(self, n_runs):
+    def _rerun_probability(self, num_runs):
         """
         Calculates a probability for running another episode with the same
         genome.
         """
 
-        if n_runs <= 0:
+        if num_runs <= 0:
             return 1
-        return 1 / n_runs ** 2
+        return 1 / num_runs ** 2
 
-    def _calculate_fitness(self, individual, hash_table, environment: GeneticEnvironment, rerun=0, verbose=False):
+    def _calculate_fitness(self, individual, hash_table, environment: GeneticEnvironment, rerun=0):
         """
         Gets fitness from hash table if possible, otherwise gets it from simulation
         rerun = 0 means never rerun
@@ -283,7 +284,7 @@ class GeneticProgramming:
         values = hash_table.find(individual)
 
         if values is None or rerun == 2 or (rerun == 1 and random.random() < self._rerun_probability(len(values))):
-            fitness = environment.run_and_compute(individual, verbose)
+            fitness = environment.run_and_compute(individual, self._verbose)
             hash_table.insert(individual, fitness)
 
             if values is None:
@@ -299,10 +300,10 @@ class GeneticProgramming:
         Select parents for crossover. Returns indices of parents.
         """
 
-        n_parents_crossover = int(round(parameters.f_crossover * parameters.n_population))
-        if n_parents_crossover <= 0:
+        num_parents_crossover = int(round(parameters.f_crossover * parameters.n_population))
+        if num_parents_crossover <= 0:
             return []
-        return selection(parameters.parent_selection, range(len(population)), fitness, n_parents_crossover,
+        return selection(parameters.parent_selection, range(len(population)), fitness, num_parents_crossover,
                          self._verbose)
 
     def _mutation_parent_selection(self, population, fitness, crossover_parents, crossover_offspring, parameters):
@@ -327,10 +328,10 @@ class GeneticProgramming:
         else:
             mutable_fitness = mutable_fitness[:len(population)]
 
-        n_parents_mutation = int(round(parameters.f_mutation * parameters.n_population))
-        if n_parents_mutation <= 0:
+        num_parents_mutation = int(round(parameters.f_mutation * parameters.n_population))
+        if num_parents_mutation <= 0:
             return []
-        return selection(parameters.parent_selection, range(len(mutable_population)), fitness, n_parents_mutation,
+        return selection(parameters.parent_selection, range(len(mutable_population)), fitness, num_parents_mutation,
                          self._verbose)
 
     def _survivor_selection(self, population, fitness, crossover_offspring, mutated_offspring, parameters):
@@ -341,9 +342,9 @@ class GeneticProgramming:
         survivor_fitness = []
 
         # Pick out selectable parents using elitism.
-        n_parents = int(round(parameters.f_parents * parameters.n_population))
-        if n_parents > 0:
-            parents = selection(SelectionMethods.ELITISM, range(len(population)), fitness[:len(population)], n_parents,
+        num_parents = int(round(parameters.f_parents * parameters.n_population))
+        if num_parents > 0:
+            parents = selection(SelectionMethods.ELITISM, range(len(population)), fitness[:len(population)], num_parents,
                                 self._verbose)
             for i in parents:
                 selectable.append(population[i])
@@ -354,9 +355,9 @@ class GeneticProgramming:
         selectable_fitness += fitness[len(population):]
 
         # Pick out elites
-        n_elites = int(round(parameters.f_elites * parameters.n_population))
-        if n_elites > 0:
-            elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, n_elites,
+        num_elites = int(round(parameters.f_elites * parameters.n_population))
+        if num_elites > 0:
+            elites = selection(SelectionMethods.ELITISM, range(len(selectable)), selectable_fitness, num_elites,
                                self._verbose)
             elites.sort(reverse=True)
             for i in elites:
@@ -365,8 +366,8 @@ class GeneticProgramming:
                 selectable.pop(i)
                 selectable_fitness.pop(i)
 
-        n_to_select = parameters.n_population - len(survivors)
-        selected = selection(parameters.survivor_selection, range(len(selectable)), selectable_fitness, n_to_select,
+        num_to_select = parameters.n_population - len(survivors)
+        selected = selection(parameters.survivor_selection, range(len(selectable)), selectable_fitness, num_to_select,
                              self._verbose)
 
         for i in selected:
@@ -375,20 +376,27 @@ class GeneticProgramming:
 
         return survivors, survivor_fitness
 
-    def _print_population(self, population, fitness, generation):
+    def _print_population(self, title, population, fitness):
 
-        print("Generation: ", generation)
+        self._print_verbose_message(title)
         for i in range(len(population)):
-            print("(%d) Genome: %s" % (i, population[i]))
-            print("     Fitness: %f" % fitness[i])
+            self._print_verbose_message("   (%d) Genome: %s" % (i, population[i]))
+            self._print_verbose_message("        Fitness: %f" % fitness[i])
 
-    def _print_best_individual(self, population, fitness, generation):
+    def _print_best_individual(self, population, fitness):
 
         best = np.argmax(fitness)
-        print("Best individual: %d" % best, population[best])
-        print("   Genome: %s" % population[best])
-        print("   Fitness: %f" % fitness[best])
-        print("Fitness average: %f, std dev: %f" % (np.average(fitness), np.std(fitness)))
+        self._print_verbose_message("Best individual: %d" % best)
+        self._print_verbose_message("   Genome: %s" % population[best])
+        self._print_verbose_message("   Fitness: %f" % fitness[best])
+        self._print_verbose_message("Fitness average: %f, std dev: %f" % (np.average(fitness), np.std(fitness)))
+
+    def _print_offspring(self, title, parents, offspring):
+
+        self._logger.debug(title)
+        self._logger.debug("   Parents: %s", parents)
+        for i in range(len(offspring)):
+            self._logger.debug("   (%d) Offspring: %s" % (i, offspring[i]))
 
     def _save_state(self, parameters, population, best_individual, best_fitness, n_episodes, base_line, generation,
                     hash_table):
