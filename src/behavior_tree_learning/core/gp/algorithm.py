@@ -202,8 +202,7 @@ def _mutation(population, parents, parameters, verbose=False):
             while attempts < max_attempts:
 
                 mutated_individual = \
-                    _operators.mutate_gene(population[parent], parameters.mutation_p_add, parameters.mutation_p_delete,
-                                           verbose=verbose)
+                    _operators.mutate_gene(population[parent], parameters.mutation_p_add, parameters.mutation_p_delete)
                 if (len(mutated_individual) >= parameters.min_length
                         and (parameters.allow_identical
                              or (mutated_individual not in population + mutated_population))):
