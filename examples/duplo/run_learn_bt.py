@@ -3,6 +3,8 @@
 import paths
 paths.add_modules_to_path()
 
+import logging
+
 from behavior_tree_learning.sbt import BehaviorNodeFactory
 from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParameters, GeneticSelectionMethods
 
@@ -10,6 +12,15 @@ from duplo.execution_nodes import get_behaviors
 from duplo.world import Pos as WorldPos
 from duplo.world import WorldSimulator, WorldFactory
 from duplo.environment import Environment
+
+
+def _configure_logger(level, file_name):
+
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+    logging.basicConfig(filename=file_name,
+                        format='%(filename)s: %(message)s')
+    logging.getLogger("gp").setLevel(level)
 
 
 def run():
@@ -41,7 +52,10 @@ def run():
     num_trials = 10
     for tdx in range(1, num_trials+1):
 
-        parameters.log_name = scenario + '_' + str(tdx)
+        log_name = scenario + '_' + str(tdx)
+        _configure_logger(logging.DEBUG, log_name + ',log')
+
+        parameters.log_name = log_name
         seed = tdx
 
         node_factory = BehaviorNodeFactory(get_behaviors(scenario))
@@ -49,7 +63,7 @@ def run():
         target_position = [WorldPos(0.0, 0.05, 0), WorldPos(0.0, 0.05, 0.0192), WorldPos(0.0, 0.05, 2 * 0.0192)]
 
         world_factory = WorldFactory(start_position)
-        environment = Environment(node_factory, world_factory, target_position, verbose=True)
+        environment = Environment(node_factory, world_factory, target_position, verbose=False)
 
         bt_learner = BehaviorTreeLearner(environment)
         success = bt_learner.run(parameters, seed, verbose=False)
