@@ -38,17 +38,6 @@ class GeneticProgramming:
         self._verbose = verbose
         return self._run(environment, parameters, hot_start, base_line)
 
-    def _print_verbose_message(self, message, *args):
-
-        if self._verbose:
-            print(message % args)
-        self._logger.debug(message % args)
-
-    def _print_message(self, message, *args):
-
-        print(message % args)
-        self._logger.info(message % args)
-
     def _initialize_random_generator(self, seed):
 
         if seed:
@@ -376,28 +365,6 @@ class GeneticProgramming:
 
         return survivors, survivor_fitness
 
-    def _print_population(self, title, population, fitness):
-
-        self._print_verbose_message(title)
-        for i in range(len(population)):
-            self._print_verbose_message("   (%d) Genome: %s" % (i, population[i]))
-            self._print_verbose_message("        Fitness: %f" % fitness[i])
-
-    def _print_best_individual(self, population, fitness):
-
-        best = np.argmax(fitness)
-        self._print_verbose_message("Best individual: %d" % best)
-        self._print_verbose_message("   Genome: %s" % population[best])
-        self._print_verbose_message("   Fitness: %f" % fitness[best])
-        self._print_verbose_message("Fitness average: %f, std dev: %f" % (np.average(fitness), np.std(fitness)))
-
-    def _print_offspring(self, title, parents, offspring):
-
-        self._logger.debug(title)
-        self._logger.debug("   Parents: %s", parents)
-        for i in range(len(offspring)):
-            self._logger.debug("   (%d) Offspring: %s" % (i, offspring[i]))
-
     def _save_state(self, parameters, population, best_individual, best_fitness, n_episodes, base_line, generation,
                     hash_table):
         """
@@ -427,3 +394,36 @@ class GeneticProgramming:
         logplot.clear_after_generation(log_name, generation)
         hash_table.load()
         return best_fitness, n_episodes, generation, population
+
+    def _print_verbose_message(self, message, *args):
+
+        if self._verbose:
+            print(message % args)
+        self._logger.debug(message % args)
+
+    def _print_message(self, message, *args):
+
+        print(message % args)
+        self._logger.info(message % args)
+
+    def _print_population(self, title, population, fitness):
+
+        self._print_verbose_message(title)
+        for i in range(len(population)):
+            self._print_verbose_message("   (%d) Genome: %s" % (i, population[i]))
+            self._print_verbose_message("        Fitness: %f" % fitness[i])
+
+    def _print_best_individual(self, population, fitness):
+
+        best = np.argmax(fitness)
+        self._print_verbose_message("Best individual: %d" % best)
+        self._print_verbose_message("   Genome: %s" % population[best])
+        self._print_verbose_message("   Fitness: %f" % fitness[best])
+        self._print_verbose_message("Fitness average: %f, std dev: %f" % (np.average(fitness), np.std(fitness)))
+
+    def _print_offspring(self, title, parents, offspring):
+
+        self._logger.debug(title)
+        self._logger.debug("   Parents: %s", parents)
+        for i in range(len(offspring)):
+            self._logger.debug("   (%d) Offspring: %s" % (i, offspring[i]))
