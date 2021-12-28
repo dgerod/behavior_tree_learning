@@ -53,12 +53,12 @@ class GeneticProgramming:
         hash_table = HashTable(parameters.hash_table_size, parameters.log_name)
 
         if hot_start:
-            best_fitness, n_episodes, last_generation, population = self._load_state(parameters.log_name, hash_table)
+            best_fitness, num_episodes, last_generation, population = self._load_state(parameters.log_name, hash_table)
         else:
             population = self._create_random_population(parameters.n_population, parameters.ind_start_length)
             logplot.clear_logs(parameters.log_name)
             best_fitness = []
-            n_episodes = [hash_table.n_values]
+            num_episodes = [hash_table.n_values]
             last_generation = 0
 
             if base_line is not None:
@@ -127,18 +127,19 @@ class GeneticProgramming:
             population, fitness = self._survivor_selection(population, fitness,
                                                            crossover_offspring, mutated_offspring, parameters)
             best_fitness.append(max(fitness))
-            n_episodes.append(hash_table.n_values)
+            num_episodes.append(hash_table.n_values)
 
             self._print_population("Survivors", population, fitness)
-            self._print_best_individual(population, fitness)
             self._print_message("Best fitness: %f" % best_fitness[-1])
+            self._print_message("Num episodes: %s" % num_episodes[-1])
+            self._print_best_individual(population, fitness)
 
             logplot.log_fitness(parameters.log_name, fitness)
             logplot.log_population(parameters.log_name, population)
 
             if (generation + 1) % 25 == 0 and generation < parameters.n_generations - 1:
                 # Last generation will be saved later
-                self._save_state(parameters, population, None, best_fitness, n_episodes, base_line, generation,
+                self._save_state(parameters, population, None, best_fitness, num_episodes, base_line, generation,
                                  hash_table)
 
         best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1, self._verbose)[0]
@@ -147,17 +148,9 @@ class GeneticProgramming:
         self._print_best_individual(population, fitness)
         self._print_verbose_message("Best individual: %s" % best_individual)
 
-        self._save_state(parameters, population, best_individual, best_fitness, n_episodes, base_line, generation,
+        self._save_state(parameters, population, best_individual, best_fitness, num_episodes, base_line, generation,
                          hash_table)
-
-        if parameters.plot:
-            logplot.plot_fitness(parameters.log_name, best_fitness, n_episodes)
-        if parameters.fig_best:
-            environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'best individual', best_individual)
-        if parameters.fig_last_gen:
-            for i in range(parameters.n_population):
-                environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'individual_' + str(i),
-                                            population[i])
+        self._plot_results(parameters, environment, population, num_episodes, best_fitness, best_individual)
 
         self._logger.debug('[run] END')
         return population, fitness, best_fitness, best_individual
@@ -394,6 +387,17 @@ class GeneticProgramming:
         logplot.clear_after_generation(log_name, generation)
         hash_table.load()
         return best_fitness, n_episodes, generation, population
+
+    def _plot_results(self, parameters, environment, population, num_episodes, best_fitness, best_individual):
+
+        if parameters.plot_fitness:
+            logplot.plot_fitness(parameters.log_name, best_fitness, num_episodes)
+        if parameters.plot_best_individual:
+            environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'best individual', best_individual)
+        if parameters.plot_last_generation:
+            for i in range(parameters.n_population):
+                environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'individual_' + str(i),
+                                            population[i])
 
     def _print_verbose_message(self, message, *args):
 
