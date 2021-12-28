@@ -12,6 +12,7 @@ class State(IntEnum):
     """
     Definition of a state in the State Machine Simulator
     """
+
     LOCALISED = 0
     HEAD = 1
     ARM = 2
@@ -25,16 +26,17 @@ class Feedback(IntEnum):
     """
     Feedback values for the fitness function
     """
-    AMCL = 0                    # particle filter pose estimate (Augmented Monte Carlo Localization)
-    CUBE = 1                    # cube pose
-    CUBE_DISTANCE = 2           # distance of the cube from the goal
-    MIN_CUBE_DISTANCE = 3       # min distance of the cube from the goal pose
-    ROBOT_CUBE_DISTANCE = 4     # distance of the robot from the cube
-    MIN_RC_DISTANCE = 5         # min distance of the robot from the cube
-    ROBOT_DISTANCE = 6          # dstance of the robot to the place pose
-    LOCALIZATION_ERROR = 7      # distance of the amcl estimate from the real robot pose
-    ELAPSED_TIME = 8            # total time elapsed since the beginning of the simulation
-    FAILURE_PB = 9              # sum of the probabilities of failure of the BT
+
+    AMCL = 0                    # Particle filter pose estimate (Augmented Monte Carlo Localization)
+    CUBE = 1                    # Cube pose
+    CUBE_DISTANCE = 2           # Distance of the cube from the goal
+    MIN_CUBE_DISTANCE = 3       # Min distance of the cube from the goal pose
+    ROBOT_CUBE_DISTANCE = 4     # Distance of the robot from the cube
+    MIN_RC_DISTANCE = 5         # Min distance of the robot from the cube
+    ROBOT_DISTANCE = 6          # Dstance of the robot to the place pose
+    LOCALIZATION_ERROR = 7      # Distance of the amcl estimate from the real robot pose
+    ELAPSED_TIME = 8            # Total time elapsed since the beginning of the simulation
+    FAILURE_PB = 9              # Sum of the probabilities of failure of the BT
 
 
 @dataclass
@@ -42,35 +44,39 @@ class Poses:
     """
     Data class for parameters for the environment poses.
     Note that the poses are pre-defined because there is a one-to-one
-    correspondance with the simulation environment in Gazebo (see paper)
+    correspondence with the simulation environment in Gazebo (see paper)
     """
-    spawn_pose: List[float] = field(default_factory=list)                # Spawn position of the robot
-    pick_table0: List[float] = field(default_factory=list)               # Position the robot has to reach to pick the cube 0
-    pick_table1: List[float] = field(default_factory=list)               # Position the robot has to reach to pick the cube 1
-    pick_table2: List[float] = field(default_factory=list)               # Position the robot has to reach to pick the cube 2
-    place_table: List[float] = field(default_factory=list)               # Position the robot has to reach to place the cube
-    random_pose1: List[float] = field(default_factory=list)              # First random position attainable by the robot
-    random_pose2: List[float] = field(default_factory=list)              # Second random position attainable by the robot
-    random_pose3: List[float] = field(default_factory=list)              # Third random position attainable by the robot
-    random_pose4: List[float] = field(default_factory=list)              # Fourth random position attainable by the robot
-    random_pose5: List[float] = field(default_factory=list)              # Fifth random position attainable by the robot
-    random_pose6: List[float] = field(default_factory=list)              # Sixth random position attainable by the robot
-    random_pose7: List[float] = field(default_factory=list)              # Seventh random position attainable by the robot
-    random_pose8: List[float] = field(default_factory=list)              # Eight random position attainable by the robot
-    random_pose9: List[float] = field(default_factory=list)              # Ninth random position attainable by the robot
-    origin: List[float] = field(default_factory=list)                    # World frame
-    half_way: List[float] = field(default_factory=list)                  # Pose half way between pick and place tables
-    amcl_init_pose: List[float] = field(default_factory=list)            # Initial estimated position of the robot (before localization)
-    cubes_spawn_pose: List[float] = field(default_factory=list)          # List of the spawn poses for the cubes
-    cube0_spawn_pose: List[float] = field(default_factory=list)          # Spawn position of the cube 0
-    cube1_spawn_pose: List[float] = field(default_factory=list)          # Spawn position of the cube 1
-    cube2_spawn_pose: List[float] = field(default_factory=list)          # Spawn position of the cube 2
-    cube_goal_pose: List[float] = field(default_factory=list)            # Goal position of the cube
+
+    spawn_pose: List[float] = field(default_factory=list)          # Spawn position of the robot
+    pick_table0: List[float] = field(default_factory=list)         # Position the robot has to reach to pick the cube 0
+    pick_table1: List[float] = field(default_factory=list)         # Position the robot has to reach to pick the cube 1
+    pick_table2: List[float] = field(default_factory=list)         # Position the robot has to reach to pick the cube 2
+    place_table: List[float] = field(default_factory=list)         # Position the robot has to reach to place the cube
+    random_pose1: List[float] = field(default_factory=list)        # First random position attainable by the robot
+    random_pose2: List[float] = field(default_factory=list)        # Second random position attainable by the robot
+    random_pose3: List[float] = field(default_factory=list)        # Third random position attainable by the robot
+    random_pose4: List[float] = field(default_factory=list)        # Fourth random position attainable by the robot
+    random_pose5: List[float] = field(default_factory=list)        # Fifth random position attainable by the robot
+    random_pose6: List[float] = field(default_factory=list)        # Sixth random position attainable by the robot
+    random_pose7: List[float] = field(default_factory=list)        # Seventh random position attainable by the robot
+    random_pose8: List[float] = field(default_factory=list)        # Eight random position attainable by the robot
+    random_pose9: List[float] = field(default_factory=list)        # Ninth random position attainable by the robot
+    origin: List[float] = field(default_factory=list)              # World frame
+    half_way: List[float] = field(default_factory=list)            # Pose half way between pick and place tables
+    amcl_init_pose: List[float] = field(default_factory=list)      # Initial estimated position of the robot (before localization)
+    cubes_spawn_pose: List[float] = field(default_factory=list)    # List of the spawn poses for the cubes
+    cube0_spawn_pose: List[float] = field(default_factory=list)    # Spawn position of the cube 0
+    cube1_spawn_pose: List[float] = field(default_factory=list)    # Spawn position of the cube 1
+    cube2_spawn_pose: List[float] = field(default_factory=list)    # Spawn position of the cube 2
+    cube_goal_pose: List[float] = field(default_factory=list)      # Goal position of the cube
 
 
 @dataclass
 class SMParameters:
-    """Data class for parameters for the state machine simulator """
+    """
+    Data class for parameters for the state machine simulator
+    """
+
     deterministic: bool = False                            # Probabilistic nature of the simulator (deterministic/probabilistic)
     fail_pick_probability: float = 0.2                     # Probability of a failure in Picking (Place transition)
     fail_place_probability: float = 0.1                    # Probability of a failure in Placing (Place transition)
@@ -83,7 +89,10 @@ class SMParameters:
 
 
 def distance(pose1, pose2):
-    """ Function implementing the distance """
+    """
+    Function implementing the distance
+    """
+
     argument = 0
     for i in range(len(pose1)):
         argument += (pose1[i]-pose2[i])**2
@@ -95,7 +104,8 @@ class WorldSimulator(implements(World)):
     """
     Class for handling the State Machine Simulator
     """
-    def __init__(self, scenario: str, deterministic=False, verbose=False, pose_id=0):
+
+    def __init__(self, scenario: str, deterministic=False, pose_id=0, verbose=False):
 
         self.sm_par = SMParameters()
         self.sm_par.deterministic = deterministic
@@ -119,7 +129,7 @@ class WorldSimulator(implements(World)):
             self.poses.cube1_spawn_pose += self.poses.cubes_spawn_pose[1]
             self.poses.cube2_spawn_pose += self.poses.cubes_spawn_pose[2]
         else:
-            raise Exception('Simulation scenario not supported.')
+            raise ValueError('Simulation scenario not supported.')
 
         # robot related (2D)
         self.poses.spawn_pose += [2.40, -11.0]
@@ -162,8 +172,10 @@ class WorldSimulator(implements(World)):
 
         # Populate feedback lists with the values
         for i in range(self.cubes):
-            self.feedback[Feedback.CUBE_DISTANCE][i] = distance(self.poses.cubes_spawn_pose[i], self.poses.cube_goal_pose)
-            self.feedback[Feedback.ROBOT_CUBE_DISTANCE][i] = distance(self.poses.cubes_spawn_pose[i][0:2], self.poses.spawn_pose)
+            self.feedback[Feedback.CUBE_DISTANCE][i] \
+                = distance(self.poses.cubes_spawn_pose[i], self.poses.cube_goal_pose)
+            self.feedback[Feedback.ROBOT_CUBE_DISTANCE][i] \
+                = distance(self.poses.cubes_spawn_pose[i][0:2], self.poses.spawn_pose)
 
         self.feedback[Feedback.MIN_CUBE_DISTANCE] = list(self.feedback[Feedback.CUBE_DISTANCE])
         self.feedback[Feedback.MIN_RC_DISTANCE] = list(self.feedback[Feedback.ROBOT_CUBE_DISTANCE])
@@ -178,14 +190,18 @@ class WorldSimulator(implements(World)):
     def startup(self, verbose):
         return True
 
-    def is_alive(self):
-        return True
-
     def shutdown(self):
         pass
 
+    def is_alive(self):
+        return True
+
+    ##############################################
+    #             UPDATE ENVIRONMENT             #
+    ##############################################
+
     def update_feedback(self):
-        """ Update the Feedback state """
+
         # Update AMCL
         if self.current[State.LOCALISED]:
             self.feedback[Feedback.AMCL] = list(map(lambda x,y:x+y, self.current[State.POSE], [random.random()*0.1, random.random()*0.1]))
@@ -228,9 +244,6 @@ class WorldSimulator(implements(World)):
 
         self.feedback[Feedback.ROBOT_DISTANCE] = distance(self.current[State.POSE], self.poses.place_table)
 
-    def get_feedback(self):
-        return True
-
     ##############################################
     #               LOCALIZATION                 #
     ##############################################
@@ -255,6 +268,7 @@ class WorldSimulator(implements(World)):
 
         self.update_feedback()
         #print("LOC +7s")
+
         self.feedback[Feedback.ELAPSED_TIME] += 7.0
         return self.current[State.LOCALISED]
 
