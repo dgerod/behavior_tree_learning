@@ -476,11 +476,11 @@ class WorldSimulator(implements(World)):
 
 class WorldFactory:
 
-    def __init__(self, scenario: str, deterministic=False, verbose=False, pose_id=0):
+    def __init__(self, scenario: str, deterministic=False, pose_id=0, verbose=False):
         self._scenario = scenario
         self._deterministic = deterministic
-        self._verbose = verbose
         self._pose_id = pose_id
+        self._verbose = verbose
 
     def make(self):
-        return WorldSimulator(self._scenario, self._deterministic, self._verbose, self._pose_id)
+        return WorldSimulator(self._scenario, self._deterministic, self._pose_id, self._verbose)

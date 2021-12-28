@@ -3,6 +3,9 @@
 import paths
 paths.add_modules_to_path()
 
+import os
+import logging
+
 from behavior_tree_learning.sbt import BehaviorNodeFactory
 from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParameters, GeneticSelectionMethods
 
@@ -11,15 +14,20 @@ from tiago_pnp.world import WorldSimulator, WorldFactory
 from tiago_pnp.environment import Environment
 
 
+def _configure_logger(level, log_name):
+
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
+    file_path = os.path.join('logs', log_name + '.log')
+    logging.basicConfig(filename=file_path,
+                        format='%(filename)s: %(message)s')
+    logging.getLogger("gp").setLevel(level)
+
+
 def run():
 
-    # if scenario == 2:
-    #    world = sm.StateMachine(self.scenario, self.deterministic, self.verbose, pose_id=i)
-    # else:
-    #    world = sm.StateMachine(self.scenario, self.deterministic, self.verbose)
-
     scenario = 'scenario_1'
-    deterministic = False
 
     parameters = GeneticParameters()
     parameters.ind_start_length = 4
@@ -38,19 +46,24 @@ def run():
     parameters.allow_identical = False
     parameters.n_generations = 8000
 
+    # add specific class for plot_parameters
+    parameters.plot_fitness = True
+    parameters.plot_best_individual = True
+    parameters.plot_last_generation = True
+
     num_trials = 10
     for tdx in range(1, num_trials+1):
 
-        # add specific class for plot_parametes
-        parameters.plot = True
-        parameters.fig_last_gen = False
-        parameters.log_name = scenario + '_' + str(tdx)
+        log_name = scenario + '_' + str(tdx)
+        _configure_logger(logging.DEBUG, log_name)
+
+        parameters.log_name = log_name
+        seed = tdx*100
 
         node_factory = BehaviorNodeFactory(get_behaviors(scenario))
-        world_factory = WorldFactory(scenario, deterministic)
-        environment = Environment(node_factory, world_factory, scenario)
+        world_factory = WorldFactory(scenario, deterministic=True)
+        environment = Environment(node_factory, world_factory, scenario, verbose=False)
 
-        seed = tdx*100
         bt_learner = BehaviorTreeLearner(environment)
         success = bt_learner.run(parameters, seed, verbose=False)
 
