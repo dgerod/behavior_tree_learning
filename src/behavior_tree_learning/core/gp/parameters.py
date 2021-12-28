@@ -29,8 +29,7 @@ class GeneticParameters:
     n_generations: int = 100                               # Number of generations
     hash_table_size: int = 100000                          # Size of hash table
     rerun_fitness: int = 0                                 # 0-run only once, 1-according to prob, 2-always
-    # verbose: bool = False                                # Extra prints
-    plot: bool = True                                      # Plot fitness
     log_name: str = '1'                                    # Name of log for folder and file handling
-    fig_best: bool = True                                  # Save final best individual as figure
-    fig_last_gen: bool = False                             # Save figures of entire last generation
+    plot_fitness: bool = True                              # Plot fitness
+    plot_best_individual: bool = True                      # Save final best individual as figure
+    plot_last_generation: bool = False                     # Save figures of entire last generation

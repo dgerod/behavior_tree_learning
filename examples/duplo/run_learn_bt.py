@@ -46,8 +46,9 @@ def run():
     parameters.mutation_p_delete = 0.3
     parameters.allow_identical = False
 
-    parameters.plot = True
-    parameters.fig_last_gen = False
+    parameters.plot_fitness = True
+    parameters.plot_best_individual = True
+    parameters.plot_last_generation = True
 
     num_trials = 10
     for tdx in range(1, num_trials+1):
