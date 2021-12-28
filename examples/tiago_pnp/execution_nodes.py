@@ -334,6 +334,10 @@ class MoveToPose(BehaviorNode):
 
         if text == "move_to_pick [0]!":
             return MoveToPose(text, world, verbose, "pick_table_0")
+        elif text == "move_to_pick [1]!":
+            return MoveToPose(text, world, verbose, "pick_table_1")
+        elif text == "move_to_pick [2]!":
+            return MoveToPose(text, world, verbose, "pick_table_2")
         elif text == "move_to_place!":
             return MoveToPose(text, world, verbose, "place_table")
         else:
@@ -555,10 +559,34 @@ def _make_scenario1_nodes():
     return behavior_register
 
 
+def _make_scenario3_nodes():
+
+    behavior_register = BehaviorRegister()
+    behavior_register.add_condition('have_block?', HaveBlock)
+    behavior_register.add_condition('cube_placed [0]?', Placed)
+    behavior_register.add_condition('cube_placed [1]?', Placed)
+    behavior_register.add_condition('cube_placed [2]?', Placed)
+    behavior_register.add_condition('task_done?', Finished)
+    behavior_register.add_action('head [up]!', MoveHeadUp)
+    behavior_register.add_action('head [down]!', MoveHeadDown)
+    behavior_register.add_action('localise!', Localise)
+    behavior_register.add_action('move_to_pick [0]!', MoveToPose)
+    behavior_register.add_action('move_to_pick [1]!', MoveToPose)
+    behavior_register.add_action('move_to_pick [2]!', MoveToPose)
+    behavior_register.add_action('move_to_place!', MoveToPose)
+    behavior_register.add_action('place!', Place)
+    behavior_register.add_action('pick!', PickUp)
+    behavior_register.add_action('arm [tucked]!', MoveArm)
+
+    return behavior_register
+
+
 def get_behaviors(name):
 
     if name == 'scenario_1':
         return _make_scenario1_nodes()
+    elif name == 'scenario_3':
+        return _make_scenario3_nodes()
     else:
         raise ValueError('Unknown %s name', name)
 
