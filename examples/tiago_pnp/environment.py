@@ -7,17 +7,23 @@ from tiago_pnp.fitness_function import FitnessFunction
 
 
 class Environment(implements(GeneticEnvironment)):
-    """ Class defining the environment in which the individual operates """
+    """
+    Class defining the environment in which the individual operates
+    """
 
     def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
                  scenario: str):
 
         self._world_factory = world_factory
         self._node_factory = node_factory
-        self._scenario = scenario
+
+        if scenario != 'scenario_1' and scenario != 'scenario_3':
+            raise ValueError('Unknown selected scenario')
 
     def run_and_compute(self, individual, verbose):
-        """ Run the simulation and return the fitness """
+        """
+        Run the simulation and return the fitness
+        """
 
         sbt = individual
 
@@ -46,7 +52,8 @@ class Environment(implements(GeneticEnvironment)):
                 completed = True
             else:
                 completed = False
-        else:
+
+        elif self._scenario == 'scenario_1' or self._scenario == 'scenario_3':
             world = self._world_factory.make()
             behavior_tree = StringBehaviorTree(sbt[:], behaviors=self._node_factory, world=world,
                                                verbose=verbose)
