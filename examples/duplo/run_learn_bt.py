@@ -3,6 +3,7 @@
 import paths
 paths.add_modules_to_path()
 
+import os
 import logging
 
 from behavior_tree_learning.sbt import BehaviorNodeFactory
@@ -14,11 +15,13 @@ from duplo.world import WorldSimulator, WorldFactory
 from duplo.environment import Environment
 
 
-def _configure_logger(level, file_name):
+def _configure_logger(level, log_name):
 
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
-    logging.basicConfig(filename=file_name,
+
+    file_path = os.path.join('logs', log_name + '.log')
+    logging.basicConfig(filename=file_path,
                         format='%(filename)s: %(message)s')
     logging.getLogger("gp").setLevel(level)
 
@@ -46,6 +49,7 @@ def run():
     parameters.mutation_p_delete = 0.3
     parameters.allow_identical = False
 
+    # add specific class for plot_parametes
     parameters.plot_fitness = True
     parameters.plot_best_individual = True
     parameters.plot_last_generation = True
@@ -54,7 +58,7 @@ def run():
     for tdx in range(1, num_trials+1):
 
         log_name = scenario + '_' + str(tdx)
-        _configure_logger(logging.DEBUG, log_name + ',log')
+        _configure_logger(logging.DEBUG, log_name)
 
         parameters.log_name = log_name
         seed = tdx
