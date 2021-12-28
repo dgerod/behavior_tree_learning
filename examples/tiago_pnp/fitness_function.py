@@ -25,8 +25,7 @@ class Coefficients:
 
 class FitnessFunction:
 
-    def compute_cost(self, world, behavior_tree, ticks, verbose=False):
-        """ Retrieve values and compute cost """
+    def compute_cost(self, world, behavior_tree, ticks, verbose=False) -> (float, bool):
 
         completed = False
         coefficients = Coefficients()
@@ -34,30 +33,29 @@ class FitnessFunction:
         depth = behavior_tree.depth
         length = behavior_tree.length
 
-        cube_dist = sum(world.feedback[sm.Feedback.CUBE_DISTANCE])
-        min_cube_dist = sum(world.feedback[sm.Feedback.MIN_CUBE_DISTANCE])
-        robot_cube_dist = sum(world.feedback[sm.Feedback.ROBOT_CUBE_DISTANCE])
-        min_rc_dist = sum(world.feedback[sm.Feedback.MIN_RC_DISTANCE])
+        cube_distance = sum(world.feedback[sm.Feedback.CUBE_DISTANCE])
+        min_cube_distance = sum(world.feedback[sm.Feedback.MIN_CUBE_DISTANCE])
+        robot_cube_distance = sum(world.feedback[sm.Feedback.ROBOT_CUBE_DISTANCE])
+        min_rc_distance = sum(world.feedback[sm.Feedback.MIN_RC_DISTANCE])
 
-        robot_dist = world.feedback[sm.Feedback.ROBOT_DISTANCE]
+        robot_distance = world.feedback[sm.Feedback.ROBOT_DISTANCE]
         loc_error = world.feedback[sm.Feedback.LOCALIZATION_ERROR]
         time = world.feedback[sm.Feedback.ELAPSED_TIME]
-        p_failure = world.feedback[sm.Feedback.FAILURE_PB]
+        failure_probability = world.feedback[sm.Feedback.FAILURE_PB]
 
         cost = float(coefficients.length*length +
                      coefficients.depth*depth +
-                     coefficients.cube_dist*cube_dist**2 +
+                     coefficients.cube_dist*cube_distance**2 +
                      coefficients.localization*loc_error**2 +
-                     coefficients.distance_robot_cube*robot_cube_dist**2 +
-                     coefficients.min_distance_cube_goal*min_cube_dist**2 +
-                     coefficients.min_distance_robot_cube*min_rc_dist**2 +
-                     coefficients.robot_dist*robot_dist**2 +
-                     coefficients.time*time) + coefficients.failure*p_failure
+                     coefficients.distance_robot_cube*robot_cube_distance**2 +
+                     coefficients.min_distance_cube_goal*min_cube_distance**2 +
+                     coefficients.min_distance_robot_cube*min_rc_distance**2 +
+                     coefficients.robot_dist*robot_distance**2 +
+                     coefficients.time*time) + coefficients.failure*failure_probability
 
-        if cube_dist == 0.0:
+        if cube_distance == 0.0:
             completed = True
         else:
-            # the task is not completed!
             cost += coefficients.task_completion
             for i in range(world.cubes):
                 if world.feedback[sm.Feedback.CUBE_DISTANCE][i] == 0.0:
@@ -72,24 +70,24 @@ class FitnessFunction:
             print("Robot pose: " + str(world.feedback[sm.Feedback.AMCL]))
             print("State pose: " + str(world.current[sm.State.POSE]))
             print("\n")
-            print("Cube distance from goal: " + str(cube_dist))
-            print("Contribution: " + str(coefficients.cube_dist*cube_dist**2))
-            print("Min cube distance: " + str(min_cube_dist))
-            print("Contribution: " + str(coefficients.min_distance_cube_goal*min_cube_dist**2))
-            print("Robot distance from cube: " + str(robot_cube_dist))
-            print("Contribution: " + str(coefficients.distance_robot_cube*robot_cube_dist**2))
-            print("Min robot distance: " + str(min_rc_dist))
-            print("Contribution: " + str(coefficients.min_distance_robot_cube*min_rc_dist**2))
-            print("Robot distance from goal: " + str(robot_dist))
-            print("Contribution: " + str(coefficients.robot_dist*robot_dist**2))
+            print("Cube distance from goal: " + str(cube_distance))
+            print("Contribution: " + str(coefficients.cube_dist*cube_distance**2))
+            print("Min cube distance: " + str(min_cube_distance))
+            print("Contribution: " + str(coefficients.min_distance_cube_goal*min_cube_distance**2))
+            print("Robot distance from cube: " + str(robot_cube_distance))
+            print("Contribution: " + str(coefficients.distance_robot_cube*robot_cube_distance**2))
+            print("Min robot distance: " + str(min_rc_distance))
+            print("Contribution: " + str(coefficients.min_distance_robot_cube*min_rc_distance**2))
+            print("Robot distance from goal: " + str(robot_distance))
+            print("Contribution: " + str(coefficients.robot_dist*robot_distance**2))
             print("Localisation Error: " + str(loc_error))
             print("Contribution: " + str(coefficients.localization*loc_error**2))
             print("Behavior Tree: L " + str(length) + ", D " + str(depth))
             print("Contribution: " + str(coefficients.length*length + coefficients.depth*depth))
             print("Elapsed Time: " + str(time))
             print("Contribution: " + str(coefficients.time*time))
-            print("Failure Probability: " + str(p_failure))
-            print("Contribution: " + str(coefficients.failure*p_failure))
+            print("Failure Probability: " + str(failure_probability))
+            print("Contribution: " + str(coefficients.failure*failure_probability))
             print("Total Cost: " + str(cost))
             print("\n")
 
