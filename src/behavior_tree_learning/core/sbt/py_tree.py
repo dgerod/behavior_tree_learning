@@ -159,12 +159,6 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
 
         return status_ok, ticks
 
-    def save_figure(self, path, name='Behavior tree', svg=False):
-        """
-        Saves the tree as a figure
-        """
+    def save_figure(self, path, name='Behavior tree'):
 
-        if svg:
-            pt.display.render_dot_tree(self.root, name=name, target_directory=path, png=False, svg=True)
-        else:
-            pt.display.render_dot_tree(self.root, name=name, target_directory=path)
+        pt.display.render_dot_tree(self.root, name=name, target_directory=path)
