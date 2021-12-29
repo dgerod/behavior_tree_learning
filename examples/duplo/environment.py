@@ -35,13 +35,13 @@ class Environment(implements(GeneticEnvironment)):
 
         tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=world, verbose=verbose)
         success, ticks = tree.run_bt(parameters=ExecutionParameters(successes_required=1))
-        fitness_value = FitnessFunction().compute_cost(world, tree, ticks, self._targets,
-                                                       self._fitness_coefficients, verbose=verbose)
+        fitness = FitnessFunction().compute_cost(world, tree, ticks, self._targets,
+                                                 self._fitness_coefficients, verbose=verbose)
 
         if verbose_enabled:
-            print("fitness: ", fitness_value)
+            print("fitness: ", fitness)
 
-        return fitness_value
+        return fitness
 
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
@@ -52,13 +52,6 @@ class Environment(implements(GeneticEnvironment)):
             tree = StringBehaviorTree(individual[:], behaviors=self._node_factory)
 
         tree.save_figure(path, name=plot_name)
-
-    def _add_to_static_tree(self, individual):
-        """ Add individual to the static part of the tree in the front """
-
-        new_individual = self._static_tree[:]
-        new_individual[-2:-2] = individual
-        return new_individual
 
 
 class Environment1(Environment):

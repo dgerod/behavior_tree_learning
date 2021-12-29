@@ -69,14 +69,22 @@ class WorldSimulator(implements(World)):
     Class for handling the State Machine Simulator
     """
 
-    def __init__(self, start_positions, random_events=False, parameters=None, mode=0):
+    def __init__(self, start_positions, random_events=False, parameters=None, scenario: str = ""):
 
         if parameters is None:
             self.sm_par = SMParameters()
         else:
             self.sm_par = parameters
+
         self.sm_par.random_events = random_events
-        self.mode = mode
+
+        if scenario == "tower":
+            self.mode = SMMode.DEFAULT
+        elif scenario == "croissant":
+            self.mode = SMMode.CROISSANT
+        else:
+            raise ValueError("Unknown [%s] scenario" % scenario)
+
         self.state = State()
         self.state.bricks = []
         for pos in start_positions:
@@ -200,11 +208,11 @@ class WorldSimulator(implements(World)):
 
 class WorldFactory:
 
-    def __init__(self, start_position, random_events=False, parameters=None, mode=0):
+    def __init__(self, start_position, random_events=False, parameters=None, scenario: str = ""):
         self._start_position = start_position
         self._random_events = random_events
         self._parameters = parameters
-        self._mode = mode
+        self._scenario = scenario
 
     def make(self):
-        return WorldSimulator(self._start_position, self._random_events, self._parameters, self._mode)
+        return WorldSimulator(self._start_position, self._random_events, self._parameters, self._scenario)

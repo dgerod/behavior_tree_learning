@@ -11,9 +11,9 @@ class HandEmpty(BehaviorNode):
 
     @staticmethod
     def make(text, world, verbose=False):
-        return HandEmpty(text, world)
+        return HandEmpty(text, world, verbose)
 
-    def __init__(self, name, world):
+    def __init__(self, name, world, verbose):
         self._world = world
         super(HandEmpty, self).__init__(name)
 
@@ -30,9 +30,9 @@ class Picked(BehaviorNode):
 
     @staticmethod
     def make(text, world, verbose=False):
-        return Picked(text, world, re.findall(r'\d+', text))
+        return Picked(text, world, verbose, re.findall(r'\d+', text))
 
-    def __init__(self, name, world, brick):
+    def __init__(self, name, world, verbose, brick):
         self._world = world
         self._brick = int(brick[0])
         super(Picked, self).__init__(name)
@@ -50,9 +50,9 @@ class AtPos(BehaviorNode):
 
     @staticmethod
     def make(text, world, verbose=False):
-        return AtPos(text, world, re.findall(r'-?\d+\.\d+|-?\d+', text), verbose)
+        return AtPos(text, world, verbose, re.findall(r'-?\d+\.\d+|-?\d+', text))
 
-    def __init__(self, name, world, brick_and_pos, verbose):
+    def __init__(self, name, world, verbose, brick_and_pos):
         self._world = world
         self._brick = int(brick_and_pos[0])
         self._pos = sm.Pos(float(brick_and_pos[1]), float(brick_and_pos[2]), float(brick_and_pos[3]))
@@ -76,9 +76,9 @@ class On(BehaviorNode):
 
     @staticmethod
     def make(text, world, verbose=False):
-        return On(text, world, re.findall(r'\d+', text), verbose)
+        return On(text, world, verbose, re.findall(r'\d+', text))
 
-    def __init__(self, name, world, bricks, verbose):
+    def __init__(self, name, world, verbose, bricks):
         self._world = world
         self._upper = int(bricks[0])
         self._lower = int(bricks[1])
@@ -112,15 +112,11 @@ class StateMachineBehavior(BehaviorNode):
             print(self.name, ":", self._state)
 
     def success(self):
-        """ Set state success """
-
         self._state = pt.common.Status.SUCCESS
         if self._verbose:
             print(self.name, ": SUCCESS")
 
     def failure(self):
-        """ Set state failure """
-
         self._state = pt.common.Status.FAILURE
         if self._verbose:
             print(self.name, ": FAILURE")
@@ -149,6 +145,7 @@ class Pick(StateMachineBehavior):
 
     def update(self):
         super(Pick, self).update()
+
         if self._state is None:
             self._state = pt.common.Status.RUNNING
         elif self._state is pt.common.Status.RUNNING:
@@ -169,8 +166,10 @@ class Place(StateMachineBehavior):
     def make(text, world, verbose=False):
         if 'place at' in text:
             return Place(text, world, position=re.findall(r'-?\d+\.\d+|-?\d+', text), verbose=verbose)
-        else:
+        elif 'place on' in text:
             return Place(text, world, brick=re.findall(r'\d+', text), verbose=verbose)
+        else:
+            raise ValueError('Unknown [%s] node' % text)
 
     def __init__(self, name, world, brick=None, position=None, verbose=False):
         # pylint: disable=too-many-arguments
@@ -321,9 +320,53 @@ def _make_tower_nodes():
     return behavior_register
 
 
+def _make_croissant_nodes():
+
+    behavior_register = BehaviorRegister()
+    behavior_register.add_condition('picked 0?', Picked)
+    behavior_register.add_condition('picked 1?', Picked)
+    behavior_register.add_condition('picked 2?', Picked)
+    behavior_register.add_condition('picked 3?', Picked)
+    behavior_register.add_condition('0 at pos (0.0, 0.0, 0.0)?', AtPos)
+    behavior_register.add_condition('1 at pos (0.0, 0.0, 0.0192)?', AtPos)
+    behavior_register.add_condition('2 at pos (0.016, -0.032, 0.0)?', AtPos)
+    behavior_register.add_condition('3 at pos (0.016, 0.032, 0.0)?', AtPos)
+    behavior_register.add_condition('0 on 1?', On)
+    behavior_register.add_condition('0 on 2?', On)
+    behavior_register.add_condition('0 on 3?', On)
+    behavior_register.add_condition('1 on 0?', On)
+    behavior_register.add_condition('1 on 2?', On)
+    behavior_register.add_condition('1 on 3?', On)
+    behavior_register.add_condition('2 on 0?', On)
+    behavior_register.add_condition('2 on 1?', On)
+    behavior_register.add_condition('2 on 3?', On)
+    behavior_register.add_condition('3 on 0?', On)
+    behavior_register.add_condition('3 on 1?', On)
+    behavior_register.add_condition('3 on 2?', On)
+    behavior_register.add_action('pick 0!', Pick)
+    behavior_register.add_action('pick 1!', Pick)
+    behavior_register.add_action('pick 2!', Pick)
+    behavior_register.add_action('pick 3!', Pick)
+    behavior_register.add_action('place at (0.0, 0.05, 0.0)!', Place)
+    behavior_register.add_action('place at (0.016, -0.032, 0.0)!', Place)
+    behavior_register.add_action('place at (0.016, 0.032, 0.0)!', Place)
+    behavior_register.add_action('place on 0!', Place)
+    behavior_register.add_action('place on 1!', Place)
+    behavior_register.add_action('place on 2!', Place)
+    behavior_register.add_action('place on 3!', Place)
+    behavior_register.add_action('apply force 0!', ApplyForce)
+    behavior_register.add_action('apply force 1!', ApplyForce)
+    behavior_register.add_action('apply force 2!', ApplyForce)
+    behavior_register.add_action('apply force 3!', ApplyForce)
+
+    return behavior_register
+
+
 def get_behaviors(name):
 
     if name == 'tower':
         return _make_tower_nodes()
+    elif name == 'croissant':
+        return _make_croissant_nodes()
     else:
         raise ValueError('Unknown %s name', name)

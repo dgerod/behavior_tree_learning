@@ -26,9 +26,44 @@ def _configure_logger(level, log_name):
     logging.getLogger("gp").setLevel(level)
 
 
-def run():
+def _plot_summary(scenario_name, trials):
 
-    scenario = 'tower'
+    from behavior_tree_learning.core.logger import logplot
+
+    parameters = logplot.PlotParameters()
+    parameters.plot_std = True
+    parameters.xlabel = 'Episodes'
+    parameters.ylabel = 'Fitness'
+    parameters.mean_color = 'r'
+    parameters.std_color = 'r'
+    parameters.horizontal = -3.0
+    parameters.save_fig = True
+    parameters.save_fig = True
+    parameters.path = os.path.join('logs', scenario_name + '.pdf')
+
+    logplot.plot_learning_curves(trials, parameters)
+
+
+def _prepare_scenarios():
+
+    scenarios = []
+
+    scenario_name = 'tower'
+    start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.0, -0.1, 0), WorldPos(0.05, -0.1, 0)]
+    target_position = [WorldPos(0.0, 0.05, 0), WorldPos(0.0, 0.05, 0.0192), WorldPos(0.0, 0.05, 2 * 0.0192)]
+    scenarios.append((scenario_name, start_position, target_position))
+
+    scenario_name = 'croissant'
+    start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.05, -0.1, 0), WorldPos(0.05, 0.1, 0),
+                      WorldPos(-0.05, 0.1, 0)]
+    target_position = [WorldPos(0.0, 0.0, 0.0), WorldPos(0.0, 0.0, 0.0192), WorldPos(0.016, -0.032, 0.0),
+                       WorldPos(0.016, 0.032, 0.0)]
+    scenarios.append((scenario_name, start_position, target_position))
+
+    return scenarios
+
+
+def run():
 
     parameters = GeneticParameters()
     parameters.n_population = 16
@@ -49,32 +84,40 @@ def run():
     parameters.mutation_p_delete = 0.3
     parameters.allow_identical = False
 
-    # add specific class for plot_parametes
+    # add specific class for plot_parameters
     parameters.plot_fitness = True
     parameters.plot_best_individual = True
     parameters.plot_last_generation = True
 
-    num_trials = 10
-    for tdx in range(1, num_trials+1):
+    scenarios = _prepare_scenarios()
+    for scenario_name, start_position, target_position in scenarios:
 
-        log_name = scenario + '_' + str(tdx)
-        _configure_logger(logging.DEBUG, log_name)
+        num_trials = 10
+        trials = []
+        for tdx in range(1, num_trials+1):
 
-        parameters.log_name = log_name
-        seed = tdx
+            trial_name = scenario_name + '_' + str(tdx)
+            trials.append(trial_name)
+            print("Trial: %s" % trial_name)
 
-        node_factory = BehaviorNodeFactory(get_behaviors(scenario))
-        start_position = [WorldPos(-0.05, -0.1, 0), WorldPos(0.0, -0.1, 0), WorldPos(0.05, -0.1, 0)]
-        target_position = [WorldPos(0.0, 0.05, 0), WorldPos(0.0, 0.05, 0.0192), WorldPos(0.0, 0.05, 2 * 0.0192)]
+            log_name = trial_name
+            _configure_logger(logging.DEBUG, log_name)
 
-        world_factory = WorldFactory(start_position)
-        environment = Environment(node_factory, world_factory, target_position, verbose=False)
+            parameters.log_name = log_name
+            seed = tdx
 
-        bt_learner = BehaviorTreeLearner(environment)
-        success = bt_learner.run(parameters, seed, verbose=False)
+            node_factory = BehaviorNodeFactory(get_behaviors(scenario_name))
+            world_factory = WorldFactory(start_position, scenario=scenario_name)
+            environment = Environment(node_factory, world_factory, target_position, verbose=False)
 
-        print("Trial: %d, Succeed: %s" % (tdx, success))
+            bt_learner = BehaviorTreeLearner(environment)
+            success = bt_learner.run(parameters, seed, verbose=False)
+
+            print("Trial: %d, Succeed: %s" % (tdx, success))
+
+        _plot_summary(scenario_name, trials)
 
 
 if __name__ == "__main__":
     run()
+
