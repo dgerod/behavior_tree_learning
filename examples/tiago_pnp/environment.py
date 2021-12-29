@@ -12,13 +12,15 @@ class Environment(implements(GeneticEnvironment)):
     """
 
     def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
-                 scenario: str):
-
-        self._world_factory = world_factory
-        self._node_factory = node_factory
+                 scenario: str, verbose=False):
 
         if scenario != 'scenario_1' and scenario != 'scenario_3':
             raise ValueError('Unknown selected scenario')
+
+        self._scenario = scenario
+        self._world_factory = world_factory
+        self._node_factory = node_factory
+        self._verbose = verbose
 
     def run_and_compute(self, individual, verbose):
         """
@@ -26,8 +28,9 @@ class Environment(implements(GeneticEnvironment)):
         """
 
         sbt = individual
+        verbose_enabled = self._verbose or verbose
 
-        if verbose:
+        if verbose_enabled:
             print("SBT: ", sbt)
 
         if self._scenario == 'scenario_2':
@@ -61,6 +64,9 @@ class Environment(implements(GeneticEnvironment)):
 
             cost, completed = FitnessFunction().compute_cost(world, behavior_tree, ticks, verbose)
             fitness = -cost
+
+        if verbose_enabled:
+            print("fitness: ", fitness)
 
         return fitness
 
