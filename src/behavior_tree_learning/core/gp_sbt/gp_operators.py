@@ -30,12 +30,7 @@ class Operators(implements(GeneticOperators)):
         attempts = 0
         while (not mutated_individual.is_valid() or mutated_individual.bt == genome) and attempts < max_attempts:
             mutated_individual.set(genome)
-            try:
-                index = random.randint(0, len(genome) - 1)
-            except:
-                import pdb;
-                pdb.set_trace()
-
+            index = random.randint(0, len(genome) - 1)
             mutation = random.random()
 
             if mutation < p_delete:
