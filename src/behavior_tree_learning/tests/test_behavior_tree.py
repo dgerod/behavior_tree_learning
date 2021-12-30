@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import paths
+paths.add_modules_to_path()
+
 import unittest
 
 import os
@@ -7,11 +10,9 @@ import random
 from behavior_tree_learning.core.sbt import behavior_tree
 from behavior_tree_learning.core.sbt import BehaviorTreeStringRepresentation, StringBehaviorTree
 from behavior_tree_learning.core.sbt import BehaviorNodeFactory
-from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
-from behavior_tree_learning.examples.duplo_state_machine.execution_nodes import make_execution_node
 
 
-behavior_tree.load_settings_from_file(os.path.join(TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml'))
+behavior_tree.load_settings_from_file(os.path.join(paths.get_test_directory(), 'BT_TEST_SETTINGS.yaml'))
 
 
 class TestBehaviorTree(unittest.TestCase):
