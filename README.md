@@ -17,7 +17,7 @@ References:
 * __Genetic Programming__. 
   Accessed on December 22, 2021. [Web](https://geneticprogramming.com)
 * __A Field Guide to Genetic Programming__. 
-  Poli, Riccardo & Langdon, William & Mcphee, Nicholas.  
+  Poli, Riccardo & Langdon, William & Mcphee, Nicholas. 
   2008. ISBN 978-1-4092-0073-4.
 * __Learning Behavior Trees with Genetic Programming in Unpredictable Environments__.
   Iovino, Matteo & Styrud, Jonathan & Falco, Pietro & Smith, Christian.
@@ -29,7 +29,7 @@ References:
   Gustavsson, Oscar & Iovino, Matteo & Styrud, Jonathan & Smith, Christian. 
   September 2021. [PDF](https://arxiv.org/pdf/2109.07133.pdf)
 
-### Notes on installation
+### Installation
 
 After cloning the repository, run the following command to install the correct dependencies:
 
