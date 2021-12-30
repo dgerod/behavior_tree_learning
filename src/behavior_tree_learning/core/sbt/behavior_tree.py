@@ -98,14 +98,6 @@ def _clean_settings():
     ALL_NODES = []
 
 
-def _load_default_settings():
-
-    _clean_settings()
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bt_settings.yaml')
-    nodes = _load_settings(file_path)
-    return nodes
-
-
 def _load_settings(file_path):
 
     nodes = {}
@@ -125,7 +117,7 @@ def _load_settings(file_path):
         except KeyError:
             pass
 
-    more_tags = ['all_nodes', 'control_node', 'behavior_nodes', 'leaf_nodes']
+    more_tags = ['all_nodes', 'control_nodes', 'behavior_nodes', 'leaf_nodes']
     for tag in more_tags:
         nodes[tag] = []
 
