@@ -12,10 +12,10 @@ from behavior_tree_learning.core.sbt import BehaviorTreeStringRepresentation, St
 from behavior_tree_learning.core.sbt import BehaviorNodeFactory
 
 
-behavior_tree.load_settings_from_file(os.path.join(paths.get_test_directory(), 'BT_TEST_SETTINGS.yaml'))
-
-
 class TestBehaviorTree(unittest.TestCase):
+
+    def setUp(self):
+        behavior_tree.load_settings_from_file(os.path.join(paths.get_test_directory(), 'BT_TEST_SETTINGS.yaml'))
 
     def test_init(self):
         """ Tests init function """
@@ -273,13 +273,6 @@ class TestBehaviorTree(unittest.TestCase):
 
         bt.set(['s(', 'a0', 'f(', 'c1', 'a0', ')', ')']).add_node(2, 'f(')
         assert bt.is_valid()
-
-    def plot_individual(self, individual, plot_name):
-        """ Saves a graphical representation of the individual """
-                
-        behavior_factory = BehaviorNodeFactory(make_execution_node)
-        pytree = StringBehaviorTree(individual[:], behaviors=behavior_factory)
-        pytree.save_fig('logs/', name=plot_name)
 
     def test_delete_node(self):
         """ Tests delete_node function """
