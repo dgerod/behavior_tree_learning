@@ -8,6 +8,9 @@ This repository is based on:
 * https://github.com/matiov/learn-BTs-with-GP
 
 References:
+* __Towards Blended Reactive Planning and Acting using Behavior Trees__.
+  Colledanchise, Michele & Almeida, Diogo & Ogren, Petter.
+  ICRA 2019, May 2021. DOI:10.1109/ICRA.2019.8794128. [PDF](https://arxiv.org/pdf/1611.00230.pdf)
 * __A Survey of Behavior Trees in Robotics and AI__. 
   Iovino, Matteo & Scukins, Edvards & Styrud, Jonathan & Ogren, Petter & Smith, Christian. 
   May 2020. [PDF](https://arxiv.org/pdf/2005.05842.pdf)
