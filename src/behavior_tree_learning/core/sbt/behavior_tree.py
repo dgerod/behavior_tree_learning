@@ -1,13 +1,9 @@
-# pylint: disable=global-at-module-level, global-statement, global-variable-undefined
 """
 Class for handling string representations of behavior trees
 """
-import os
 import random
 import yaml
-from behavior_tree_learning.core.sbt.behavior_factory import BehaviorNodeFactory
 
-# Below are lists of the possible node types
 global FALLBACK_NODES
 """
 A list of all types of fallback nodes used, typically just one
