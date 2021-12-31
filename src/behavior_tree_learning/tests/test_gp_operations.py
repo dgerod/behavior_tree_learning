@@ -1,28 +1,28 @@
 #!/usr/bin/env python
 
+import paths
+paths.add_modules_to_path()
+
 import unittest
 
-import os
 import random
-from behavior_tree_learning.core.sbt import behavior_tree
+from behavior_tree_learning.core.sbt import BehaviorTreeStringRepresentation
+from behavior_tree_learning.core.sbt import BehaviorNodeFactory
 from behavior_tree_learning.core.gp_sbt import Operators
-from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
+from tests.fwk.behavior_nodes import get_behaviors
 
 
-class TestGpOperations(unittest.TestCase):
+class TestGpForSbtOperations(unittest.TestCase):
 
-    BT_SETTINGS = os.path.join(TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml')
+    def setUp(self) -> None:
+        self._node_factory = BehaviorNodeFactory(get_behaviors())
 
     def test_mutate_gene(self):
-        """ Tests mutate_gene function """
-
-        behavior_tree.load_settings_from_file(self.BT_SETTINGS)
 
         gp_operators = Operators()
-        genome = ['s(', 'a0', ')']
+        genome = ['s(', 'c0', ')']
 
         with self.assertRaises(Exception):
-
             gp_operators.mutate_gene(genome, p_add=-1, p_delete=1)
         
         with self.assertRaises(Exception):
@@ -30,25 +30,22 @@ class TestGpOperations(unittest.TestCase):
 
         for _ in range(10):
             mutated_genome = gp_operators.mutate_gene(genome, p_add=1, p_delete=0)
-            assert len(mutated_genome) >= len(genome)
+            self.assertGreaterEqual(len(mutated_genome), len(genome))
 
             mutated_genome = gp_operators.mutate_gene(genome, p_add=0, p_delete=1)
-            assert len(mutated_genome) <= len(genome)
+            self.assertLessEqual(len(mutated_genome), len(genome))
 
             mutated_genome = gp_operators.mutate_gene(genome, p_add=0, p_delete=0)
-            bt = behavior_tree.BehaviorTreeStringRepresentation(mutated_genome)
-            assert mutated_genome != genome
-            assert bt.is_valid()
+            bt = BehaviorTreeStringRepresentation(mutated_genome)
+            self.assertNotEqual(mutated_genome, genome)
+            self.assertTrue(bt.is_valid())
 
             mutated_genome = gp_operators.mutate_gene(genome, p_add=0.3, p_delete=0.3)
             bt.set(mutated_genome)
-            assert mutated_genome != genome
-            assert bt.is_valid()
+            self.assertNotEqual(mutated_genome, genome)
+            self.assertTrue(bt.is_valid())
 
     def test_crossover_genome(self):
-        """ Tests crossover_genome function """
-
-        behavior_tree.load_settings_from_file(self.BT_SETTINGS)
 
         gp_operators = Operators()
         genome1 = ['s(', 'c0', 'f(', 'c0', 'a0', ')', 'a0', ')']
@@ -62,7 +59,7 @@ class TestGpOperations(unittest.TestCase):
         assert offspring2 != genome1
         assert offspring2 != genome2
 
-        bt1 = behavior_tree.BehaviorTreeStringRepresentation(offspring1)
+        bt1 = BehaviorTreeStringRepresentation(offspring1)
         assert bt1.is_valid()
         bt1 = bt1.set(offspring2)
         assert bt1.is_valid()

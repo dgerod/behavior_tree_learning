@@ -17,6 +17,19 @@ class C(BehaviorNode):
         return pt.common.Status.SUCCESS
 
 
+class A(BehaviorNode):
+
+    @staticmethod
+    def make(text, world, verbose):
+        return A(text, world)
+
+    def __init__(self, name, wold):
+        super(A, self).__init__(str(name))
+
+    def update(self):
+        return pt.common.Status.SUCCESS
+
+
 class Toggle1(BehaviorNode):
 
     @staticmethod
@@ -148,6 +161,14 @@ def get_behaviors():
     behavior_register.add_condition('c0', C)
     behavior_register.add_condition('c1', C)
     behavior_register.add_condition('c2', C)
+    behavior_register.add_action('a0', A)
+    behavior_register.add_action('a1', A)
+    behavior_register.add_action('a2', A)
+    behavior_register.add_action('a3', A)
+    behavior_register.add_action('a4', A)
+    behavior_register.add_action('a5', A)
+
+    """
     behavior_register.add_action('t1', Toggle1)
     behavior_register.add_action('t2', Toggle1)
     behavior_register.add_action('t3', Toggle1)
@@ -156,6 +177,7 @@ def get_behaviors():
     behavior_register.add_action('r2', Read2)
     behavior_register.add_action('r3', Read3)
     behavior_register.add_action('r4', Read4)
+    """
 
     return behavior_register
 
