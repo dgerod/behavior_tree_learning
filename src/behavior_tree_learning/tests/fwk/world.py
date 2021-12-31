@@ -20,27 +20,18 @@ class SMParameters:
 
 
 class DummyWorld(implements(World)):
-    """
-    Class for handling the State Machine Simulator
-    """
 
     def __init__(self):
         self.sm_par = SMParameters()
         self.state = [False]*(len(State))
 
-    def get_feedback(self):
-        # pylint: disable=no-self-use
-        """ Dummy to fit template """
+    def startup(self):
         return True
 
-    def get_sensor_data(self):
-        # pylint: disable=no-self-use
-        """ Dummy to fit template """
+    def is_alive(self):
         return True
 
-    def send_references(self):
-        # pylint: disable=no-self-use
-        """ Dummy to fit template """
+    def shutdown(self):
         return
 
     def toggle_1(self):
