@@ -57,8 +57,6 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         """
 
         string = pt.display.ascii_tree(self.root)
-        print(string)
-
         string = string.replace("[o] ", "")
         string = string.replace("\t", "")
         string = string.replace("-->", "")
