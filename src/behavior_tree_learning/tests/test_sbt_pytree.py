@@ -1,77 +1,75 @@
 #!/usr/bin/env python
 
+import paths
+paths.add_modules_to_path()
+
 import unittest
 
-import os
-from behavior_tree_learning.core.sbt import behavior_tree
 from behavior_tree_learning.core.sbt import StringBehaviorTree
+from behavior_tree_learning.core.sbt import BehaviorNodeFactory
 from behavior_tree_learning.core.logger import print_ascii_tree
-from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
-from behavior_tree_learning.tests.fwk import behaviors_states as behaviors
+from tests.fwk.behavior_nodes import get_behaviors
 
 
-class TestStringBehaviorTreeForPyTree(unittest.TestCase):
+class TestStringBehaviorTree(unittest.TestCase):
 
-    BT_SETTINGS = os.path.join(TEST_DIRECTORY, 'BT_TEST_SETTINGS.yaml')
+    def setUp(self) -> None:
 
-    def test_pytree(self):
-        """ Tests the StringBehaviorTree class initialization """
+        self._node_factory = BehaviorNodeFactory(get_behaviors())
 
-        behavior_tree.load_settings_from_file(self.BT_SETTINGS)
+    def test_bt_from_str(self):
 
-        bt = ['f(', 'a', 'a', ')']
-        py_tree = StringBehaviorTree(bt, behaviors=behaviors)
-        assert bt == []
-        assert len(py_tree.root.children) == 2
-        print_ascii_tree(py_tree)
+        sbt = ['f(', 'c0', 'c0', ')']
+        bt = StringBehaviorTree(sbt, behaviors=self._node_factory)
+        self.assertEqual(sbt, [])
+        self.assertEqual(len(bt.root.children), 2)
+        print_ascii_tree(bt)
 
-        bt = ['f(', 'f(', 'a', 'a', ')', ')']
-        py_tree = StringBehaviorTree(bt, behaviors=behaviors)
-        assert bt == []
-        assert len(py_tree.root.children) == 1
-        print_ascii_tree(py_tree)
+        sbt = ['f(', 'f(', 'c0', 'c0', ')', ')']
+        bt = StringBehaviorTree(sbt, behaviors=self._node_factory)
+        self.assertEqual(sbt, [])
+        self.assertEqual(len(bt.root.children), 1)
+        print_ascii_tree(bt)
 
-        bt = ['f(', 'f(', 'a', 'a', ')', 's(', 'a', 'a', ')', ')']
-        py_tree = StringBehaviorTree(bt, behaviors=behaviors)
-        assert bt == []
-        assert len(py_tree.root.children) == 2
-        print_ascii_tree(py_tree)
+        sbt = ['f(', 'f(', 'c0', 'c0', ')', 's(', 'c0', 'c0', ')', ')']
+        bt = StringBehaviorTree(sbt, behaviors=self._node_factory)
+        self.assertEqual(sbt, [])
+        self.assertEqual(len(bt.root.children), 2)
+        print_ascii_tree(bt)
 
-        bt = ['f(', 'f(', 'a', 'a', ')', 'f(', 's(', 'a', ')', ')', ')']
-        py_tree = StringBehaviorTree(bt, behaviors=behaviors)
-        assert bt == []
-        assert len(py_tree.root.children) == 2
-        print_ascii_tree(py_tree)
+        sbt = ['f(', 'f(', 'c0', 'c0', ')', 'f(', 's(', 'c0', ')', ')', ')']
+        bt = StringBehaviorTree(sbt, behaviors=self._node_factory)
+        self.assertEqual(sbt, [])
+        self.assertEqual(len(bt.root.children), 2)
+        print_ascii_tree(bt)
         
-        bt = ['f(', 'f(', 'a', 'a', ')']
-        py_tree = StringBehaviorTree(bt, behaviors=behaviors)
-        assert bt == []
-        assert len(py_tree.root.children) == 1
-        print_ascii_tree(py_tree)
+        sbt = ['f(', 'f(', 'c0', 'c0', ')']
+        bt = StringBehaviorTree(sbt, behaviors=self._node_factory)
+        self.assertEqual(sbt, [])
+        self.assertEqual(len(bt.root.children), 1)
+        print_ascii_tree(bt)
 
-        bt = ['f(', 'f(', 'a', ')', ')', 'a', ')']
-        py_tree = StringBehaviorTree(bt, behaviors=behaviors)
-        assert bt != []
-        print_ascii_tree(py_tree)
+        sbt = ['f(', 'f(', 'c0', ')', ')', 'c0', ')']
+        bt = StringBehaviorTree(sbt, behaviors=self._node_factory)
+        self.assertEqual(sbt, ['c0', ')'])
+        self.assertEqual(len(bt.root.children), 1)
+        print_ascii_tree(bt)
        
         with self.assertRaises(Exception):
-            StringBehaviorTree(['nonbehavior'], behaviors=behaviors)
+            StringBehaviorTree(['nonbehavior'], behaviors=self._node_factory)
         
         with self.assertRaises(Exception):
-            StringBehaviorTree(['f(', 'nonpytreesbehavior', ')'], behaviors=behaviors)
+            StringBehaviorTree(['f(', 'nonpytreesbehavior', ')'], behaviors=self._node_factory)
         
-    def test_get_bt_from_root(self):
-        """ Specific test for get_string_from_root function """
+    def test_str_from_bt(self):
 
-        behavior_tree.load_settings_from_file(self.BT_SETTINGS)
-        
-        bt = ['f(', 'f(', 'a', 'a', ')', 'f(', 's(', 'a', ')', ')', ')']
-        py_tree = StringBehaviorTree(bt[:], behaviors=behaviors)
-        assert py_tree.get_bt_from_root() == bt
+        sbt = ['f(', 'f(', 'c0', 'c0', ')', 'f(', 's(', 'c0', ')', ')', ')']
+        bt = StringBehaviorTree(sbt[:], behaviors=self._node_factory)
+        self.assertEqual(bt.to_string(), sbt)
 
-        bt = ['f(', 'f(', 'a', ')', 'a', ')']
-        py_tree = StringBehaviorTree(bt[:], behaviors=behaviors)
-        assert py_tree.get_bt_from_root() == bt
+        sbt = ['f(', 'f(', 'c0', ')', 'c0', ')']
+        bt = StringBehaviorTree(sbt[:], behaviors=self._node_factory)
+        self.assertEqual(bt.to_string(), sbt)
 
 
 if __name__ == '__main__':
