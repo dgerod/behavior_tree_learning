@@ -7,7 +7,7 @@ import unittest
 
 from behavior_tree_learning.core.sbt import StringBehaviorTree
 from behavior_tree_learning.core.sbt import BehaviorNodeFactory
-from behavior_tree_learning.core.logger import print_ascii_tree
+from behavior_tree_learning.core.plotter import print_ascii_tree
 from tests.fwk.behavior_nodes import get_behaviors
 
 
