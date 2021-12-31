@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
-import os
-import sys
-
-PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.normpath(PACKAGE_DIRECTORY))
+import paths
+paths.add_modules_to_path()
 
 import unittest
 from behavior_tree_learning.core.sbt.parse_operation import parse_function
