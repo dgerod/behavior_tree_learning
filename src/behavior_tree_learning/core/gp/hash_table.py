@@ -1,7 +1,8 @@
-# pylint: disable=too-few-public-methods
 """
 Hash table with linked list for entries with same hash
 """
+
+import os
 import hashlib
 import ast
 
@@ -32,18 +33,19 @@ class Node:
 
 
 class HashTable:
-    """
-    Main hash table class
-    """
-    def __init__(self, size=100000, log_name='1'):
-        """
+
+    _FILE_NAME = 'hash_log.txt'
+    _DEFAULT_LOG_NAME = 'test'
+
+    def __init__(self, size=100000, name: str = ''):
+        """_
         Initialize hash table to fixed size
         """
 
         self.size = size
+        self.file_name = self._DEFAULT_LOG_NAME if name == '' else name
         self.buckets = [None]*self.size
         self.n_values = 0
-        self.log_name = log_name
 
     def __eq__(self, other):
 
@@ -57,7 +59,7 @@ class HashTable:
                 break
         return equal
 
-    def hash(self, key):
+    def hash(self, key: str):
         """
         Generate a hash for a given key
         Input:  string key
@@ -71,7 +73,7 @@ class HashTable:
         hashcode = int(hashcode, 16)
         return hashcode % self.size
 
-    def insert(self, key, value):
+    def insert(self, key: str, value):
         """
         Insert a key - value pair to the hashtable
         Input:  key - string
@@ -96,7 +98,7 @@ class HashTable:
 
         self.n_values += 1
 
-    def find(self, key):
+    def find(self, key: str):
         """
         Find a data value based on key
         Input:  key - string
@@ -117,28 +119,31 @@ class HashTable:
         Loads hash table information.
         """
 
-        with open(logplot.get_log_folder(self.log_name) + '/hash_log.txt', 'r') as f:
+        file_name = os.path.join(logplot.get_log_folder(self.file_name), self._FILE_NAME)
+        with open(file_name, 'r') as f:
             lines = f.read().splitlines()
 
             for i in range(0, len(lines)):
                 individual = lines[i]
-                individual = individual[5:].split(", value: ")
+                individual = individual[5:].split(', value: ')
                 key = ast.literal_eval(individual[0])
-                individual = individual[1].split(", count: ")
-                values = individual[0][1:-1].split(", ") # Remove brackets and split multiples
+                individual = individual[1].split(', count: ')
+                values = individual[0][1:-1].split(', ')  # Remove brackets and split multiples
                 for value in values:
                     self.insert(key, float(value))
 
-    def write_table(self):
+    def write(self):
         """
         Writes table contents to a file
         """
 
-        with open(logplot.get_log_folder(self.log_name) + '/hash_log.txt', "w") as f:
+        file_name = os.path.join(logplot.get_log_folder(self.file_name), self._FILE_NAME)
+
+        with open(file_name, 'w') as f:
             for node in filter(lambda x: x is not None, self.buckets):
                 while node is not None:
-                    f.writelines("key: " + str(node.key) + \
-                                 ", value: " + str(node.value) + \
-                                 ", count: " + str(len(node.value)) + "\n")
+                    f.writelines('key: ' + str(node.key) +
+                                 ', value: ' + str(node.value) +
+                                 ', count: ' + str(len(node.value)) + '\n')
                     node = node.next
         f.close()

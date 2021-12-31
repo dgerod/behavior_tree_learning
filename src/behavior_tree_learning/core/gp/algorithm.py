@@ -374,7 +374,7 @@ class GeneticProgramming:
         logplot.log_n_episodes(parameters.log_name, n_episodes)
         logplot.log_settings(parameters.log_name, parameters, base_line)
         logplot.log_state(parameters.log_name, random.getstate(), np.random.get_state(), generation)
-        hash_table.write_table()
+        hash_table.write()
 
     def _load_state(self, log_name, hash_table):
         """
