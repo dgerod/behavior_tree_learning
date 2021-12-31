@@ -28,7 +28,7 @@ class Toggle1(BehaviorNode):
         super(Toggle1, self).__init__(str(name))
 
     def update(self):
-        self._world.toggle1()
+        self._world.toggle_1()
         return pt.common.Status.SUCCESS
 
 
@@ -43,7 +43,7 @@ class Toggle2(BehaviorNode):
         super(Toggle2, self).__init__(str(name))
 
     def update(self):
-        self._world.toggle2()
+        self._world.toggle_2()
         return pt.common.Status.SUCCESS
 
 
@@ -58,7 +58,7 @@ class Toggle3(BehaviorNode):
         super(Toggle3, self).__init__(str(name))
 
     def update(self):
-        self._world.toggle3()
+        self._world.toggle_3()
         return pt.common.Status.SUCCESS
 
 
@@ -73,7 +73,7 @@ class Toggle4(BehaviorNode):
         super(Toggle4, self).__init__(str(name))
 
     def update(self):
-        self._world.toggle4()
+        self._world.toggle_4()
         return pt.common.Status.SUCCESS
 
 
@@ -84,11 +84,11 @@ class Read1(BehaviorNode):
         return Read1(text, world)
 
     def __init__(self, name, world):
-        self._world_interface = world
+        self._world = world
         super(Read1, self).__init__(str(name))
 
     def update(self):
-        if self._world_interface.read1():
+        if self._world.read_1():
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
 
@@ -104,7 +104,7 @@ class Read2(BehaviorNode):
         super(Read2, self).__init__(str(name))
 
     def update(self):
-        if self._world.read2():
+        if self._world.read_2():
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
 
@@ -120,7 +120,7 @@ class Read3(BehaviorNode):
         super(Read3, self).__init__(str(name))
 
     def update(self):
-        if self._world.read3():
+        if self._world.read_3():
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
 
@@ -136,7 +136,7 @@ class Read4(BehaviorNode):
         super(Read4, self).__init__(str(name))
 
     def update(self):
-        if self._world.read4():
+        if self._world.read_4():
             return pt.common.Status.SUCCESS
         return pt.common.Status.FAILURE
 

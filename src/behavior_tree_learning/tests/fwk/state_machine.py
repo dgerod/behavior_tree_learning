@@ -1,19 +1,16 @@
-"""
-State Machine Simulator
-"""
+
 from enum import IntEnum
 from dataclasses import dataclass
 from interface import implements
 from behavior_tree_learning.core.sbt import World
 
+
 class State(IntEnum):
-    """
-    Definition of substates
-    """
-    Boolstate1 = 0
-    Boolstate2 = 1
-    Boolstate3 = 2
-    Boolstate4 = 3
+
+    state1 = 0
+    state2 = 1
+    state3 = 2
+    state4 = 3
 
 
 @dataclass
@@ -22,7 +19,7 @@ class SMParameters:
     verbose: bool = False                                  #Extra prints
 
 
-class StateMachine(implements(World)):
+class DummyWorld(implements(World)):
     """
     Class for handling the State Machine Simulator
     """
@@ -46,34 +43,26 @@ class StateMachine(implements(World)):
         """ Dummy to fit template """
         return
 
-    def toggle1(self):
-        """ Just a simple toggle """
-        self.state[State.Boolstate1] = True
+    def toggle_1(self):
+        self.state[State.state1] = True
 
-    def toggle2(self):
-        """ Just a simple toggle """
-        self.state[State.Boolstate2] = True
+    def toggle_22(self):
+        self.state[State.state2] = True
 
-    def toggle3(self):
-        """ Just a simple toggle """
-        self.state[State.Boolstate3] = True
+    def toggle_3(self):
+        self.state[State.state3] = True
 
-    def toggle4(self):
-        """ Just a simple toggle """
-        self.state[State.Boolstate4] = True
+    def toggle_4(self):
+        self.state[State.state4] = True
 
-    def read1(self):
-        """ Just a simple state reader """
-        return self.state[State.Boolstate1]
+    def read_1(self):
+        return self.state[State.state1]
 
-    def read2(self):
-        """ Just a simple state reader """
-        return self.state[State.Boolstate2]
+    def read_2(self):
+        return self.state[State.state2]
 
-    def read3(self):
-        """ Just a simple state reader """
-        return self.state[State.Boolstate3]
+    def read_3(self):
+        return self.state[State.state3]
 
     def read4(self):
-        """ Just a simple state reader """
-        return self.state[State.Boolstate4]
+        return self.state[State.state4]
