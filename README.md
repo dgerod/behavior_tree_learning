@@ -36,3 +36,11 @@ After cloning the repository, run the following command to install the correct d
 ```bash
 pip3 install -r requirements.txt
 ```
+
+To check the package is working well you should execute all the tests. So, move to the 
+test directory of the package and execute them:
+
+```bash
+cd %PACKAGE_DIRECTORY%/src/behavior_tree_learning/tests
+python -m unittest discover -s . -p 'test_*.py'
+```
