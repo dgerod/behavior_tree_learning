@@ -115,4 +115,4 @@ def plan(world, get_execution_node, get_condition_parameters, goals):
 
     sbt_behavior_factory = BehaviorNodeFactory(get_execution_node)
     pt.display.render_dot_tree(tree, name='Planned bt', target_directory='')
-    print(StringBehaviorTree('', sbt_behavior_factory, world, tree).get_bt_from_root())
+    print(StringBehaviorTree('', sbt_behavior_factory, world, tree).to_string())

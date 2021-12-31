@@ -26,7 +26,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
 
         if root is not None:
             self.root = root
-            string = self.get_bt_from_root()
+            string = self.to_string()
 
         self.bt = BehaviorTreeStringRepresentation(string)
         self.depth = self.bt.depth()
@@ -49,7 +49,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         if has_children:
             self.create_from_string(string, self.root)
 
-    def get_bt_from_root(self):
+    def to_string(self):
         """
         Returns bt string (actually a list) from py tree root
         by cleaning the ascii tree from py trees
