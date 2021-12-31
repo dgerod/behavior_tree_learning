@@ -16,7 +16,7 @@ class TestBehaviorTreeStringRepresentation(unittest.TestCase):
     def setUp(self):
 
         behavior_tree.load_settings_from_file(
-            os.path.join(paths.get_test_directory(), 'fwk', 'BT_TEST_SETTINGS.yaml'))
+            os.path.join(paths.get_test_directory(), 'fwk', 'BT_SETTINGS.yaml'))
 
     def test_init(self):
 
