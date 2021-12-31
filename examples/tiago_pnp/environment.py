@@ -27,14 +27,14 @@ class Environment(implements(GeneticEnvironment)):
         Run the simulation and return the fitness
         """
 
-        sbt = individual
+        sbt = list(individual)
         verbose_enabled = self._verbose or verbose
 
         if verbose_enabled:
             print("SBT: ", sbt)
 
         if self._scenario == 'scenario_2':
-            # in this case we run the same BT against the state machine in 3 different setups
+            # In this case we run the same BT against the state machine in 3 different setups
             # every setup features a different spawn pose for the cube
 
             fitness = 0
@@ -57,6 +57,7 @@ class Environment(implements(GeneticEnvironment)):
                 completed = False
 
         elif self._scenario == 'scenario_1' or self._scenario == 'scenario_3':
+
             world = self._world_factory.make()
             behavior_tree = StringBehaviorTree(sbt[:], behaviors=self._node_factory, world=world,
                                                verbose=verbose)
@@ -73,5 +74,6 @@ class Environment(implements(GeneticEnvironment)):
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
 
-        tree = StringBehaviorTree(individual[:], behaviors=self._node_factory)
+        sbt = list(individual)
+        tree = StringBehaviorTree(sbt[:], behaviors=self._node_factory)
         tree.save_figure(path, name=plot_name)

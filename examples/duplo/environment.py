@@ -27,7 +27,7 @@ class Environment(implements(GeneticEnvironment)):
 
         verbose_enabled = self._verbose or verbose
 
-        sbt = individual
+        sbt = list(individual)
         if verbose_enabled:
             print("SBT: ", sbt)
 
@@ -46,10 +46,12 @@ class Environment(implements(GeneticEnvironment)):
     def plot_individual(self, path, plot_name, individual):
         """ Saves a graphical representation of the individual """
 
+        sbt = list(individual)
+
         if self._static_tree is not None:
-            tree = StringBehaviorTree(self._add_to_static_tree(individual), behaviors=self._node_factory)
+            tree = StringBehaviorTree(self._add_to_static_tree(sbt), behaviors=self._node_factory)
         else:
-            tree = StringBehaviorTree(individual[:], behaviors=self._node_factory)
+            tree = StringBehaviorTree(sbt[:], behaviors=self._node_factory)
 
         tree.save_figure(path, name=plot_name)
 

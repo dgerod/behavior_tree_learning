@@ -2,7 +2,6 @@ import logging
 import random
 from statistics import mean
 import numpy as np
-from interface import implements
 
 from behavior_tree_learning.core.logger import logplot
 from behavior_tree_learning.core.gp.hash_table import HashTable
@@ -60,7 +59,7 @@ class GeneticProgramming:
 
         fitness = []
         for individual in population:
-            fitness.append(self._calculate_fitness(list(individual), hash_table, environment, rerun=0))
+            fitness.append(self._calculate_fitness(individual, hash_table, environment, rerun=0))
 
         if not hot_start:
             best_fitness.append(max(fitness))
@@ -89,7 +88,7 @@ class GeneticProgramming:
             if generation > 1:
                 fitness = []
                 for index, individual in enumerate(population):
-                    fitness.append(self._calculate_fitness(list(individual), hash_table, environment, parameters.rerun_fitness))
+                    fitness.append(self._calculate_fitness(individual, hash_table, environment, parameters.rerun_fitness))
                     if base_line is not None and individual == base_line:
                         baseline_index = index
 
@@ -100,7 +99,7 @@ class GeneticProgramming:
             crossover_parents = self._crossover_parent_selection(population, fitness, parameters)
             crossover_offspring = self._crossover(population, crossover_parents, parameters)
             for offspring in crossover_offspring:
-                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment,
+                fitness.append(self._calculate_fitness(offspring, hash_table, environment,
                                                        parameters.rerun_fitness))
             self._print_offspring("Crossover", crossover_parents, crossover_offspring)
 
@@ -113,7 +112,7 @@ class GeneticProgramming:
             mutated_offspring = self._mutation(population + crossover_offspring, mutation_parents,
                                                parameters)
             for offspring in mutated_offspring:
-                fitness.append(self._calculate_fitness(list(offspring), hash_table, environment,
+                fitness.append(self._calculate_fitness(offspring, hash_table, environment,
                                                        parameters.rerun_fitness))
             self._print_offspring("Mutation", mutation_parents, mutated_offspring)
 
