@@ -2,6 +2,7 @@ import time
 import py_trees as pt
 from behavior_tree_learning.core.sbt.world import World
 from behavior_tree_learning.core.sbt.behavior_tree import BehaviorTreeStringRepresentation
+from behavior_tree_learning.core.sbt.behavior_factory import BehaviorNodeFactory
 
 
 class ExecutionParameters:
@@ -21,7 +22,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         def __init__(self, verbose):
             self.verbose = verbose
 
-    def __init__(self, string, behaviors, world: World = None, root=None, verbose=False):
+    def __init__(self, string: str, behaviors: BehaviorNodeFactory, world: World = None, root=None, verbose=False):
 
         if root is not None:
             self.root = root
@@ -58,12 +59,12 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         string = pt.display.ascii_tree(self.root)
         print(string)
 
-        string = string.replace('[o] ', '')
-        string = string.replace('\t', '')
-        string = string.replace('-->', '')
-        string = string.replace('Fallback', 'f(')
-        string = string.replace('Sequence', 's(')
-        bt = string.split('\n')
+        string = string.replace("[o] ", "")
+        string = string.replace("\t", "")
+        string = string.replace("-->", "")
+        string = string.replace("Fallback", "f(")
+        string = string.replace("Sequence", "s(")
+        bt = string.split("\n")
         bt = bt[:-1]
 
         prev_leading_spaces = 999999
@@ -80,13 +81,13 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         
         return bt_obj.bt
 
-    def create_from_string(self, string, node):
+    def create_from_string(self, string: str, node):
         """
         Recursive function to generate the tree from a string
         """
 
         while len(string) > 0:
-            if string[0] == ')':
+            if string[0] == ")":
                 string.pop(0)
                 return node
 
@@ -103,7 +104,7 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
         # This return is only reached if there are too few up nodes
         return node
 
-    def run_bt(self, parameters=ExecutionParameters()):
+    def run_bt(self, parameters: ExecutionParameters = ExecutionParameters()):
         """
         Function executing the behavior tree
         """
@@ -159,6 +160,6 @@ class StringBehaviorTree(pt.trees.BehaviourTree):
 
         return status_ok, ticks
 
-    def save_figure(self, path, name='Behavior tree'):
+    def save_figure(self, path: str, name: str = "bt"):
 
         pt.display.render_dot_tree(self.root, name=name, target_directory=path)
