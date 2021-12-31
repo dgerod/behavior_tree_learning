@@ -3,13 +3,12 @@ Hash table with linked list for entries with same hash
 """
 
 import os
+import pathlib
 import hashlib
 import ast
 
-import behavior_tree_learning.core.logger.logplot as logplot
 
-
-class Node:
+class _Node:
     """
     Node data structure - essentially a LinkedList node
     """
@@ -20,7 +19,7 @@ class Node:
         self.next = None
 
     def __eq__(self, other):
-        if not isinstance(other, Node):
+        if not isinstance(other, _Node):
             return False
         equal = self.key == other.key and self.value == other.value
         if equal:
@@ -35,17 +34,17 @@ class Node:
 class HashTable:
 
     _FILE_NAME = 'hash_log.txt'
-    _DEFAULT_DIRECTORY_NAME = 'test'
+    _DEFAULT_DIRECTORY_NAME = 'logs'
 
-    def __init__(self, size=100000, name: str = ''):
+    def __init__(self, size=100000, path: str = ''):
         """_
         Initialize hash table to fixed size
         """
 
-        self.size = size
-        self.directory_name = self._DEFAULT_DIRECTORY_NAME if name == '' else name
-        self.buckets = [None]*self.size
-        self.n_values = 0
+        self._size = size
+        self._directory_name = self._DEFAULT_DIRECTORY_NAME if path == '' else path
+        self._buckets = [None]*self._size
+        self._num_values = 0
 
     def __eq__(self, other):
 
@@ -53,11 +52,14 @@ class HashTable:
             return False
 
         equal = True
-        for i in range(self.size):
-            if self.buckets[i] != other.buckets[i]:
+        for i in range(self._size):
+            if self._buckets[i] != other._buckets[i]:
                 equal = False
                 break
         return equal
+
+    def num_values(self):
+        return self._num_values
 
     def hash(self, key: str):
         """
@@ -71,7 +73,7 @@ class HashTable:
         new_hash.update(string.encode('utf-8'))
         hashcode = new_hash.hexdigest()
         hashcode = int(hashcode, 16)
-        return hashcode % self.size
+        return hashcode % self._size
 
     def insert(self, key: str, value):
         """
@@ -81,9 +83,9 @@ class HashTable:
         """
 
         index = self.hash(key)
-        node = self.buckets[index]
+        node = self._buckets[index]
         if node is None:
-            self.buckets[index] = Node(key, value)
+            self._buckets[index] = _Node(key, value)
         else:
             done = False
             while not done:
@@ -91,12 +93,12 @@ class HashTable:
                     node.value.append(value)
                     done = True
                 elif node.next is None:
-                    node.next = Node(key, value)
+                    node.next = _Node(key, value)
                     done = True
                 else:
                     node = node.next
 
-        self.n_values += 1
+        self._num_values += 1
 
     def find(self, key: str):
         """
@@ -106,7 +108,7 @@ class HashTable:
         """
 
         index = self.hash(key)
-        node = self.buckets[index]
+        node = self._buckets[index]
         while node is not None and node.key != key:
             node = node.next
 
@@ -119,10 +121,9 @@ class HashTable:
         Loads hash table information.
         """
 
-        dir_path = os.path.join(logplot.get_log_folder(self.directory_name))
-        self._create_directory(dir_path)
+        self._create_directory(self._directory_name)
 
-        with open(os.path.join(dir_path, self._FILE_NAME), 'r') as f:
+        with open(os.path.join(self._directory_name, self._FILE_NAME), 'r') as f:
             lines = f.read().splitlines()
 
             for i in range(0, len(lines)):
@@ -139,11 +140,10 @@ class HashTable:
         Writes table contents to a file
         """
 
-        dir_path = os.path.join(logplot.get_log_folder(self.directory_name))
-        self._create_directory(dir_path)
+        self._create_directory(self._directory_name)
 
-        with open(os.path.join(dir_path, self._FILE_NAME), 'w') as f:
-            for node in filter(lambda x: x is not None, self.buckets):
+        with open(os.path.join(self._directory_name, self._FILE_NAME), 'w') as f:
+            for node in filter(lambda x: x is not None, self._buckets):
                 while node is not None:
                     f.writelines('key: ' + str(node.key) +
                                  ', value: ' + str(node.value) +
@@ -154,5 +154,5 @@ class HashTable:
     @staticmethod
     def _create_directory(directory_path):
 
-        if not os.path.exists(directory_path):
-            os.mkdir(directory_path)
+        pathlib.Path(directory_path).mkdir(parents=True, exist_ok=True)
+

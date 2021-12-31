@@ -1,4 +1,5 @@
 import logging
+import os
 import random
 from statistics import mean
 import numpy as np
@@ -36,7 +37,9 @@ class GeneticProgramming:
     def _run(self, environment: GeneticEnvironment, parameters: GeneticParameters, hot_start=False, base_line=None):
 
         self._logger.debug('[run] BEGIN')
-        hash_table = HashTable(parameters.hash_table_size, parameters.log_name)
+
+        hash_table = HashTable(parameters.hash_table_size,
+                               os.path.join(logplot.get_log_folder(parameters.log_name)))
 
         # Original population
         # --------------------------------------------------
@@ -47,7 +50,7 @@ class GeneticProgramming:
             population = self._create_random_population(parameters.n_population, parameters.ind_start_length)
             logplot.clear_logs(parameters.log_name)
             best_fitness = []
-            num_episodes = [hash_table.n_values]
+            num_episodes = [hash_table.num_values()]
             last_generation = 0
 
             if base_line is not None:
@@ -123,7 +126,7 @@ class GeneticProgramming:
             population, fitness = self._survivor_selection(population, fitness,
                                                            crossover_offspring, mutated_offspring, parameters)
             best_fitness.append(max(fitness))
-            num_episodes.append(hash_table.n_values)
+            num_episodes.append(hash_table.num_values())
 
             self._print_population("Survivors", population, fitness)
             self._print_message("Best fitness: %f" % best_fitness[-1])
