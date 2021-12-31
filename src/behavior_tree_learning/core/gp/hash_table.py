@@ -35,7 +35,7 @@ class Node:
 class HashTable:
 
     _FILE_NAME = 'hash_log.txt'
-    _DEFAULT_LOG_NAME = 'test'
+    _DEFAULT_DIRECTORY_NAME = 'test'
 
     def __init__(self, size=100000, name: str = ''):
         """_
@@ -43,7 +43,7 @@ class HashTable:
         """
 
         self.size = size
-        self.file_name = self._DEFAULT_LOG_NAME if name == '' else name
+        self.directory_name = self._DEFAULT_DIRECTORY_NAME if name == '' else name
         self.buckets = [None]*self.size
         self.n_values = 0
 
@@ -119,8 +119,10 @@ class HashTable:
         Loads hash table information.
         """
 
-        file_name = os.path.join(logplot.get_log_folder(self.file_name), self._FILE_NAME)
-        with open(file_name, 'r') as f:
+        dir_path = os.path.join(logplot.get_log_folder(self.directory_name))
+        self._create_directory(dir_path)
+
+        with open(os.path.join(dir_path, self._FILE_NAME), 'r') as f:
             lines = f.read().splitlines()
 
             for i in range(0, len(lines)):
@@ -137,9 +139,10 @@ class HashTable:
         Writes table contents to a file
         """
 
-        file_name = os.path.join(logplot.get_log_folder(self.file_name), self._FILE_NAME)
+        dir_path = os.path.join(logplot.get_log_folder(self.directory_name))
+        self._create_directory(dir_path)
 
-        with open(file_name, 'w') as f:
+        with open(os.path.join(dir_path, self._FILE_NAME), 'w') as f:
             for node in filter(lambda x: x is not None, self.buckets):
                 while node is not None:
                     f.writelines('key: ' + str(node.key) +
@@ -147,3 +150,9 @@ class HashTable:
                                  ', count: ' + str(len(node.value)) + '\n')
                     node = node.next
         f.close()
+
+    @staticmethod
+    def _create_directory(directory_path):
+
+        if not os.path.exists(directory_path):
+            os.mkdir(directory_path)
