@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-import unittest
+import paths
+paths.add_modules_to_path()
 
+import unittest
 import os
 import shutil
 from behavior_tree_learning.core.logger import logplot
-from behavior_tree_learning.tests.fwk.paths import TEST_DIRECTORY
 
 
 class TestStringBehaviorTreeForPyTree(unittest.TestCase):
@@ -13,7 +14,6 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
     OUTPUT_DIR = 'logs'
     
     def test_trim_logs(self):
-        """ Tests trim_logs function """
 
         logs = []
         logs.append([1, 2, 3])
@@ -25,7 +25,6 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
         assert logs == [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
 
     def test_plot_fitness(self):
-        """ Tests plot_fitness function """
 
         LOG_NAME = 'test'
         
@@ -37,9 +36,8 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
         except FileNotFoundError:
             pass
 
-    def test_extend_gens(self):
-        """ Tests plot of learning curves with extended gens """
-        
+    def test_plot_learning_curves_with_extend_gens(self):
+
         LOG_NAME_1 = 'test1'
         LOG_NAME_2 = 'test2'
         PDF_FILE_NAME = 'test.pdf'
@@ -60,8 +58,7 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
         logplot.plot_learning_curves([LOG_NAME_1, LOG_NAME_2], parameters)
 
     def test_plot_learning_curves(self):
-        """ Tests plot_learning_curves function """
-        
+
         LOG_NAME = 'test'
         PDF_FILE_NAME = 'test.pdf'
         
@@ -84,7 +81,7 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
         parameters.x_max = 0
         parameters.plot_horizontal = True
         logplot.plot_learning_curves([LOG_NAME], parameters)
-        assert not os.path.isfile(PDF_FILE_NAME)
+        self.assertFalse(os.path.isfile(PDF_FILE_NAME))
 
         parameters.extrapolate_y = True
         parameters.plot_mean = True
@@ -95,7 +92,7 @@ class TestStringBehaviorTreeForPyTree(unittest.TestCase):
         parameters.plot_horizontal = True
         parameters.save_fig = True
         logplot.plot_learning_curves([LOG_NAME], parameters)
-        assert os.path.isfile(PDF_FILE_NAME)
+        self.assertTrue(os.path.isfile(PDF_FILE_NAME))
         os.remove(PDF_FILE_NAME)
 
         parameters.x_max = 10
