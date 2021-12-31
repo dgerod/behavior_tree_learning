@@ -16,7 +16,8 @@ from duplo.world import Pos as WorldPos
 
 def run():
 
-    node_factory = BehaviorNodeFactory(get_behaviors('tower'))
+    scenario_name = 'tower'
+    node_factory = BehaviorNodeFactory(get_behaviors(scenario_name))
 
     sbt_1 = bt_collection.select_bt(0)
     sbt_2 = bt_collection.select_bt(1)
@@ -31,7 +32,7 @@ def run():
         sbt = list(trial)
         print("SBT: ", sbt)
 
-        simulated_world = WorldSimulator(start_position)
+        simulated_world = WorldSimulator(start_position, scenario=scenario_name)
         bt_executor = BehaviorTreeExecutor(node_factory, simulated_world)
 
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1),
