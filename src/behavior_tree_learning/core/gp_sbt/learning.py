@@ -31,7 +31,7 @@ class BehaviorTreeLearner:
 
     def run(self, parameters: GeneticParameters, seed=None, hot_start=False, base_line=None, verbose=False):
 
-        gp_algorithm = GeneticProgramming(self._gp_operators)
-        gp_algorithm.run(self._environment_adapter, parameters, seed, hot_start, base_line, verbose)
+        gp = GeneticProgramming(self._gp_operators)
+        gp.run(self._environment_adapter, parameters, seed, hot_start, base_line, verbose)
 
         return True
