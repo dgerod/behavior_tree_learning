@@ -214,19 +214,19 @@ def get_action_list():
 
 class BehaviorTreeStringRepresentation:
     """
-    Class for handling string representations of behavior trees
+    Represent a string behavior tree (SBT), it converts a string to a string behavior tree.
     """
 
     def __init__(self, bt):
         """
-        Creates a bt
+        Creates a bt from string
         """
 
         self.bt = bt[:]
 
     def set(self, bt):
         """
-        Sets bt string
+        Sets bt from string
         """
 
         self.bt = bt[:]
