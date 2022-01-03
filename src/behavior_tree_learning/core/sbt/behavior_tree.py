@@ -4,67 +4,68 @@ Class for handling string representations of behavior trees
 import random
 import yaml
 
-global FALLBACK_NODES
+FALLBACK_NODES = []
 """
 A list of all types of fallback nodes used, typically just one
 """
 
-global SEQUENCE_NODES
+SEQUENCE_NODES = []
 """
 A list of all types of sequence nodes used, typically just one
 """
 
-global CONTROL_NODES
+CONTROL_NODES = []
 """
 Control nodes are nodes that may have one or more children/subtrees.
 Subsequent nodes will be children/subtrees until the corresponding up character is reached
 List will contain FALLBACK_NODES, SEQUENCE_NODES and any other control nodes, e.g. parallel nodes
 """
 
-global CONDITION_NODES
+CONDITION_NODES = []
 """
 Conditions nodes are childless leaf nodes that never return RUNNING state.
 They may never be the last child of any parent.
 """
 
-global ACTION_NODES
+ACTION_NODES = []
 """
 Conditions nodes are also childless leaf nodes but may return RUNNING state. They may
 also be the last child of any parent.
 """
 
-global ATOMIC_FALLBACK_NODES
+ATOMIC_FALLBACK_NODES = []
 """
 Atomic fallback nodes are fallback nodes that have a predetermined set of children/subtrees
 that cannot be changed.  They behave mostly like action nodes except that they may not be the
 children of fallback nodes. Length is counted as one.
 """
-global ATOMIC_SEQUENCE_NODES
+
+ATOMIC_SEQUENCE_NODES = []
 """
 Atomic sequence nodes are sequence nodes that have a predetermined set of children/subtrees
 that cannot be changed.  They behave mostly like action nodes except that they may not be the
 children of sequence nodes. Length is counted as one.
 """
 
-global UP_NODE
+UP_NODE = []
 """
 The up node is not really a node but a character that marks the end of a control nodes
 set of children and subtrees
 """
 
-global LEAF_NODES
+LEAF_NODES = []
 """
 CONDITIONS + ACTION_NODES + ATOMIC_FALLBACK_NODES + ATOMIC_SEQUENCE_NODES
 Any kind of leaf node.
 """
 
-global BEHAVIOR_NODES
+BEHAVIOR_NODES = []
 """
 ACTION_NODES + ATOMIC_FALLBACK_NODES + ATOMIC_SEQUENCE_NODES
 Basically leaf nodes that actually do something and that may be implemented as the last child.
 """
 
-global ALL_NODES
+ALL_NODES = []
 
 
 def _clean_settings():
