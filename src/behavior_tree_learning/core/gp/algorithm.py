@@ -137,7 +137,7 @@ class GeneticProgramming:
             logplot.log_population(parameters.log_name, population)
 
             if (generation + 1) % 25 == 0 and generation < parameters.n_generations - 1:
-                # Last generation will be saved later
+                # Save state every 25 generations but not the last one as it is saved later
                 self._save_state(parameters, population, None, best_fitness, num_episodes, base_line, generation,
                                  hash_table)
 
@@ -145,13 +145,13 @@ class GeneticProgramming:
         # --------------------------------------------------
 
         best_individual = selection(SelectionMethods.ELITISM, population, fitness, 1, self._verbose)[0]
+        self._save_state(parameters, population, best_individual, best_fitness, num_episodes, base_line, generation,
+                         hash_table)
 
         self._print_population("Final population", population, fitness)
         self._print_best_individual(population, fitness)
         self._print_verbose_message("Best individual: %s" % best_individual)
 
-        self._save_state(parameters, population, best_individual, best_fitness, num_episodes, base_line, generation,
-                         hash_table)
         self._plot_results(parameters, environment, population, num_episodes, best_fitness, best_individual)
 
         self._logger.debug('[run] END')
