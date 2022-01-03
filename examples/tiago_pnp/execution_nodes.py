@@ -547,14 +547,14 @@ def _make_scenario1_nodes():
     behavior_register.add_condition('have_block?', HaveBlock)
     behavior_register.add_condition('cube_placed [0]?', Placed)
     behavior_register.add_condition('task_done?', Finished)
-    behavior_register.add_action('head [up]!', MoveHeadUp)
-    behavior_register.add_action('head [down]!', MoveHeadDown)
+    behavior_register.add_action('head [Up]!', MoveHeadUp)
+    behavior_register.add_action('head [Down]!', MoveHeadDown)
     behavior_register.add_action('localise!', Localise)
     behavior_register.add_action('move_to_pick [0]!', MoveToPose)
     behavior_register.add_action('move_to_place!', MoveToPose)
     behavior_register.add_action('place!', Place)
     behavior_register.add_action('pick!', PickUp)
-    behavior_register.add_action('arm [tucked]!', MoveArm)
+    behavior_register.add_action('arm [Tucked]!', MoveArm)
 
     return behavior_register
 
@@ -567,8 +567,8 @@ def _make_scenario3_nodes():
     behavior_register.add_condition('cube_placed [1]?', Placed)
     behavior_register.add_condition('cube_placed [2]?', Placed)
     behavior_register.add_condition('task_done?', Finished)
-    behavior_register.add_action('head [up]!', MoveHeadUp)
-    behavior_register.add_action('head [down]!', MoveHeadDown)
+    behavior_register.add_action('head [Up]!', MoveHeadUp)
+    behavior_register.add_action('head [Down]!', MoveHeadDown)
     behavior_register.add_action('localise!', Localise)
     behavior_register.add_action('move_to_pick [0]!', MoveToPose)
     behavior_register.add_action('move_to_pick [1]!', MoveToPose)
@@ -576,7 +576,7 @@ def _make_scenario3_nodes():
     behavior_register.add_action('move_to_place!', MoveToPose)
     behavior_register.add_action('place!', Place)
     behavior_register.add_action('pick!', PickUp)
-    behavior_register.add_action('arm [tucked]!', MoveArm)
+    behavior_register.add_action('arm [Tucked]!', MoveArm)
 
     return behavior_register
 

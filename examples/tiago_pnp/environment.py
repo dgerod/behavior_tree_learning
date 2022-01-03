@@ -1,5 +1,4 @@
 from interface import implements
-from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
 from behavior_tree_learning.gp import GeneticEnvironment
 from tiago_pnp.world import WorldFactory
