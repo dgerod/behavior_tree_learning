@@ -9,17 +9,9 @@ Software Guidebook
 
 ### BehaviorTreeLearner
 
-## Internals
+## Internal Structure
 ### Dependencies
 
-```plantuml
-@startuml
+![Packages dependencies](internal_deps.png)
 
-!theme blueprint
-[GP-SBT] -> [GP]
-[GP] -> [Logger]
-[GP-SBT] -> [SBT]
-[Plotter] -> [SBT]
-
-@enduml
-```
+## How to extend

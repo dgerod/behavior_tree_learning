@@ -1,0 +1,9 @@
+@startuml
+
+!theme toy
+[GP-SBT] -> [GP]
+[GP] -> [Logger]
+[GP-SBT] -> [SBT]
+[Plotter] -> [SBT]
+
+@enduml
