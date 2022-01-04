@@ -1,20 +1,38 @@
-from interface import implements
-from behavior_tree_learning.core.gp import GeneticEnvironment
+from interface import Interface, implements
 from behavior_tree_learning.core.sbt import BehaviorNodeFactory, StringBehaviorTree, ExecutionParameters
 from behavior_tree_learning.core.gp_sbt.world_factory import WorldFactory
 from behavior_tree_learning.core.gp_sbt.fitness_function import FitnessFunction
 
 
-class Environment(implements(GeneticEnvironment)):
+class Environment(Interface):
 
     def run_and_compute(self, individual, verbose):
+        """
+        Run the simulation and return the fitness
+
+        Parameters:
+            individual
+            verbose (bool)
+        Returns:
+            fitness (float)
+        """
         pass
 
     def plot_individual(self, path, plot_name, individual):
+        """
+        Saves a graphical representation of the individual
+
+        Parameters:
+            path (str) : where to store the figure
+            plot_name (str) : name of the figure
+            individual
+        Returns:
+            None
+        """
         pass
 
 
-class EnvironmentWithCostFunction(implements(GeneticEnvironment)):
+class EnvironmentWithCostFunction(implements(Environment)):
 
     def __init__(self,
                  node_factory: BehaviorNodeFactory,

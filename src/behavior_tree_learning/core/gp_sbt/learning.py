@@ -9,9 +9,6 @@ from behavior_tree_learning.core.gp_sbt.gp_operators \
 
 class BehaviorTreeLearner:
 
-    # __init__(BNF, environment)
-    #   GPO_for_SBT(BNF) internally it creates ABN
-    # Environment(cost_function, world)
     def __init__(self, environment: Environment):
 
         class EnvironmentAdapter(implements(GeneticEnvironment)):
@@ -25,7 +22,6 @@ class BehaviorTreeLearner:
             def plot_individual(self, path, plot_name, individual):
                 self._environment.plot_individual(path, plot_name, individual)
 
-        # GeneticOperatorsForStringBehaviorTree(ABN)
         self._gp_operators = GeneticOperatorsForSBT()
         self._environment_adapter = EnvironmentAdapter(environment)
 
