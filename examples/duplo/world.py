@@ -64,7 +64,7 @@ def move_brick_to(brick, position):
     brick.z = position.z
 
 
-class WorldSimulator(implements(World)):
+class ApplicationWorld(implements(World)):
     """
     Class for handling the State Machine Simulator
     """
@@ -206,7 +206,7 @@ class WorldSimulator(implements(World)):
         return False
 
 
-class WorldFactory:
+class ApplicationWorldFactory:
 
     def __init__(self, start_position, random_events=False, parameters=None, scenario: str = ""):
         self._start_position = start_position
@@ -215,4 +215,4 @@ class WorldFactory:
         self._scenario = scenario
 
     def make(self):
-        return WorldSimulator(self._start_position, self._random_events, self._parameters, self._scenario)
+        return ApplicationWorld(self._start_position, self._random_events, self._parameters, self._scenario)

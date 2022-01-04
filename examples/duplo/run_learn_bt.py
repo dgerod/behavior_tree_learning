@@ -11,8 +11,8 @@ from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParamete
 
 from duplo.execution_nodes import get_behaviors
 from duplo.world import Pos as WorldPos
-from duplo.world import WorldSimulator, WorldFactory
-from duplo.environment import Environment
+from duplo.world import ApplicationWorldFactory
+from duplo.environment import ApplicationEnvironment
 
 
 def _configure_logger(level, log_name):
@@ -107,8 +107,8 @@ def run():
             seed = tdx
 
             node_factory = BehaviorNodeFactory(get_behaviors(scenario_name))
-            world_factory = WorldFactory(start_position, scenario=scenario_name)
-            environment = Environment(node_factory, world_factory, target_position, verbose=False)
+            world_factory = ApplicationWorldFactory(start_position, scenario=scenario_name)
+            environment = ApplicationEnvironment(node_factory, world_factory, target_position, verbose=False)
 
             bt_learner = BehaviorTreeLearner(environment)
             success = bt_learner.run(parameters, seed, verbose=False)

@@ -10,7 +10,7 @@ from behavior_tree_learning.sbt import BehaviorNodeFactory
 from duplo.paths import get_log_directory
 from duplo import bt_collection
 from duplo.execution_nodes import get_behaviors
-from duplo.world import WorldSimulator
+from duplo.world import ApplicationWorld
 from duplo.world import Pos as WorldPos
 
 
@@ -32,7 +32,7 @@ def run():
         sbt = list(trial)
         print("SBT: ", sbt)
 
-        simulated_world = WorldSimulator(start_position, scenario=scenario_name)
+        simulated_world = ApplicationWorld(start_position, scenario=scenario_name)
         bt_executor = BehaviorTreeExecutor(node_factory, simulated_world)
 
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1),
@@ -43,7 +43,7 @@ def run():
         except OSError:
             pass
 
-        file_name = 'trial_%d' % (tdx + 1)
+        file_name = 'trial_%d' % tdx
         tree.save_figure(get_log_directory(), name=file_name)
         print("Succeed: ", success)
 

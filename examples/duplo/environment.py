@@ -1,14 +1,14 @@
 from interface import implements
 from behavior_tree_learning.sbt import BehaviorTreeExecutor, ExecutionParameters
 from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
-from behavior_tree_learning.gp import GeneticEnvironment
-from duplo.world import WorldFactory
+from behavior_tree_learning.learning import Environment
+from duplo.world import ApplicationWorldFactory
 from duplo.fitness_function import FitnessFunction
 
 
-class Environment(implements(GeneticEnvironment)):
+class ApplicationEnvironment(implements(Environment)):
 
-    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
+    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: ApplicationWorldFactory,
                  target_positions,
                  static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
 
@@ -52,51 +52,3 @@ class Environment(implements(GeneticEnvironment)):
             tree = StringBehaviorTree(sbt[:], behaviors=self._node_factory)
 
         tree.save_figure(path, name=plot_name)
-
-
-class Environment1(Environment):
-    """ Test class for only running first target in list  """
-
-    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
-                 target_positions,
-                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
-
-        super().__init__(node_factory, world_factory,
-                         target_positions,
-                         static_tree, sm_pars, mode, fitness_coefficients, verbose)
-        self._targets = [self._targets[0]]
-
-    def get_fitness(self, individual):
-        return super().get_fitness(self._add_to_static_tree(individual))
-
-
-class Environment12(Environment):
-    """ Test class for only running first two targets in list  """
-
-    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
-                 target_positions,
-                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
-
-        super().__init__(node_factory, world_factory,
-                         target_positions,
-                         static_tree, sm_pars, mode, fitness_coefficients, verbose)
-        self._targets = self._targets[:2]
-
-    def get_fitness(self, individual):
-        return super().get_fitness(self._add_to_static_tree(individual))
-
-
-class Environment123(Environment):
-    """ Test class for only running first three targets in list  """
-
-    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
-                 target_positions,
-                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
-
-        super().__init__(node_factory, world_factory,
-                         target_positions,
-                         static_tree, sm_pars, mode, fitness_coefficients, verbose)
-        self._targets = self._targets[:3]
-
-    def get_fitness(self, individual):
-        return super().get_fitness(self._add_to_static_tree(individual))

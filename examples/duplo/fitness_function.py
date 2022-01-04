@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from duplo.world import WorldSimulator
+from duplo.world import ApplicationWorld
 
 
 @dataclass
@@ -19,7 +19,7 @@ class Coefficients:
 
 class FitnessFunction:
 
-    def compute_cost(self, world: WorldSimulator, behavior_tree, ticks, targets, coefficients=None, verbose=False):
+    def compute_cost(self, world: ApplicationWorld, behavior_tree, ticks, targets, coefficients=None, verbose=False):
 
         if coefficients is None:
             coefficients = Coefficients()
