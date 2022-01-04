@@ -8,7 +8,7 @@ from behavior_tree_learning.sbt import BehaviorNodeFactory, BehaviorTreeExecutor
 from tiago_pnp.paths import get_log_directory
 from tiago_pnp import bt_collection
 from tiago_pnp.execution_nodes import get_behaviors
-from tiago_pnp.world import WorldSimulator
+from tiago_pnp.world import ApplicationWorld
 
 
 def run():
@@ -28,7 +28,7 @@ def run():
         node_factory = trial[1]
         print("SBT: ", sbt)
 
-        simulated_world = WorldSimulator(scenario, deterministic)
+        simulated_world = ApplicationWorld(scenario, deterministic)
         bt_executor = BehaviorTreeExecutor(node_factory, simulated_world)
 
         success, ticks, tree = bt_executor.run(sbt, ExecutionParameters(successes_required=1),

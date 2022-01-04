@@ -1,16 +1,16 @@
 from interface import implements
 from behavior_tree_learning.sbt import StringBehaviorTree, BehaviorNodeFactory
-from behavior_tree_learning.gp import GeneticEnvironment
-from tiago_pnp.world import WorldFactory
+from behavior_tree_learning.learning import Environment
+from tiago_pnp.world import ApplicationWorldFactory
 from tiago_pnp.fitness_function import FitnessFunction
 
 
-class Environment(implements(GeneticEnvironment)):
+class ApplicationEnvironment(implements(Environment)):
     """
     Class defining the environment in which the individual operates
     """
 
-    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: WorldFactory,
+    def __init__(self, node_factory: BehaviorNodeFactory, world_factory: ApplicationWorldFactory,
                  scenario: str, verbose=False):
 
         if scenario != 'scenario_1' and scenario != 'scenario_3':

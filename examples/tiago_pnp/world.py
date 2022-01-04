@@ -100,7 +100,7 @@ def distance(pose1, pose2):
     return math.sqrt(argument)
 
 
-class WorldSimulator(implements(World)):
+class ApplicationWorld(implements(World)):
     """
     Class for handling the State Machine Simulator
     """
@@ -488,7 +488,7 @@ class WorldSimulator(implements(World)):
         return True
 
 
-class WorldFactory:
+class ApplicationWorldFactory:
 
     def __init__(self, scenario: str, deterministic=False, pose_id=0, verbose=False):
         self._scenario = scenario
@@ -497,4 +497,4 @@ class WorldFactory:
         self._verbose = verbose
 
     def make(self):
-        return WorldSimulator(self._scenario, self._deterministic, self._pose_id, self._verbose)
+        return ApplicationWorld(self._scenario, self._deterministic, self._pose_id, self._verbose)

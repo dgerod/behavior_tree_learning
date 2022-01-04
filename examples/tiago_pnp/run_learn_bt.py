@@ -10,8 +10,8 @@ from behavior_tree_learning.sbt import BehaviorNodeFactory
 from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParameters, GeneticSelectionMethods
 
 from tiago_pnp.execution_nodes import get_behaviors
-from tiago_pnp.world import WorldSimulator, WorldFactory
-from tiago_pnp.environment import Environment
+from tiago_pnp.world import ApplicationWorld, ApplicationWorldFactory
+from tiago_pnp.environment import ApplicationEnvironment
 
 
 def _configure_logger(level, log_name):
@@ -61,8 +61,8 @@ def run():
         seed = tdx*100
 
         node_factory = BehaviorNodeFactory(get_behaviors(scenario))
-        world_factory = WorldFactory(scenario, deterministic=True)
-        environment = Environment(node_factory, world_factory, scenario, verbose=False)
+        world_factory = ApplicationWorldFactory(scenario, deterministic=True)
+        environment = ApplicationEnvironment(node_factory, world_factory, scenario, verbose=False)
 
         bt_learner = BehaviorTreeLearner(environment)
         success = bt_learner.run(parameters, seed, verbose=False)
