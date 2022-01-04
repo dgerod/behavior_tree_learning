@@ -1,2 +1,3 @@
-from behavior_tree_learning.core.gp import GeneticEnvironment, GeneticParameters, GeneticSelectionMethods
-from behavior_tree_learning.core.gp import gp
+from behavior_tree_learning.core.gp import GeneticEnvironment, GeneticOperators
+from behavior_tree_learning.core.gp import GeneticParameters, GeneticSelectionMethods
+from behavior_tree_learning.core.gp import GeneticProgramming
