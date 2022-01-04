@@ -4,7 +4,6 @@ import paths
 paths.add_modules_to_path()
 
 import unittest
-
 import random
 from behavior_tree_learning.core.sbt import BehaviorNodeFactory
 from behavior_tree_learning.core.gp import selection as gps

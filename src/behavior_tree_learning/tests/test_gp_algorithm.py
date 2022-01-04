@@ -41,8 +41,8 @@ class TestGpAlgorithm(unittest.TestCase):
         parameters = GeneticParameters()
         environment = FakEnvironment()
 
-        gp_algorithm = GeneticProgramming(operators)
-        gp_algorithm.run(environment, parameters)
+        #gp_algorithm = GeneticProgramming(operators)
+        #gp_algorithm.run(environment, parameters)
 
 
 if __name__ == '__main__':

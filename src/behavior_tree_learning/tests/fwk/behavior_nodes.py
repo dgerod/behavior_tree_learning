@@ -168,16 +168,5 @@ def get_behaviors():
     behavior_register.add_action('a4', A)
     behavior_register.add_action('a5', A)
 
-    """
-    behavior_register.add_action('t1', Toggle1)
-    behavior_register.add_action('t2', Toggle1)
-    behavior_register.add_action('t3', Toggle1)
-    behavior_register.add_action('t4', Toggle1)
-    behavior_register.add_action('r1', Read1)
-    behavior_register.add_action('r2', Read2)
-    behavior_register.add_action('r3', Read3)
-    behavior_register.add_action('r4', Read4)
-    """
-
     return behavior_register
 
