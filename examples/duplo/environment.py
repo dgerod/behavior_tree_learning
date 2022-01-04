@@ -18,8 +18,6 @@ class Environment(implements(GeneticEnvironment)):
 
         self._targets = target_positions
         self._static_tree = static_tree
-        self._sm_pars = sm_pars
-        self._mode = mode
         self._fitness_coefficients = fitness_coefficients
         self._random_events = False
 
