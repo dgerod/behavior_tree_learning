@@ -57,7 +57,7 @@ class BehaviorRegister:
 
 class BehaviorNodeFactory:
     
-    def __init__(self, execution_behavior_register=None):
+    def __init__(self, execution_behavior_register: BehaviorRegister = None):
     
         if execution_behavior_register is not None:
             self._execution_behavior_register = execution_behavior_register
