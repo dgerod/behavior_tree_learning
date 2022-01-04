@@ -32,7 +32,7 @@ class Environment(Interface):
         pass
 
 
-class EnvironmentWithCostFunction(implements(Environment)):
+class EnvironmentWithFitnessFunction(implements(Environment)):
 
     def __init__(self,
                  node_factory: BehaviorNodeFactory,

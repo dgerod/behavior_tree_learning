@@ -1,4 +1,4 @@
-from behavior_tree_learning.core.gp_sbt.environment import Environment
-from behavior_tree_learning.core.gp_sbt.learning import BehaviorTreeLearner
+from behavior_tree_learning.core.gp_sbt.environment import Environment, EnvironmentWithFitnessFunction
+from behavior_tree_learning.core.gp_sbt.world_factory import WorldFactory
 from behavior_tree_learning.core.gp_sbt.gp_operators import Operators
-
+from behavior_tree_learning.core.gp_sbt.learning import BehaviorTreeLearner

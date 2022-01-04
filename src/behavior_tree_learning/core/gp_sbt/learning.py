@@ -2,14 +2,22 @@ from interface import implements
 from behavior_tree_learning.core.gp import GeneticEnvironment
 from behavior_tree_learning.core.gp import GeneticParameters
 from behavior_tree_learning.core.gp import GeneticProgramming
-from behavior_tree_learning.core.gp_sbt.environment import Environment
+from behavior_tree_learning.core.gp_sbt.environment import Environment, EnvironmentWithFitnessFunction
 from behavior_tree_learning.core.gp_sbt.gp_operators \
     import Operators as GeneticOperatorsForSBT
 
 
 class BehaviorTreeLearner:
 
-    def __init__(self, environment: Environment):
+    def __init__(self, environment):
+        """
+         Parameters:
+             environment (Environment or EnvironmentWithFitnessFunction)
+         """
+
+        #if (not isinstance(environment.super(), Environment)
+        #        and not isinstance(environment, EnvironmentWithFitnessFunction)):
+        #    raise ValueError('Incorrect [%s] type' % type(environment))
 
         class EnvironmentAdapter(implements(GeneticEnvironment)):
 
