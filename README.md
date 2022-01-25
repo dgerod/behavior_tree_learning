@@ -34,7 +34,7 @@ References:
 
 Other references:
 * __Integrating Reinforcement Learning into Behavior Trees by Hierarchical Compositio__.
-  Kartašev, Mart 
+  Kartašev, Mart. 
   In Degree Project Computer Sciene and Engineering, KTH, Stockholm (Sweden) 
   2019.[PDF](https://www.diva-portal.org/smash/get/diva2:1368535/FULLTEXT01.pdf)
 
