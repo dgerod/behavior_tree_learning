@@ -32,6 +32,12 @@ References:
   Gustavsson, Oscar & Iovino, Matteo & Styrud, Jonathan & Smith, Christian. 
   September 2021. [PDF](https://arxiv.org/pdf/2109.07133.pdf)
 
+Other references:
+* __Integrating Reinforcement Learning into Behavior Trees by Hierarchical Compositio__.
+  Kartašev, Mart. 
+  In Degree Project Computer Sciene and Engineering, KTH, Stockholm (Sweden) 
+  2019.[PDF](https://www.diva-portal.org/smash/get/diva2:1368535/FULLTEXT01.pdf)
+
 ### Installation
 
 After cloning the repository, run the following command to install the correct dependencies:
