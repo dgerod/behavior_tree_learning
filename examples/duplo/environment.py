@@ -33,6 +33,7 @@ class ApplicationEnvironment(implements(Environment)):
 
         tree = StringBehaviorTree(sbt, behaviors=self._node_factory, world=world, verbose=verbose)
         success, ticks = tree.run_bt(parameters=ExecutionParameters(successes_required=1))
+
         fitness = FitnessFunction().compute_cost(world, tree, ticks, self._targets,
                                                  self._fitness_coefficients, verbose=verbose)
 
