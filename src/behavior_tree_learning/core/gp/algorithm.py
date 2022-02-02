@@ -45,7 +45,8 @@ class GeneticProgramming:
 
         # EXECUTE_NEXT_GENERATION
 
-        steps.notify_start()
+        steps.execution_started()
+        steps.execute_generation(0)
 
         # Original population
         # --------------------------------------------------
@@ -63,12 +64,10 @@ class GeneticProgramming:
                 population[0] = base_line
                 baseline_index = 0
 
-        steps.current_population(last_generation, population)
+        steps.current_population(population)
 
         # Select best candidate
         # --------------------------------------------------
-
-        # CALL ENVIRONMENTS, ...
 
         fitness = []
         for individual in population:
@@ -87,17 +86,15 @@ class GeneticProgramming:
         # --------------------------------------------------
 
         generation = parameters.n_generations - 1  # In case loop is skipped due to hot-start
-
         for generation in range(last_generation + 1, parameters.n_generations):
 
-            # WAIT_MAKE_NEXT_GENERATION
+            steps.execute_generation(generation)
 
             self._print_message("=== Generation: %d/%d ===" % (generation, parameters.n_generations))
             self._print_population("Population", population, fitness)
             self._print_best_individual(population, fitness)
 
-            # PUBLISH_POPULATION(population)
-            steps.current_population(last_generation, population)
+            steps.current_population(population)
 
             if parameters.keep_baseline:
                 if base_line is not None and base_line not in population:
@@ -118,10 +115,13 @@ class GeneticProgramming:
 
             crossover_parents = self._crossover_parent_selection(population, fitness, parameters)
             crossover_offspring = self._crossover(population, crossover_parents, parameters)
+
+            self._print_offspring("Crossover", crossover_parents, crossover_offspring)
+            steps.crossover_population(crossover_offspring)
+
             for offspring in crossover_offspring:
                 fitness.append(self._calculate_fitness(offspring, hash_table, steps,
                                                        parameters.rerun_fitness))
-            self._print_offspring("Crossover", crossover_parents, crossover_offspring)
 
             if parameters.boost_baseline and parameters.boost_baseline_only_co and base_line is not None:
                 # Restore original fitness for survivor selection
@@ -131,10 +131,13 @@ class GeneticProgramming:
                                                                crossover_parents, crossover_offspring, parameters)
             mutated_offspring = self._mutation(population + crossover_offspring, mutation_parents,
                                                parameters)
+
+            self._print_offspring("Mutation", mutation_parents, mutated_offspring)
+            steps.mutated_population(mutated_offspring)
+
             for offspring in mutated_offspring:
                 fitness.append(self._calculate_fitness(offspring, hash_table, steps,
                                                        parameters.rerun_fitness))
-            self._print_offspring("Mutation", mutation_parents, mutated_offspring)
 
             if parameters.boost_baseline and base_line is not None:
                 # Restore original fitness for survivor selection
@@ -142,6 +145,8 @@ class GeneticProgramming:
 
             population, fitness = self._survivor_selection(population, fitness,
                                                            crossover_offspring, mutated_offspring, parameters)
+            steps.survided_population(mutated_offspring)
+
             best_fitness.append(max(fitness))
             num_episodes.append(hash_table.num_values())
 
@@ -158,11 +163,8 @@ class GeneticProgramming:
                 self._save_state(parameters, population, None, best_fitness, num_episodes, base_line, generation,
                                  hash_table)
 
-            # EXECUTE_NEXT_GENERATION
-            # check num_generation and error
             error = 0.0
             steps.more_generations(generation, last_generation, error)
-            # continue = reached_condition(current_generation, error)
 
         # Prepare results
         # --------------------------------------------------
@@ -176,6 +178,8 @@ class GeneticProgramming:
         self._print_verbose_message("Best individual: %s" % best_individual)
 
         self._plot_results(parameters, steps, population, num_episodes, best_fitness, best_individual)
+
+        steps.execution_completed()
 
         self._logger.debug('[run] END')
         return population, fitness, best_fitness, best_individual
