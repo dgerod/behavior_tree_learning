@@ -10,7 +10,7 @@ class ApplicationEnvironment(implements(Environment)):
 
     def __init__(self, node_factory: BehaviorNodeFactory, world_factory: ApplicationWorldFactory,
                  target_positions,
-                 static_tree=None, sm_pars=None, mode=0, fitness_coefficients=None, verbose=False):
+                 static_tree=None, fitness_coefficients=None, verbose=False):
 
         self._node_factory = node_factory
         self._world_factory = world_factory

@@ -1,7 +1,7 @@
 # Learning Behavior Trees with Genetic Programming
 
 This repository contains an implementation of a Genetic Programming (GP) algorithm 
-that evolves Behavior Trees (BTs) to solve different manipulation tasks.
+that evolves Behavior Trees (BTs) to solve different tasks.
 
 This repository is based on:
 * https://github.com/jstyrud/planning-and-learning
@@ -41,15 +41,26 @@ Other references:
 ### Installation
 
 After cloning the repository, run the following command to install the correct dependencies:
-
 ```bash
 pip3 install -r requirements.txt
 ```
 
 To check the package is working well you should execute all the tests. So, move to the 
 test directory of the package and execute them:
-
 ```bash
 cd %PACKAGE_DIRECTORY%/src/behavior_tree_learning/tests
 python -m unittest discover -s . -p 'test_*.py'
+```
+### Examples
+
+Execute an existing behavior tree stored in "bt_collection.py":
+```bash
+cd %PACKAGE_DIRECTORY%/examples/duplo
+python ./run_execute_bt.py
+```
+
+And learn a behavior tree using genetic programming: 
+```bash
+cd %PACKAGE_DIRECTORY%/examples/duplo
+python ./run_learn_bt.py
 ```

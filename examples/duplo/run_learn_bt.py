@@ -110,7 +110,7 @@ def run():
             world_factory = ApplicationWorldFactory(start_position, scenario=scenario_name)
             environment = ApplicationEnvironment(node_factory, world_factory, target_position, verbose=False)
 
-            bt_learner = BehaviorTreeLearner(environment)
+            bt_learner = BehaviorTreeLearner.from_environment(environment)
             success = bt_learner.run(parameters, seed, verbose=False)
 
             print("Trial: %d, Succeed: %s" % (tdx, success))

@@ -7,7 +7,7 @@ import numpy as np
 from behavior_tree_learning.core.logger import logplot
 from behavior_tree_learning.core.gp.hash_table import HashTable
 from behavior_tree_learning.core.gp.parameters import GeneticParameters
-from behavior_tree_learning.core.gp.environment import GeneticEnvironment
+from behavior_tree_learning.core.gp.steps import AlgorithmSteps
 from behavior_tree_learning.core.gp.selection import SelectionMethods, selection
 from behavior_tree_learning.core.gp.operators import GeneticOperators
 
@@ -20,12 +20,12 @@ class GeneticProgramming:
         self._verbose = False
         self._logger = logging.getLogger("gp")
 
-    def run(self, environment: GeneticEnvironment, parameters: GeneticParameters,
+    def run(self, steps: AlgorithmSteps, parameters: GeneticParameters,
             seed=None, hot_start=False, base_line=None, verbose=False):
 
         self._initialize_random_generator(seed)
         self._verbose = verbose
-        return self._run(environment, parameters, hot_start, base_line)
+        return self._run(steps, parameters, hot_start, base_line)
 
     @staticmethod
     def _initialize_random_generator(seed):
@@ -34,12 +34,19 @@ class GeneticProgramming:
             random.seed(seed)
             np.random.seed(seed)
 
-    def _run(self, environment: GeneticEnvironment, parameters: GeneticParameters, hot_start=False, base_line=None):
+    def _run(self, steps, parameters, hot_start=False, base_line=None):
 
         self._logger.debug('[run] BEGIN')
 
         hash_table = HashTable(parameters.hash_table_size,
                                os.path.join(logplot.get_log_folder(parameters.log_name)))
+
+        # START
+
+        # EXECUTE_NEXT_GENERATION
+
+        steps.execution_started()
+        steps.execute_generation(0)
 
         # Original population
         # --------------------------------------------------
@@ -57,12 +64,14 @@ class GeneticProgramming:
                 population[0] = base_line
                 baseline_index = 0
 
+        steps.current_population(population)
+
         # Select best candidate
         # --------------------------------------------------
 
         fitness = []
         for individual in population:
-            fitness.append(self._calculate_fitness(individual, hash_table, environment, rerun=0))
+            fitness.append(self._calculate_fitness(individual, hash_table, steps, rerun=0))
 
         if not hot_start:
             best_fitness.append(max(fitness))
@@ -79,9 +88,13 @@ class GeneticProgramming:
         generation = parameters.n_generations - 1  # In case loop is skipped due to hot-start
         for generation in range(last_generation + 1, parameters.n_generations):
 
+            steps.execute_generation(generation)
+
             self._print_message("=== Generation: %d/%d ===" % (generation, parameters.n_generations))
             self._print_population("Population", population, fitness)
             self._print_best_individual(population, fitness)
+
+            steps.current_population(population)
 
             if parameters.keep_baseline:
                 if base_line is not None and base_line not in population:
@@ -89,9 +102,10 @@ class GeneticProgramming:
                     population.append(base_line)
 
             if generation > 1:
+
                 fitness = []
                 for index, individual in enumerate(population):
-                    fitness.append(self._calculate_fitness(individual, hash_table, environment, parameters.rerun_fitness))
+                    fitness.append(self._calculate_fitness(individual, hash_table, steps, parameters.rerun_fitness))
                     if base_line is not None and individual == base_line:
                         baseline_index = index
 
@@ -101,10 +115,13 @@ class GeneticProgramming:
 
             crossover_parents = self._crossover_parent_selection(population, fitness, parameters)
             crossover_offspring = self._crossover(population, crossover_parents, parameters)
-            for offspring in crossover_offspring:
-                fitness.append(self._calculate_fitness(offspring, hash_table, environment,
-                                                       parameters.rerun_fitness))
+
             self._print_offspring("Crossover", crossover_parents, crossover_offspring)
+            steps.crossover_population(crossover_offspring)
+
+            for offspring in crossover_offspring:
+                fitness.append(self._calculate_fitness(offspring, hash_table, steps,
+                                                       parameters.rerun_fitness))
 
             if parameters.boost_baseline and parameters.boost_baseline_only_co and base_line is not None:
                 # Restore original fitness for survivor selection
@@ -114,10 +131,13 @@ class GeneticProgramming:
                                                                crossover_parents, crossover_offspring, parameters)
             mutated_offspring = self._mutation(population + crossover_offspring, mutation_parents,
                                                parameters)
-            for offspring in mutated_offspring:
-                fitness.append(self._calculate_fitness(offspring, hash_table, environment,
-                                                       parameters.rerun_fitness))
+
             self._print_offspring("Mutation", mutation_parents, mutated_offspring)
+            steps.mutated_population(mutated_offspring)
+
+            for offspring in mutated_offspring:
+                fitness.append(self._calculate_fitness(offspring, hash_table, steps,
+                                                       parameters.rerun_fitness))
 
             if parameters.boost_baseline and base_line is not None:
                 # Restore original fitness for survivor selection
@@ -125,6 +145,8 @@ class GeneticProgramming:
 
             population, fitness = self._survivor_selection(population, fitness,
                                                            crossover_offspring, mutated_offspring, parameters)
+            steps.survided_population(mutated_offspring)
+
             best_fitness.append(max(fitness))
             num_episodes.append(hash_table.num_values())
 
@@ -141,6 +163,9 @@ class GeneticProgramming:
                 self._save_state(parameters, population, None, best_fitness, num_episodes, base_line, generation,
                                  hash_table)
 
+            error = 0.0
+            steps.more_generations(generation, last_generation, error)
+
         # Prepare results
         # --------------------------------------------------
 
@@ -152,7 +177,9 @@ class GeneticProgramming:
         self._print_best_individual(population, fitness)
         self._print_verbose_message("Best individual: %s" % best_individual)
 
-        self._plot_results(parameters, environment, population, num_episodes, best_fitness, best_individual)
+        self._plot_results(parameters, steps, population, num_episodes, best_fitness, best_individual)
+
+        steps.execution_completed()
 
         self._logger.debug('[run] END')
         return population, fitness, best_fitness, best_individual
@@ -260,7 +287,7 @@ class GeneticProgramming:
             return 1
         return 1 / num_runs ** 2
 
-    def _calculate_fitness(self, individual, hash_table, environment: GeneticEnvironment, rerun=0):
+    def _calculate_fitness(self, individual, hash_table, steps, rerun=0):
         """
         Gets fitness from hash table if possible, otherwise gets it from simulation
         rerun = 0 means never rerun
@@ -271,7 +298,7 @@ class GeneticProgramming:
         values = hash_table.find(individual)
 
         if values is None or rerun == 2 or (rerun == 1 and random.random() < self._rerun_probability(len(values))):
-            fitness = environment.run_and_compute(individual, self._verbose)
+            fitness = steps.calculate_fitness(individual, self._verbose)
             hash_table.insert(individual, fitness)
 
             if values is None:
@@ -393,15 +420,15 @@ class GeneticProgramming:
         hash_table.load()
         return best_fitness, n_episodes, generation, population
 
-    def _plot_results(self, parameters, environment, population, num_episodes, best_fitness, best_individual):
+    def _plot_results(self, parameters, steps, population, num_episodes, best_fitness, best_individual):
 
         if parameters.plot_fitness:
             logplot.plot_fitness(parameters.log_name, best_fitness, num_episodes)
         if parameters.plot_best_individual:
-            environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'best individual', best_individual)
+            steps.plot_individual(logplot.get_log_folder(parameters.log_name), 'best individual', best_individual)
         if parameters.plot_last_generation:
             for i in range(parameters.n_population):
-                environment.plot_individual(logplot.get_log_folder(parameters.log_name), 'individual_' + str(i),
+                steps.plot_individual(logplot.get_log_folder(parameters.log_name), 'individual_' + str(i),
                                             population[i])
 
     def _print_verbose_message(self, message, *args):
