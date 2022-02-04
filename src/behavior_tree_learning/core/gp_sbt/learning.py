@@ -31,9 +31,13 @@ class BehaviorTreeLearner:
         self._gp_operators = None
         self._steps = None
 
-    def run(self, parameters: GeneticParameters, seed=None, hot_start=False, base_line=None, verbose=False):
+    def run(self, parameters: GeneticParameters, seed=None, hot_start=False, base_line=None, verbose=False,
+            outputs_dir_path=""):
 
-        gp = GeneticProgramming(self._gp_operators)
+        if not self._gp_operators or not self._steps:
+            raise RuntimeError("Object not created correctly, a factory method should be used")
+
+        gp = GeneticProgramming(self._gp_operators, outputs_dir_path)
         gp.run(self._steps, parameters, seed, hot_start, base_line, verbose=verbose)
 
         return True

@@ -14,9 +14,11 @@ from behavior_tree_learning.core.gp.operators import GeneticOperators
 
 class GeneticProgramming:
 
-    def __init__(self, operators: GeneticOperators):
+    def __init__(self, operators: GeneticOperators, output_directory_path):
 
         self._operators = operators
+        self._output_directory = output_directory_path
+
         self._verbose = False
         self._logger = logging.getLogger("gp")
 
@@ -37,23 +39,20 @@ class GeneticProgramming:
     def _run(self, steps, parameters, hot_start=False, base_line=None):
 
         self._logger.debug('[run] BEGIN')
-
-        hash_table = HashTable(parameters.hash_table_size,
-                               os.path.join(logplot.get_log_folder(parameters.log_name)))
-
-        # START
-
-        # EXECUTE_NEXT_GENERATION
-
         steps.execution_started()
-        steps.execute_generation(0)
+
+        logplot.configure_log(self._output_directory)
+        hash_table = HashTable(parameters.hash_table_size, logplot.get_log_folder(parameters.log_name))
 
         # Original population
         # --------------------------------------------------
 
         if hot_start:
             best_fitness, num_episodes, last_generation, population = self._load_state(parameters.log_name, hash_table)
+
         else:
+            steps.execute_generation(0)
+
             population = self._create_random_population(parameters.n_population, parameters.ind_start_length)
             logplot.clear_logs(parameters.log_name)
             best_fitness = []
@@ -82,7 +81,7 @@ class GeneticProgramming:
         self._print_population("Population", population, fitness)
         self._print_best_individual(population, fitness)
 
-        # Produce next generations
+        # Next generations
         # --------------------------------------------------
 
         generation = parameters.n_generations - 1  # In case loop is skipped due to hot-start

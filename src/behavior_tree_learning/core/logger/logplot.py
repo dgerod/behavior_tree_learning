@@ -11,20 +11,23 @@ import matplotlib.pyplot as plt
 import matplotlib
 from scipy import interpolate
 
+
 matplotlib.rcParams['pdf.fonttype'] = 42
+_DIRECTORY_PATH = "logs"
 
 
 def open_file(path, mode):
     """
     Attempts to open file at path.
-    Tried up to max_attempts times because of intermittent permission errors on windows
+    Tried up to max_attempts times because of intermittent permission errors on Windows
     """
+
     max_attempts = 100
     f = None
-    for _ in range(max_attempts): # pragma: no branch
+    for _ in range(max_attempts):
         try:
             f = open(path, mode)
-        except PermissionError: # pragma: no cover
+        except PermissionError:
             continue
         break
     return f
@@ -33,26 +36,33 @@ def open_file(path, mode):
 def make_directory(path):
     """
     Attempts to create directory at path.
-    Tried up to max_attempts times because of intermittent permission errors on windows
+    Tried up to max_attempts times because of intermittent permission errors on Windows
     """
+
     max_attempts = 100
-    for _ in range(max_attempts): # pragma: no branch
+    for _ in range(max_attempts):
         try:
             os.mkdir(path)
-        except PermissionError: # pragma: no cover
+        except PermissionError:
             continue
         break
 
 
+def configure_log(directory_path=""):
+
+    if directory_path != "":
+        global _DIRECTORY_PATH
+        _DIRECTORY_PATH = directory_path
+
+
 def get_log_folder(log_name):
-    """ Returns log folder as string """
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-    return 'logs/log_' + log_name
+
+    return _get_log_folder(log_name)
 
 
 def trim_logs(logs):
     """ Trims a list of logs so that all logs have the same number of entries/generations """
+
     min_rowlength = 9999999
     for row in logs:
         rowlen = len(row)
@@ -65,7 +75,8 @@ def trim_logs(logs):
 
 def clear_logs(log_name):
     """ Clears previous log folders of same same """
-    log_folder = get_log_folder(log_name)
+
+    log_folder = _get_log_folder(log_name)
     try:
         shutil.rmtree(log_folder)
     except FileNotFoundError: # pragma: no cover
@@ -80,57 +91,64 @@ def clear_logs(log_name):
 
 def clear_after_generation(log_name, generation):
     """ Clears fitness and population logs after given generation """
-    with open_file(get_log_folder(log_name) + '/fitness_log.txt', 'r') as f:
+
+    with open_file(_get_log_folder(log_name) + '/fitness_log.txt', 'r') as f:
         lines = f.readlines()
-    with open_file(get_log_folder(log_name) + '/fitness_log.txt', 'w') as f:
+    with open_file(_get_log_folder(log_name) + '/fitness_log.txt', 'w') as f:
         for i in range(generation + 1):
             f.write(lines[i])
-    with open_file(get_log_folder(log_name) + '/population_log.txt', 'r') as f:
+    with open_file(_get_log_folder(log_name) + '/population_log.txt', 'r') as f:
         lines = f.readlines()
-    with open_file(get_log_folder(log_name) + '/population_log.txt', 'w') as f:
+    with open_file(_get_log_folder(log_name) + '/population_log.txt', 'w') as f:
         for i in range(generation + 1):
             f.write(lines[i])
 
 
 def log_best_individual(log_name, best_individual):
     """ Saves the best individual """
-    with open_file(get_log_folder(log_name) + '/best_individual.pickle', 'wb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/best_individual.pickle', 'wb') as f:
         pickle.dump(best_individual, f)
 
 
 def log_fitness(log_name, fitness):
     """ Logs fitness of all individuals """
-    with open_file(get_log_folder(log_name) + '/fitness_log.txt', 'a') as f:
+
+    with open_file(_get_log_folder(log_name) + '/fitness_log.txt', 'a') as f:
         f.write("%s\n" % fitness)
 
 
 def log_best_fitness(log_name, best_fitness):
     """ Logs best fitness of each generation """
-    with open_file(get_log_folder(log_name) + '/best_fitness_log.pickle', 'wb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/best_fitness_log.pickle', 'wb') as f:
         pickle.dump(best_fitness, f)
 
 
 def log_n_episodes(log_name, n_episodes):
     """ Logs number of episodes """
-    with open_file(get_log_folder(log_name) + '/n_episodes_log.pickle', 'wb') as f:
+    with open_file(_get_log_folder(log_name) + '/n_episodes_log.pickle', 'wb') as f:
         pickle.dump(n_episodes, f)
 
 
 def log_population(log_name, population):
     """ Logs full population of the generation"""
-    with open_file(get_log_folder(log_name) + '/population_log.txt', 'a') as f:
+
+    with open_file(_get_log_folder(log_name) + '/population_log.txt', 'a') as f:
         f.write("%s\n" % population)
 
 
 def log_last_population(log_name, population):
     """ Logs current population as pickle object """
-    with open_file(get_log_folder(log_name) + '/population.pickle', 'wb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/population.pickle', 'wb') as f:
         pickle.dump(population, f)
 
 
 def log_settings(log_name, settings, base_line):
     """ Logs settings used for the run """
-    with open_file(get_log_folder(log_name) + '/settings.txt', 'w') as f:
+
+    with open_file(_get_log_folder(log_name) + '/settings.txt', 'w') as f:
         for key, value in vars(settings).items():
             f.write(key + ' ' + str(value) + '\n')
         f.write('Baseline: ' + str(base_line) + '\n')
@@ -138,7 +156,8 @@ def log_settings(log_name, settings, base_line):
 
 def log_state(log_name, randomstate, np_randomstate, generation):
     """ Logs the current random state and generation number """
-    with open_file(get_log_folder(log_name) + '/states.pickle', 'wb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/states.pickle', 'wb') as f:
         pickle.dump(randomstate, f)
         pickle.dump(np_randomstate, f)
         pickle.dump(generation, f)
@@ -146,20 +165,23 @@ def log_state(log_name, randomstate, np_randomstate, generation):
 
 def get_best_fitness(log_name):
     """ Gets the best fitness list from the given log """
-    with open_file(get_log_folder(log_name) + '/best_fitness_log.pickle', 'rb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/best_fitness_log.pickle', 'rb') as f:
         best_fitness = pickle.load(f)
     return best_fitness
 
 
 def get_n_episodes(log_name):
     """ Gets the list of n_episodes from the given log """
-    with open_file(get_log_folder(log_name) + '/n_episodes_log.pickle', 'rb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/n_episodes_log.pickle', 'rb') as f:
         n_episodes = pickle.load(f)
     return n_episodes
 
 
 def get_state(log_name):
     """ Gets the random state and generation number """
+
     with open_file(get_log_folder(log_name) + '/states.pickle', 'rb') as f:
         randomstate = pickle.load(f)
         np_randomstate = pickle.load(f)
@@ -169,14 +191,16 @@ def get_state(log_name):
 
 def get_last_population(log_name):
     """ Gets the last population list from the given log """
-    with open_file(get_log_folder(log_name) + '/population.pickle', 'rb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/population.pickle', 'rb') as f:
         population = pickle.load(f)
     return population
 
 
 def get_best_individual(log_name):
     """ Return the best individual from the given log """
-    with open_file(get_log_folder(log_name) + '/best_individual.pickle', 'rb') as f:
+
+    with open_file(_get_log_folder(log_name) + '/best_individual.pickle', 'rb') as f:
         best_individual = pickle.load(f)
     return best_individual
 
@@ -185,6 +209,7 @@ def plot_fitness(log_name, fitness, n_episodes=None):
     """
     Plots fitness over iterations or individuals
     """
+
     if n_episodes is not None:
         plt.plot(n_episodes, fitness)
         plt.xlabel("Episodes")
@@ -192,7 +217,7 @@ def plot_fitness(log_name, fitness, n_episodes=None):
         plt.plot(fitness)
         plt.xlabel("Generation")
     plt.ylabel("Fitness")
-    plt.savefig(get_log_folder(log_name) + '/Fitness.png')
+    plt.savefig(_get_log_folder(log_name) + '/Fitness.png')
     plt.close()
 
 
@@ -265,8 +290,8 @@ def plot_learning_curves(logs, parameters):
         x = np.arange(startx, endx + 1)
 
     if parameters.plot_horizontal:
-        plt.plot([0, parameters.x_max], \
-                 [parameters.horizontal, parameters.horizontal], \
+        plt.plot([0, parameters.x_max],
+                 [parameters.horizontal, parameters.horizontal],
                  color='k', linestyle=parameters.horizontal_linestyle, linewidth=1, label=parameters.horizontal_label)
 
     y = np.zeros((len(x), n_logs))
@@ -289,9 +314,9 @@ def plot_learning_curves(logs, parameters):
         y_std = np.std(y, axis=1)
         plt.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=.1, color=parameters.std_color)
     if parameters.plot_minmax:
-        maxcurve = np.max(y, axis=1)
-        mincurve = np.min(y, axis=1)
-        plt.fill_between(x, mincurve, maxcurve, alpha=.1, color=parameters.std_color)
+        max_curve = np.max(y, axis=1)
+        min_curve = np.min(y, axis=1)
+        plt.fill_between(x, min_curve, max_curve, alpha=.1, color=parameters.std_color)
 
     plt.legend(loc=parameters.legend_position)
     plt.xlabel(parameters.xlabel)
@@ -307,3 +332,12 @@ def plot_learning_curves(logs, parameters):
 
         plt.savefig(parameters.path, format='pdf', dpi=300)
         plt.close()
+
+
+def _get_log_folder(log_name):
+
+    directory_path = _DIRECTORY_PATH
+    if not os.path.exists(directory_path):
+        os.mkdir(directory_path)
+
+    return os.path.join(directory_path, log_name)
