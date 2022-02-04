@@ -1,7 +1,6 @@
-# Learning Behavior Trees with Genetic Programming
+# Learning Behavior Trees using Genetic Programming
 
-This repository contains an implementation of a Genetic Programming (GP) algorithm 
-that evolves Behavior Trees (BTs) to solve different tasks.
+This repository contains an implementation of a Genetic Programming (GP) algorithm that evolves Behavior Trees (BTs) to solve different tasks.
 
 This repository is based on:
 * https://github.com/jstyrud/planning-and-learning
