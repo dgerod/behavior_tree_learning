@@ -51,13 +51,13 @@ class GeneticProgramming:
             best_fitness, num_episodes, last_generation, population = self._load_state(parameters.log_name, hash_table)
 
         else:
-            steps.execute_generation(0)
+            last_generation = 0
+            steps.execute_generation(last_generation)
 
             population = self._create_random_population(parameters.n_population, parameters.ind_start_length)
             logplot.clear_logs(parameters.log_name)
             best_fitness = []
             num_episodes = [hash_table.num_values()]
-            last_generation = 0
 
             if base_line is not None:
                 population[0] = base_line
@@ -80,6 +80,9 @@ class GeneticProgramming:
         self._print_message("=== Generation: %d ===" % last_generation)
         self._print_population("Population", population, fitness)
         self._print_best_individual(population, fitness)
+
+        error = np.argmax(fitness)
+        steps.more_generations(last_generation, parameters.n_generations-1, error)
 
         # Next generations
         # --------------------------------------------------
@@ -162,8 +165,8 @@ class GeneticProgramming:
                 self._save_state(parameters, population, None, best_fitness, num_episodes, base_line, generation,
                                  hash_table)
 
-            error = 0.0
-            steps.more_generations(generation, last_generation, error)
+            error = np.argmax(fitness)
+            steps.more_generations(generation, parameters.n_generations-1, error)
 
         # Prepare results
         # --------------------------------------------------
