@@ -62,7 +62,7 @@ cd %PACKAGE_DIRECTORY%/examples/duplo
 python ./run_execute_bt.py
 ```
 
-And learn a behavior tree using genetic programming: 
+Learn a behavior tree using genetic programming: 
 ```bash
 cd %PACKAGE_DIRECTORY%/examples/duplo
 python ./run_learn_bt.py
