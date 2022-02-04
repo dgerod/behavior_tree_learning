@@ -105,10 +105,8 @@ def run():
             trials.append(trial_name)
             print("Trial: %s" % trial_name)
 
-            outputs_dir = paths.get_outputs_directory()
             log_name = trial_name
-
-            _configure_logger(logging.DEBUG, outputs_dir, log_name)
+            _configure_logger(logging.DEBUG, paths.get_log_directory(), log_name)
 
             parameters.log_name = log_name
             seed = tdx
@@ -119,12 +117,12 @@ def run():
 
             bt_learner = BehaviorTreeLearner.from_environment(environment)
             success = bt_learner.run(parameters, seed,
-                                     outputs_dir_path=outputs_dir,
+                                     outputs_dir_path=paths.get_outputs_directory(),
                                      verbose=False)
 
             print("Trial: %d, Succeed: %s" % (tdx, success))
 
-        _plot_summary(outputs_dir, scenario_name, trials)
+        _plot_summary(paths.get_outputs_directory(), scenario_name, trials)
 
 
 if __name__ == "__main__":

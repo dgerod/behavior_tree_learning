@@ -19,3 +19,7 @@ def get_example_directory():
 
 def get_outputs_directory():
     return os.path.join(_CURRENT_EXAMPLE_DIRECTORY, 'results')
+
+
+def get_log_directory():
+    return os.path.join(_CURRENT_EXAMPLE_DIRECTORY, 'logs')
