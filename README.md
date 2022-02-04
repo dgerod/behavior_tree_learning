@@ -36,10 +36,10 @@ Other references:
 * __Integrating Reinforcement Learning into Behavior Trees by Hierarchical Composition__.
   Kartašev, Mart. 
   In Degree Project Computer Sciene and Engineering, KTH, Stockholm (Sweden) 
-  2019.[PDF](https://www.diva-portal.org/smash/get/diva2:1368535/FULLTEXT01.pdf)
+  2019. [PDF](https://www.diva-portal.org/smash/get/diva2:1368535/FULLTEXT01.pdf)
 * __Learning Behavior Trees From Demonstration__.
   French, Kevin & Wu, Shiyu & Pan, Tianyang & Zhou, Zheming & Jenkins, Odest Chadwicke. 
-  ICRA-2019, May 2019. [Reference](https://ieeexplore.ieee.org/document/8794104)
+  ICRA-2019, May 2019. [IEEE](https://ieeexplore.ieee.org/document/8794104)
 
 ### Installation
 
