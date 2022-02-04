@@ -17,5 +17,5 @@ def get_example_directory():
     return _CURRENT_EXAMPLE_DIRECTORY
 
 
-def get_log_directory():
-    return os.path.join(_CURRENT_EXAMPLE_DIRECTORY, 'logs')
+def get_outputs_directory():
+    return os.path.join(_CURRENT_EXAMPLE_DIRECTORY, 'results')

@@ -15,18 +15,23 @@ from duplo.world import ApplicationWorldFactory
 from duplo.environment import ApplicationEnvironment
 
 
-def _configure_logger(level, log_name):
+def _configure_logger(level, directory_path, name):
 
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
 
-    file_path = os.path.join('logs', log_name + '.log')
+    try:
+        file_path = os.path.join(directory_path, name + '.log')
+        os.mkdir(directory_path)
+    except:
+        pass
+
     logging.basicConfig(filename=file_path,
                         format='%(filename)s: %(message)s')
     logging.getLogger("gp").setLevel(level)
 
 
-def _plot_summary(scenario_name, trials):
+def _plot_summary(outputs_dir_path, scenario_name, trials):
 
     from behavior_tree_learning.core.logger import logplot
 
@@ -39,7 +44,7 @@ def _plot_summary(scenario_name, trials):
     parameters.horizontal = -3.0
     parameters.save_fig = True
     parameters.save_fig = True
-    parameters.path = os.path.join('logs', scenario_name + '.pdf')
+    parameters.path = os.path.join(outputs_dir_path, scenario_name + '.pdf')
 
     logplot.plot_learning_curves(trials, parameters)
 
@@ -100,8 +105,10 @@ def run():
             trials.append(trial_name)
             print("Trial: %s" % trial_name)
 
+            outputs_dir = paths.get_outputs_directory()
             log_name = trial_name
-            _configure_logger(logging.DEBUG, log_name)
+
+            _configure_logger(logging.DEBUG, outputs_dir, log_name)
 
             parameters.log_name = log_name
             seed = tdx
@@ -111,11 +118,13 @@ def run():
             environment = ApplicationEnvironment(node_factory, world_factory, target_position, verbose=False)
 
             bt_learner = BehaviorTreeLearner.from_environment(environment)
-            success = bt_learner.run(parameters, seed, verbose=False)
+            success = bt_learner.run(parameters, seed,
+                                     outputs_dir_path=outputs_dir,
+                                     verbose=False)
 
             print("Trial: %d, Succeed: %s" % (tdx, success))
 
-        _plot_summary(scenario_name, trials)
+        _plot_summary(outputs_dir, scenario_name, trials)
 
 
 if __name__ == "__main__":
