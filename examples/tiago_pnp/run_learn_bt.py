@@ -14,12 +14,17 @@ from tiago_pnp.world import ApplicationWorld, ApplicationWorldFactory
 from tiago_pnp.environment import ApplicationEnvironment
 
 
-def _configure_logger(level, log_name):
+def _configure_logger(level, directory_path, name):
 
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
 
-    file_path = os.path.join('logs', log_name + '.log')
+    try:
+        file_path = os.path.join(directory_path, name + '.log')
+        os.mkdir(directory_path)
+    except:
+        pass
+
     logging.basicConfig(filename=file_path,
                         format='%(filename)s: %(message)s')
     logging.getLogger("gp").setLevel(level)
@@ -55,7 +60,7 @@ def run():
     for tdx in range(1, num_trials+1):
 
         log_name = scenario + '_' + str(tdx)
-        _configure_logger(logging.DEBUG, log_name)
+        _configure_logger(logging.DEBUG, paths.get_log_directory(), log_name)
 
         parameters.log_name = log_name
         seed = tdx*100
