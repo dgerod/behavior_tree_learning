@@ -10,7 +10,7 @@ This repository is based on:
 References:
 * __Towards Blended Reactive Planning and Acting using Behavior Trees__.
   Colledanchise, Michele & Almeida, Diogo & Ogren, Petter.
-  ICRA 2019, May 2021. DOI:10.1109/ICRA.2019.8794128. [PDF](https://arxiv.org/pdf/1611.00230.pdf)
+  ICRA-2019, May 2019. DOI:10.1109/ICRA.2019.8794128. [PDF](https://arxiv.org/pdf/1611.00230.pdf)
 * __A Survey of Behavior Trees in Robotics and AI__. 
   Iovino, Matteo & Scukins, Edvards & Styrud, Jonathan & Ogren, Petter & Smith, Christian. 
   May 2020. [PDF](https://arxiv.org/pdf/2005.05842.pdf)
@@ -28,15 +28,18 @@ References:
 * __Combining Planning and Learning of Behavior Trees for Robotic Assembly__.
   Styrud, Jonathan & Iovino, Matteo & Norrlöf, Mikael & Björkman, Mårten & Smith, Christian. 
   March 2021. [PDF](https://arxiv.org/pdf/2103.09036v1.pdf) 
+
+Other references:
 * __Combining Context Awareness and Planning to Learn Behavior Trees from Demonstration__. 
   Gustavsson, Oscar & Iovino, Matteo & Styrud, Jonathan & Smith, Christian. 
   September 2021. [PDF](https://arxiv.org/pdf/2109.07133.pdf)
-
-Other references:
-* __Integrating Reinforcement Learning into Behavior Trees by Hierarchical Compositio__.
+* __Integrating Reinforcement Learning into Behavior Trees by Hierarchical Composition__.
   Kartašev, Mart. 
   In Degree Project Computer Sciene and Engineering, KTH, Stockholm (Sweden) 
-  2019.[PDF](https://www.diva-portal.org/smash/get/diva2:1368535/FULLTEXT01.pdf)
+  2019. [PDF](https://www.diva-portal.org/smash/get/diva2:1368535/FULLTEXT01.pdf)
+* __Learning Behavior Trees From Demonstration__.
+  French, Kevin & Wu, Shiyu & Pan, Tianyang & Zhou, Zheming & Jenkins, Odest Chadwicke. 
+  ICRA-2019, May 2019. [IEEE](https://ieeexplore.ieee.org/document/8794104)
 
 ### Installation
 
@@ -59,7 +62,7 @@ cd %PACKAGE_DIRECTORY%/examples/duplo
 python ./run_execute_bt.py
 ```
 
-And learn a behavior tree using genetic programming: 
+Learn a behavior tree using genetic programming: 
 ```bash
 cd %PACKAGE_DIRECTORY%/examples/duplo
 python ./run_learn_bt.py
