@@ -52,6 +52,7 @@ class GeneticProgramming:
 
         else:
             last_generation = 0
+            steps.more_generations(last_generation, parameters.n_generations - 1, 0.0)
             steps.execute_generation(last_generation)
 
             population = self._create_random_population(parameters.n_population, parameters.ind_start_length)
@@ -82,7 +83,7 @@ class GeneticProgramming:
         self._print_best_individual(population, fitness)
 
         error = np.argmax(fitness)
-        steps.more_generations(last_generation, parameters.n_generations-1, error)
+        steps.more_generations(last_generation + 1, parameters.n_generations - 1, error)
 
         # Next generations
         # --------------------------------------------------
@@ -166,7 +167,7 @@ class GeneticProgramming:
                                  hash_table)
 
             error = np.argmax(fitness)
-            steps.more_generations(generation, parameters.n_generations-1, error)
+            steps.more_generations(generation, parameters.n_generations - 1, error)
 
         # Prepare results
         # --------------------------------------------------
