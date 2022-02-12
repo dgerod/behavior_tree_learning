@@ -13,7 +13,7 @@ References:
 * __A Survey of Behavior Trees in Robotics and AI__. 
   Iovino, Matteo & Scukins, Edvards & Styrud, Jonathan & Ogren, Petter & Smith, Christian. 
   May 2020. [PDF](https://arxiv.org/pdf/2005.05842.pdf)
-* __Behavior Trees inRobotics and AI__.
+* __Behavior Trees in Robotics and AI: An Introduction__.
   Colledanchise, Michele & Ogren, Petter. 
   June 2020. [PDF](https://arxiv.org/pdf/1709.00084.pdf)
 * __Genetic Programming__. 
