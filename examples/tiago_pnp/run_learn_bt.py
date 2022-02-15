@@ -36,9 +36,10 @@ def run():
     scenario = 'scenario_1'
     parameters = GeneticParameters()
 
-    parameters.n_population = 30
-    parameters.fitness_error = 0.
+    parameters.n_generations = 8000
+    parameters.fitness_error = 16.
 
+    parameters.n_population = 30
     parameters.ind_start_length = 4
     parameters.f_crossover = 0.4
     parameters.f_mutation = 0.6
@@ -52,7 +53,6 @@ def run():
     parameters.mutation_p_delete = 0.2
     parameters.rerun_fitness = 0
     parameters.allow_identical = False
-    parameters.n_generations = 8000
 
     tracer = TraceConfiguration()
     tracer.plot_fitness = True
