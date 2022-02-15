@@ -8,6 +8,7 @@ import logging
 
 from behavior_tree_learning.sbt import BehaviorNodeFactory
 from behavior_tree_learning.learning import BehaviorTreeLearner, GeneticParameters, GeneticSelectionMethods
+from behavior_tree_learning.learning import TraceConfiguration
 
 from duplo.execution_nodes import get_behaviors
 from duplo.world import Pos as WorldPos
@@ -71,8 +72,11 @@ def _prepare_scenarios():
 def run():
 
     parameters = GeneticParameters()
-    parameters.n_population = 16
+
     parameters.n_generations = 200
+    parameters.fitness_error = 0.
+
+    parameters.n_population = 16
     parameters.ind_start_length = 8
     parameters.f_crossover = 0.5
     parameters.n_offspring_crossover = 2
@@ -89,10 +93,10 @@ def run():
     parameters.mutation_p_delete = 0.3
     parameters.allow_identical = False
 
-    # add specific class for plot_parameters
-    parameters.plot_fitness = True
-    parameters.plot_best_individual = True
-    parameters.plot_last_generation = True
+    tracer = TraceConfiguration()
+    tracer.plot_fitness = True
+    tracer.plot_best_individual = True
+    tracer.plot_last_generation = True
 
     scenarios = _prepare_scenarios()
     for scenario_name, start_position, target_position in scenarios:
@@ -118,6 +122,7 @@ def run():
             bt_learner = BehaviorTreeLearner.from_environment(environment)
             success = bt_learner.run(parameters, seed,
                                      outputs_dir_path=paths.get_outputs_directory(),
+                                     trace_conf=tracer,
                                      verbose=False)
 
             print("Trial: %d, Succeed: %s" % (tdx, success))
