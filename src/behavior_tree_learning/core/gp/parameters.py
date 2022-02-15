@@ -4,7 +4,6 @@ from behavior_tree_learning.core.gp.selection import SelectionMethods
 
 @dataclass
 class GeneticParameters:
-    """ Data class for parameters for the GP algorithm """
 
     ind_start_length: int = 5                              # Start length of initial genomes
     min_length: int = 2                                    # Minimum length of individual
@@ -26,10 +25,16 @@ class GeneticParameters:
     keep_baseline: bool = True                             # Baseline, if any, is always kept in population for breeding
     boost_baseline: bool = False                           # Baseline is boosted to have higher probability of breeding
     boost_baseline_only_co: bool = True                    # Baseline is boosted for crossover selection, not mutation
-    n_generations: int = 100                               # Number of generations
+    n_generations: int = 100                               # Maximum number of generations
+    fitness_error: float = 0.0                             # Finish when best fitness is under this threshold
     hash_table_size: int = 100000                          # Size of hash table
     rerun_fitness: int = 0                                 # 0-run only once, 1-according to prob, 2-always
     log_name: str = '1'                                    # Name of log for folder and file handling
-    plot_fitness: bool = True                              # Plot fitness
-    plot_best_individual: bool = True                      # Save final best individual as figure
+
+
+@dataclass
+class TraceConfiguration:
+
+    plot_fitness: bool = False                             # Save a plot with all fitness as figure
+    plot_best_individual: bool = False                     # Save final best individual as figure
     plot_last_generation: bool = False                     # Save figures of entire last generation

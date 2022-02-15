@@ -39,6 +39,7 @@ def _tournament_selection(population, fitness, n_winners, verbose):
     winner_fitness, winners = [list(x) for x in zip(*tournament_population)]
     while len(winners) > n_winners:
         for i in range(0, int(len(winners) / 2)):
+
             if winner_fitness[i] < winner_fitness[i+1]:
                 winner_fitness.pop(i)
                 winners.pop(i)

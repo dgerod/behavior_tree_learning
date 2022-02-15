@@ -32,7 +32,7 @@ class AlgorithmSteps(Interface):
         pass
 
     @interface.default
-    def more_generations(self, generation, last_generation, error):
+    def more_generations(self, generation, last_generation, fitness_achieved):
         pass
 
     @interface.default
