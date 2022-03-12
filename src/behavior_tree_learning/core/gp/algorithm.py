@@ -1,5 +1,4 @@
 import logging
-import os
 import random
 from statistics import mean
 import numpy as np
@@ -79,7 +78,7 @@ class GeneticProgramming:
         self._print_population("Population", population, fitness)
         self._print_best_individual(population, fitness)
 
-        fitness_achieved = abs(np.max(best_fitness)) < parameters.fitness_error
+        fitness_achieved = np.max(best_fitness) >= parameters.fitness_threshold
         steps.more_generations(last_generation + 1, parameters.n_generations - 1, fitness_achieved)
 
         # Next generations
@@ -165,7 +164,7 @@ class GeneticProgramming:
 
             generation += 1
 
-            fitness_achieved = abs(np.max(best_fitness)) < parameters.fitness_error
+            fitness_achieved = np.max(best_fitness) >= parameters.fitness_threshold
             steps.more_generations(generation, parameters.n_generations - 1, fitness_achieved)
 
         # Prepare results
@@ -215,6 +214,7 @@ class GeneticProgramming:
         max_attempts = 100
 
         for parent in parents:
+
             for _ in range(parameters.n_offspring_mutation):
 
                 attempts = 0
@@ -287,7 +287,8 @@ class GeneticProgramming:
 
         if num_runs <= 0:
             return 1
-        return 1 / num_runs ** 2
+        else:
+            return 1 / num_runs ** 2
 
     def _calculate_fitness(self, individual, hash_table, steps, rerun=0):
         """
@@ -351,6 +352,13 @@ class GeneticProgramming:
                          self._verbose)
 
     def _survivor_selection(self, population, fitness, crossover_offspring, mutated_offspring, parameters):
+        """
+        Replacement process for next population:
+            1) Best parents (elitism) are selected using 'f_parents' parameter.
+            2) Create a selectable population with best parents, crossover and mutated offsprings.
+            3) Best ones (elitism) from selectable population using 'f_elitism' parameter.
+            4) Fill rest of next population using 'survivor_selection' method from selectable population.
+        """
 
         selectable = []
         selectable_fitness = []

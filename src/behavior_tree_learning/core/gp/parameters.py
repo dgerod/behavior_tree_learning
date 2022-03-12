@@ -26,7 +26,7 @@ class GeneticParameters:
     boost_baseline: bool = False                           # Baseline is boosted to have higher probability of breeding
     boost_baseline_only_co: bool = True                    # Baseline is boosted for crossover selection, not mutation
     n_generations: int = 100                               # Maximum number of generations
-    fitness_error: float = 0.0                             # Finish when best fitness is under this threshold
+    fitness_threshold: float = 0.0                         # Finish when best fitness is over this threshold
     hash_table_size: int = 100000                          # Size of hash table
     rerun_fitness: int = 0                                 # 0-run only once, 1-according to prob, 2-always
     log_name: str = '1'                                    # Name of log for folder and file handling

@@ -37,7 +37,7 @@ def run():
     parameters = GeneticParameters()
 
     parameters.n_generations = 8000
-    parameters.fitness_error = 16.
+    parameters.fitness_threshold = -16.
 
     parameters.n_population = 30
     parameters.ind_start_length = 4

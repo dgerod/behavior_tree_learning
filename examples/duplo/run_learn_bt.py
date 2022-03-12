@@ -74,7 +74,7 @@ def run():
     parameters = GeneticParameters()
 
     parameters.n_generations = 200
-    parameters.fitness_error = 0.
+    parameters.fitness_threshold = 0.
 
     parameters.n_population = 16
     parameters.ind_start_length = 8
